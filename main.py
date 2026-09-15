@@ -3,20 +3,35 @@ import tkinter as tk
 from tkinter import ttk
 
 from api.PrizefighterAPI import PrizefighterAPI
-from ui.edit_weight_classes import EditWeightClassesTab
+from ui.settings import SettingsTab
+from ui.add_fighter import AddFighterTab
+from ui.edit_fighter import EditFighterTab
+
 
 def main():
     root = tk.Tk()
     root.title("Prizefighters Promoter ML - Data Tracker")
-    root.geometry("700x500")
+    root.geometry("1000x650")
 
     api = PrizefighterAPI()
 
     notebook = ttk.Notebook(root)
     notebook.pack(fill="both", expand=True)
 
-    weight_classes_tab = EditWeightClassesTab(notebook, api)
-    notebook.add(weight_classes_tab, text="Settings")
+    add_fighter_tab = AddFighterTab(notebook, api)
+    edit_fighter_tab = EditFighterTab(notebook, api)
+    settings_tab = SettingsTab(notebook, api)
+
+    notebook.add(add_fighter_tab, text="Add Fighter")
+    notebook.add(edit_fighter_tab, text="Edit Fighter")
+    notebook.add(settings_tab, text="Settings")
+
+    def on_tab_changed(event):
+        current = notebook.nametowidget(notebook.select())
+        if hasattr(current, "on_tab_shown"):
+            current.on_tab_shown()
+
+    notebook.bind("<<NotebookTabChanged>>", on_tab_changed)
 
     root.mainloop()
 
