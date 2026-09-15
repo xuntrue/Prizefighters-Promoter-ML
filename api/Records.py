@@ -2,7 +2,6 @@ import csv
 import os
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
-
 RECORDS_FILE = os.path.join(DATA_DIR, "records.csv")
 
 FIELDNAMES = ["FighterID", "Wins", "Knockouts", "Losses", "Draws"]
@@ -10,6 +9,7 @@ FIELDNAMES = ["FighterID", "Wins", "Knockouts", "Losses", "Draws"]
 class RecordError(Exception):
     """Raised when a record fails validation."""
     pass
+
 
 class Records:
     def __init__(self, filepath: str = RECORDS_FILE):
@@ -22,16 +22,27 @@ class Records:
             with open(self.filepath, "w", newline="", encoding="utf-8") as f:
                 writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
                 writer.writeheader()
-    
+
     # --- CREATE ---
-    def create_default(self, fighter_id: int) -> None:
-        """Create a zeroed-out record row for a newly added fighter """
+    def create(self, fighter_id: int, wins: int = 0, knockouts: int = 0, losses: int = 0, draws: int = 0) -> None:
+        """ Create a record row for a newly added fighter  """
+        if min(wins, knockouts, losses, draws) < 0:
+            raise RecordError("Record values cannot be negative.")
+        if knockouts > wins:
+            raise RecordError("Knockouts cannot exceed total wins.")
+
         existing = self.get_all()
         if any(row["fighter_id"] == fighter_id for row in existing):
             raise RecordError(f"A record for FighterID {fighter_id} already exists.")
 
-        existing.append({"fighter_id": fighter_id, "wins": 0, "knockouts": 0, "losses": 0, "draws": 0})
+        existing.append(
+            {"fighter_id": fighter_id, "wins": wins, "knockouts": knockouts, "losses": losses, "draws": draws}
+        )
         self._save_all(existing)
+
+    def create_default(self, fighter_id: int) -> None:
+        """ Convenience wrapper: create a zeroed-out record (debut fighter) """
+        self.create(fighter_id)
 
     # --- READ ---
     def get_all(self) -> list:
@@ -71,7 +82,6 @@ class Records:
                     }
                 )
 
-  
     # --- UPDATE ---
     def update(self, fighter_id: int, wins: int, knockouts: int, losses: int, draws: int) -> None:
         if min(wins, knockouts, losses, draws) < 0:

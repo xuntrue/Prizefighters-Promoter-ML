@@ -1,6 +1,5 @@
 import csv
 import os
-
 from datetime import datetime
 
 from api.Country import Country
@@ -10,12 +9,11 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 FIGHTERS_FILE = os.path.join(DATA_DIR, "fighters.csv")
 
 FIELDNAMES = [
-    "FighterID",
-    "FirstName", "LastName", "Nickname", "Placement",
+    "FighterID", "FirstName", "LastName", "Nickname", "Placement",
     "Hometown", "Country",
     "Birthdate",
     "Weightclass", "Reach",
-    "Stance", "Style",
+    "Stance", "Style"
 ]
 
 PLACEMENTS = ["Prefix", "Middle", "Suffix", "None"]
@@ -32,8 +30,71 @@ MAX_REACH = 75
 BIRTHDATE_FORMAT = "%d-%m-%Y"
 
 class FighterError(Exception):
-    """Raised when a fighter record fails validation"""
+    """ Raised when a fighter record fails validation """
     pass
+
+
+def format_full_name(first_name: str, last_name: str, nickname: str = "", placement: str = "None") -> str:
+    """
+    Build a fighter's display name from their name fields, e.g.:
+        format_full_name("Andy", "Ruiz", "The Destroyer", "Middle")  -> "Andy 'The Destroyer' Ruiz"
+        format_full_name("Conor", "McGregor", "The Notorious", "Prefix") -> "'The Notorious' Conor McGregor"
+        format_full_name("Phillip", "Willems", "The Count", "Suffix") -> "Phillip Willems 'The Count'"
+        format_full_name("Logan", "Reed", "", "None") -> "Logan Reed"
+    """
+    first_name = (first_name or "").strip()
+    last_name = (last_name or "").strip()
+    nickname = (nickname or "").strip()
+    base = f"{first_name} {last_name}".strip()
+
+    if not nickname or placement == "None" or placement not in PLACEMENTS:
+        return base
+
+    quoted = f"'{nickname}'"
+    if placement == "Prefix":
+        return f"{quoted} {base}".strip()
+    if placement == "Suffix":
+        return f"{base} {quoted}".strip()
+    return f"{first_name} {quoted} {last_name}".strip()  # Middle
+
+
+def _ordinal(n: int) -> str:
+    if 11 <= (n % 100) <= 13:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
+
+
+def format_birthdate_readable(birthdate: str):
+    """ Convert 'dd-mm-yyyy' into e.g. 'August 23rd 1993' """
+    try:
+        parsed = datetime.strptime(birthdate, BIRTHDATE_FORMAT)
+    except (ValueError, TypeError):
+        return None
+    return f"{parsed.strftime('%B')} {_ordinal(parsed.day)} {parsed.year}"
+
+
+def compute_age(birthdate: str, as_of):
+    try:
+        born = datetime.strptime(birthdate, BIRTHDATE_FORMAT).date()
+    except (ValueError, TypeError):
+        return None
+
+    if as_of < born:
+        return None
+
+    years = as_of.year - born.year
+    months = as_of.month - born.month
+    days = as_of.day - born.day
+
+    if days < 0:
+        months -= 1
+    if months < 0:
+        years -= 1
+        months += 12
+
+    return years, months
 
 
 class Fighter:
@@ -105,37 +166,6 @@ class Fighter:
                 continue
             results.append(row)
         return results
-
-    # --- UPDATE ---
-    def update(self, fighter_id, first_name, last_name, nickname, placement, hometown,
-               country, birthdate, weightclass, reach, stance, style) -> None:
-        first_name, last_name, nickname, hometown, country = self._validate(
-            first_name, last_name, nickname, placement, hometown,
-            country, birthdate, weightclass, reach, stance, style,
-        )
-
-        existing = self.get_all()
-        if not any(row["fighter_id"] == fighter_id for row in existing):
-            raise FighterError(f"No fighter found with FighterID {fighter_id}.")
-
-        others = [row for row in existing if row["fighter_id"] != fighter_id]
-        others.append(
-            {
-                "fighter_id": fighter_id,
-                "first_name": first_name,
-                "last_name": last_name,
-                "nickname": nickname,
-                "placement": placement,
-                "hometown": hometown,
-                "country": country,
-                "birthdate": birthdate,
-                "weightclass": weightclass,
-                "reach": reach,
-                "stance": stance,
-                "style": style,
-            }
-        )
-        self._save_all(others)
 
     def _save_all(self, rows: list):
         with open(self.filepath, "w", newline="", encoding="utf-8") as f:
@@ -227,7 +257,39 @@ class Fighter:
         if style not in (1, 2, 3, 4):
             raise FighterError("Style must be one of: In Fighter, Out Boxer, Brawler, Boxer Puncher.")
 
-        return first_name, last_name, nickname, hometown, country  
+        return first_name, last_name, nickname, hometown, country
+
+    # --- UPDATE ---
+    def update(self, fighter_id, first_name, last_name, nickname, placement, hometown,
+               country, birthdate, weightclass, reach, stance, style) -> None:
+
+        first_name, last_name, nickname, hometown, country = self._validate(
+            first_name, last_name, nickname, placement, hometown,
+            country, birthdate, weightclass, reach, stance, style,
+        )
+
+        existing = self.get_all()
+        if not any(row["fighter_id"] == fighter_id for row in existing):
+            raise FighterError(f"No fighter found with FighterID {fighter_id}.")
+
+        others = [row for row in existing if row["fighter_id"] != fighter_id]
+        others.append(
+            {
+                "fighter_id": fighter_id,
+                "first_name": first_name,
+                "last_name": last_name,
+                "nickname": nickname,
+                "placement": placement,
+                "hometown": hometown,
+                "country": country,
+                "birthdate": birthdate,
+                "weightclass": weightclass,
+                "reach": reach,
+                "stance": stance,
+                "style": style,
+            }
+        )
+        self._save_all(others)
 
     # --- DELETE ---
     def delete(self, fighter_id: int) -> None:

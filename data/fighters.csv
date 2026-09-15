@@ -1,1 +1,11 @@
 FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weightclass,Reach,Stance,Style
+1,Ricardo,López,,None,Guantanamo,CU,23-04-1961,300,66,1,1
+2,Edgar,Guzman,,None,Leon,MX,12-07-1969,300,66,0,3
+3,David,Stankevic,,None,Marijampole,LT,04-01-1961,300,71,0,3
+4,Takashi,Sato,,None,Sapporo,JP,19-05-1970,300,64,0,1
+5,Eduardo,Moreira,,None,Uruguay,UY,23-08-1969,300,74,0,2
+6,Ricardo,Perez,,None,Camaguey,CU,27-02-1963,300,71,0,2
+7,Kron,Luan,,None,Elbasan,AL,09-07-1961,300,70,0,3
+8,Juan,Diaz,,None,Ponce,PR,16-05-1972,300,64,0,1
+9,David,Ramirez,,None,Santa Tecla,SV,26-03-1962,300,70,1,2
+10,Cian,Sullivan,The Irish Giant,Middle,Cork,IE,14-02-1965,300,70,0,3

@@ -1,18 +1,5 @@
-"""
-fighter_form.py
-
-Shared form widget for entering/editing a fighter's biographical data.
-Both add_fighter.py and edit_fighter.py need the exact same set of
-fields (name, nickname, country, weightclass, physical attributes...),
-so the fields live here once instead of being duplicated in both files.
-
-This widget only builds inputs and reads/writes plain Python values --
-it does no validation and never touches the API or CSV files itself.
-Validation and persistence stay in api/Fighter.py, called by whichever
-screen (add or edit) embeds this form.
-"""
-
 import tkinter as tk
+
 from tkinter import ttk
 
 from api.PrizefighterAPI import PrizefighterAPI
@@ -128,13 +115,26 @@ class FighterFormFrame(ttk.Frame):
             self, textvariable=self.style_var, values=list(STYLE_TO_INT.keys()), state="readonly", width=22
         ).grid(row=row, column=1, sticky="w", padx=5, pady=4)
 
+    # ---------- Live-update hook ----------
+
+    def bind_change(self, callback):
+        """Call `callback()` (no arguments) whenever any field in this form
+        changes. Used by add_fighter.py to keep its preview pane in sync."""
+        watched_vars = (
+            self.first_name_var, self.last_name_var, self.nickname_var,
+            self.placement_var, self.hometown_var, self.country_var,
+            self.birthdate_var, self.weight_class_var, self.reach_var,
+            self.stance_var, self.style_var,
+        )
+        for var in watched_vars:
+            var.trace_add("write", lambda *_args: callback())
+
     # ---------- Reference data (countries / weight classes) ----------
 
     def refresh_reference_data(self):
-        """Reload country and weight-class options from the API. Call this
-        whenever the tab becomes visible, in case settings.py changed them."""
-        self._country_options = [(c["a2"], c["country_name"]) for c in self.api.get_countries()]
-        self.country_combo["values"] = [f"{a2} - {name}" for a2, name in self._country_options]
+        """Reload country and weight-class options from API """
+        self._country_options = [(c["country_name"], c["a2"]) for c in self.api.get_countries()]
+        self.country_combo["values"] = [f"[{a2}] {name}" for name, a2 in self._country_options]
 
         self._weight_class_options = [
             (wc["weight_limit"], wc["weight_class"]) for wc in self.api.get_weight_classes()
@@ -148,7 +148,7 @@ class FighterFormFrame(ttk.Frame):
     def get_raw_values(self) -> dict:
         """Return the form's values as the raw strings/ints Fighter.add()/update()
         expect. Does NOT validate -- that's api.Fighter's job."""
-        country_a2 = self.country_var.get().split(" - ")[0].strip() if self.country_var.get() else ""
+        country_a2 = self.country_var.get()[1:3] if self.country_var.get() else ""
 
         weight_class_text = self.weight_class_var.get()
         weightclass = None

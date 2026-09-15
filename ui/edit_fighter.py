@@ -1,10 +1,10 @@
 import tkinter as tk
+
 from tkinter import ttk, messagebox
 
 from api.PrizefighterAPI import PrizefighterAPI
 from api.Fighter import FighterError
 from ui.fighter_form import FighterFormFrame
-
 
 class EditFighterTab(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
@@ -16,6 +16,7 @@ class EditFighterTab(ttk.Frame):
         self._build_results_table()
         self._build_form()
 
+    # ---------- Construction ----------
     def _build_search(self):
         search_frame = ttk.LabelFrame(self, text="Search Fighters")
         search_frame.pack(fill="x", padx=10, pady=10)
@@ -40,16 +41,20 @@ class EditFighterTab(ttk.Frame):
         table_frame = ttk.LabelFrame(self, text="Results")
         table_frame.pack(fill="both", expand=False, padx=10, pady=(0, 10))
 
-        columns = ("fighter_id", "first_name", "last_name", "nickname")
+        columns = ("fighter_id", "first_name", "last_name", "nickname", "country")
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=6)
         self.tree.heading("fighter_id", text="ID")
         self.tree.heading("first_name", text="First Name")
         self.tree.heading("last_name", text="Last Name")
         self.tree.heading("nickname", text="Nickname")
+        self.tree.heading("country", text="Nationality")
+
         self.tree.column("fighter_id", width=50, anchor="center")
         self.tree.column("first_name", width=120, anchor="w")
         self.tree.column("last_name", width=120, anchor="w")
         self.tree.column("nickname", width=120, anchor="w")
+        self.tree.column("country", width=120, anchor="w")
+
         self.tree.pack(side="left", fill="both", expand=True, padx=(5, 0), pady=5)
 
         scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
@@ -89,7 +94,9 @@ class EditFighterTab(ttk.Frame):
             self.tree.insert(
                 "",
                 "end",
-                values=(fighter["fighter_id"], fighter["first_name"], fighter["last_name"], fighter["nickname"]),
+                values=(fighter["fighter_id"], fighter["first_name"], fighter["last_name"], fighter["nickname"], 
+                        self.api.countries.get_by_code(fighter["country"] if fighter["country"] else None)
+                )
             )
 
         if not results:
