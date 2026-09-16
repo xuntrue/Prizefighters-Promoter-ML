@@ -3,15 +3,16 @@ import tkinter as tk
 from tkinter import ttk
 
 from api.PrizefighterAPI import PrizefighterAPI
-from ui.settings import SettingsTab
+
 from ui.add_fighter import AddFighterTab
 from ui.edit_fighter import EditFighterTab
-
+from ui.rankings import RankingsTab
+from ui.settings import SettingsTab
 
 def main():
     root = tk.Tk()
     root.title("Prizefighters Promoter ML - Data Tracker")
-    root.geometry("1000x650")
+    root.geometry("1000x800")
 
     api = PrizefighterAPI()
 
@@ -20,10 +21,12 @@ def main():
 
     add_fighter_tab = AddFighterTab(notebook, api)
     edit_fighter_tab = EditFighterTab(notebook, api)
+    rankings_tab = RankingsTab(notebook, api)
     settings_tab = SettingsTab(notebook, api)
 
     notebook.add(add_fighter_tab, text="Add Fighter")
     notebook.add(edit_fighter_tab, text="Edit Fighter")
+    notebook.add(rankings_tab, text="Rankings")
     notebook.add(settings_tab, text="Settings")
 
     def on_tab_changed(event):

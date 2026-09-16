@@ -95,7 +95,7 @@ class EditFighterTab(ttk.Frame):
                 "",
                 "end",
                 values=(fighter["fighter_id"], fighter["first_name"], fighter["last_name"], fighter["nickname"], 
-                        self.api.countries.get_by_code(fighter["country"] if fighter["country"] else None)
+                        self.api.countries.get_by_code(fighter["country"])["country_name"]
                 )
             )
 

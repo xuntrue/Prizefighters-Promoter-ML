@@ -13,11 +13,7 @@ from api.Fighter import (
     MAX_REACH,
 )
 
-
 class FighterFormFrame(ttk.Frame):
-    """A reusable block of fighter fields. Call get_values()/set_values()/clear()
-    from the screen that embeds this frame."""
-
     def __init__(self, parent, api: PrizefighterAPI):
         super().__init__(parent)
         self.api = api
@@ -30,38 +26,34 @@ class FighterFormFrame(ttk.Frame):
         self.refresh_reference_data()
 
     # ---------- Construction ----------
-
     def _build_fields(self):
         row = 0
 
-        ttk.Label(self, text="First Name:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
+        # --- Row 0: First + Last name share one cell ---
+        ttk.Label(self, text="Name (First / Last):").grid( row=row, column=0, sticky="w", padx=5, pady=4)
+        name_row = ttk.Frame(self)
+        name_row.grid(row=row, column=1, sticky="w", padx=5, pady=4)
+
         self.first_name_var = tk.StringVar()
-        ttk.Entry(self, textvariable=self.first_name_var, width=25).grid(
-            row=row, column=1, sticky="w", padx=5, pady=4
-        )
-        row += 1
+        ttk.Entry(name_row, textvariable=self.first_name_var, width=14).pack(side="left")
 
-        ttk.Label(self, text="Last Name:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         self.last_name_var = tk.StringVar()
-        ttk.Entry(self, textvariable=self.last_name_var, width=25).grid(
-            row=row, column=1, sticky="w", padx=5, pady=4
-        )
+        ttk.Entry(name_row, textvariable=self.last_name_var, width=14).pack(side="left", padx=(6, 0))
         row += 1
 
-        ttk.Label(self, text="Nickname:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
+        # --- Row 1: Nickname + its placement share one cell ---
+        ttk.Label(self, text="Nickname / Placement:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
+        nickname_row = ttk.Frame(self)
+        nickname_row.grid(row=row, column=1, sticky="w", padx=5, pady=4)
+
         self.nickname_var = tk.StringVar()
-        ttk.Entry(self, textvariable=self.nickname_var, width=25).grid(
-            row=row, column=1, sticky="w", padx=5, pady=4
-        )
-        row += 1
+        ttk.Entry(nickname_row, textvariable=self.nickname_var, width=16).pack(side="left")
 
-        ttk.Label(self, text="Nickname Placement:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         self.placement_var = tk.StringVar(value="None")
-        ttk.Combobox(
-            self, textvariable=self.placement_var, values=PLACEMENTS, state="readonly", width=22
-        ).grid(row=row, column=1, sticky="w", padx=5, pady=4)
+        ttk.Combobox(nickname_row, textvariable=self.placement_var, values=PLACEMENTS, state="readonly", width=8).pack(side="left", padx=(6, 0))
         row += 1
 
+        # --- Row 2: Hometown ---
         ttk.Label(self, text="Hometown:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         self.hometown_var = tk.StringVar()
         ttk.Entry(self, textvariable=self.hometown_var, width=25).grid(
@@ -69,12 +61,14 @@ class FighterFormFrame(ttk.Frame):
         )
         row += 1
 
+        # --- Row 3: Country ---
         ttk.Label(self, text="Country:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         self.country_var = tk.StringVar()
         self.country_combo = ttk.Combobox(self, textvariable=self.country_var, state="readonly", width=30)
         self.country_combo.grid(row=row, column=1, sticky="w", padx=5, pady=4)
         row += 1
 
+        # --- Row 4: Birthdate ---
         ttk.Label(self, text="Birthdate (dd-mm-yyyy):").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         self.birthdate_var = tk.StringVar()
         ttk.Entry(self, textvariable=self.birthdate_var, width=15).grid(
@@ -82,6 +76,7 @@ class FighterFormFrame(ttk.Frame):
         )
         row += 1
 
+        # --- Row 5: Weight Class ---
         ttk.Label(self, text="Weight Class:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         self.weight_class_var = tk.StringVar()
         self.weight_class_combo = ttk.Combobox(
@@ -90,6 +85,7 @@ class FighterFormFrame(ttk.Frame):
         self.weight_class_combo.grid(row=row, column=1, sticky="w", padx=5, pady=4)
         row += 1
 
+        # --- Row 6: Reach ---
         ttk.Label(self, text=f"Reach (in, {MIN_REACH}-{MAX_REACH}):").grid(
             row=row, column=0, sticky="w", padx=5, pady=4
         )
@@ -99,6 +95,7 @@ class FighterFormFrame(ttk.Frame):
         ).grid(row=row, column=1, sticky="w", padx=5, pady=4)
         row += 1
 
+        # --- Row 7: Stance ---
         ttk.Label(self, text="Stance:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         stance_frame = ttk.Frame(self)
         stance_frame.grid(row=row, column=1, sticky="w", padx=5, pady=4)
@@ -109,6 +106,7 @@ class FighterFormFrame(ttk.Frame):
             ).pack(side="left", padx=(0, 10))
         row += 1
 
+        # --- Row 8: Style ---
         ttk.Label(self, text="Style:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         self.style_var = tk.StringVar(value="In Fighter")
         ttk.Combobox(
@@ -116,7 +114,6 @@ class FighterFormFrame(ttk.Frame):
         ).grid(row=row, column=1, sticky="w", padx=5, pady=4)
 
     # ---------- Live-update hook ----------
-
     def bind_change(self, callback):
         """Call `callback()` (no arguments) whenever any field in this form
         changes. Used by add_fighter.py to keep its preview pane in sync."""
