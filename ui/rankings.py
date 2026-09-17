@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 
 from api.PrizefighterAPI import PrizefighterAPI
 from api.Rankings import RankingError, TYPE_DIVISION, TYPE_P4P
+
 from ui.ranking_editor import RankingEditorFrame, MODE_RANKING
 from ui.record_fans import RecordFansSection
 
@@ -92,9 +93,15 @@ class DivisionRankingsSection(ttk.Frame):
         self.editor.set_eligible_fighters(fighters)
 
     def _on_division_changed(self):
+        ranking_type, weight_limit = self._current_division()
         self._refresh_eligible_fighters()
         self.editor.clear()
-        self.status_label.config(text="Division changed -- load a snapshot or start adding fighters.")
+        self._on_load_month()
+        
+        if ranking_type == "P4P":
+            self.status_label.config(text=f"Division changed to P4P")
+        else:
+            self.status_label.config(text=f"Division changed to {weight_limit}lbs")
 
     # ---------- Loading ----------
     def _on_carry_forward(self):

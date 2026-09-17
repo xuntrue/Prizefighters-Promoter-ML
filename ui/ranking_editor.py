@@ -1,4 +1,5 @@
 import tkinter as tk
+
 from tkinter import ttk, messagebox
 
 from api.PrizefighterAPI import PrizefighterAPI
@@ -21,14 +22,15 @@ class RankingEditorFrame(ttk.Frame):
         self._build_entry_controls()
 
     # ---------- Construction ----------
+
     def _build_table(self):
         frame = ttk.Frame(self)
         frame.pack(fill="both", expand=True, padx=5, pady=5)
 
         if self.mode == MODE_RANKING:
-            columns = ("rank", "fighter", "record", "title")
-            headings = ("#", "Fighter", "Record", "Title")
-            widths = (40, 220, 120, 60)
+            columns = ("rank", "fighter", "division", "record", "title")
+            headings = ("#", "Fighter", "Division", "Record", "Title")
+            widths = (40, 190, 150, 110, 60)
         else:
             columns = ("rank", "fighter", "record", "fans")
             headings = ("#", "Fighter", "Record", "Total Fans")
@@ -97,6 +99,7 @@ class RankingEditorFrame(ttk.Frame):
         ttk.Button(button_row, text="Update Selected", command=self._update_selected).pack(side="left", padx=5)
         ttk.Button(button_row, text="Fill Record From File", command=self._fill_record_from_file).pack(side="left", padx=5)
 
+
     # ---------- Eligible fighters ----------
     def set_eligible_fighters(self, fighters: list):
         """ Restrict the fighter dropdown to a given list of fighter dicts """
@@ -104,7 +107,7 @@ class RankingEditorFrame(ttk.Frame):
             (
                 (
                     f["fighter_id"],
-                    format_full_name(f["first_name"], f["last_name"], f["nickname"], f["placement"]),
+                    f'{f["first_name"]} {f["last_name"]}',
                 )
                 for f in fighters
             ),
@@ -126,8 +129,19 @@ class RankingEditorFrame(ttk.Frame):
                 return label
         fighter = self.api.get_fighter(fighter_id)
         if fighter is None:
-            return f"(unknown fighter)"
-        return (f'{format_full_name(fighter["first_name"], fighter["last_name"], fighter["nickname"], fighter["placement"])}')
+            return f"#{fighter_id} (unknown fighter)"
+        return (f'#{fighter_id} '
+                f'{format_full_name(fighter["first_name"], fighter["last_name"], fighter["nickname"], fighter["placement"])}')
+
+    def _division_label_for_fighter(self, fighter_id: int) -> str:
+        fighter = self.api.get_fighter(fighter_id)
+        if fighter is None:
+            return "?"
+        weight_limit = fighter["weightclass"]
+        for wc in self.api.get_weight_classes():
+            if wc["weight_limit"] == weight_limit:
+                return f'{wc["weight_class"]}'
+        return str(weight_limit)
 
     # ---------- Table rendering ----------
     def refresh_table(self):
@@ -137,14 +151,17 @@ class RankingEditorFrame(ttk.Frame):
 
         for index, entry in enumerate(self.entries):
             record = f'{entry["wins"]}-{entry["losses"]}-{entry["draws"]} ({entry["knockouts"]} KO)'
+            fighter_label = self._label_for_fighter(entry["fighter_id"])
+
             if self.mode == MODE_RANKING:
-                last_col = "★" if entry.get("title") else ""
+                division_label = self._division_label_for_fighter(entry["fighter_id"])
+                last_col = "Yes" if entry.get("title") else ""
+                values = (index + 1, fighter_label, division_label, record, last_col)
             else:
                 last_col = f'{entry.get("total_fans", 0):,}'
-            self.tree.insert(
-                "", "end", iid=str(index),
-                values=(index + 1, self._label_for_fighter(entry["fighter_id"]), record, last_col),
-            )
+                values = (index + 1, fighter_label, record, last_col)
+
+            self.tree.insert("", "end", iid=str(index), values=values)
 
         if selected_index is not None and 0 <= selected_index < len(self.entries):
             self.tree.selection_set(str(selected_index))
@@ -169,6 +186,7 @@ class RankingEditorFrame(ttk.Frame):
             self.total_fans_var.set(entry.get("total_fans", 0))
 
     # ---------- Editing ----------
+
     def _read_form(self):
         """Read the entry controls into a dict, or None after showing an error."""
         fighter_id = self._selected_fighter_id()
@@ -248,8 +266,7 @@ class RankingEditorFrame(ttk.Frame):
         self.refresh_table()
 
     def _fill_record_from_file(self):
-        """Pull the fighter's current record out of records.csv into the
-        record spinboxes, so the user doesn't retype what we already know."""
+        """ Pull fighter's current record from records.csv """
         fighter_id = self._selected_fighter_id()
         if fighter_id is None:
             messagebox.showerror("No Fighter", "Pick a fighter from the dropdown first.")
@@ -291,7 +308,6 @@ class RankingEditorFrame(ttk.Frame):
     # ---------- Bulk load ----------
 
     def load_entries(self, entries: list):
-        """Replace the working snapshot wholesale (used by carry-forward
-        and when viewing an existing month)."""
+        """ Replace the working snapshot wholesale (used by carry-forward and when viewing an existing month) """
         self.entries = [dict(e) for e in entries]
         self.refresh_table()

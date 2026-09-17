@@ -49,11 +49,11 @@ class EditFighterTab(ttk.Frame):
         self.tree.heading("nickname", text="Nickname")
         self.tree.heading("country", text="Nationality")
 
-        self.tree.column("fighter_id", width=50, anchor="center")
-        self.tree.column("first_name", width=120, anchor="w")
-        self.tree.column("last_name", width=120, anchor="w")
-        self.tree.column("nickname", width=120, anchor="w")
-        self.tree.column("country", width=120, anchor="w")
+        self.tree.column("fighter_id", width=30, anchor="center")
+        self.tree.column("first_name", width=60, anchor="w")
+        self.tree.column("last_name", width=60, anchor="w")
+        self.tree.column("nickname", width=60, anchor="w")
+        self.tree.column("country", width=60, anchor="w")
 
         self.tree.pack(side="left", fill="both", expand=True, padx=(5, 0), pady=5)
 

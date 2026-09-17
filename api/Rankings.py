@@ -10,9 +10,28 @@ or concatenating per-month files:
     rankings.csv      -- divisional and pound-for-pound rankings
         SnapshotMonth  -> str, "YYYY-MM"
         RankingType    -> "DIVISION" or "P4P"
-        WeightLimit    -> int (blank for P4P), FK -> weights.csv
+        WeightLimit    -> int (blank for P4P), FK -> weights.csv. This is
+                          the division being ranked -- part of the
+                          snapshot's identity, constant across every row
+                          of a given DIVISION snapshot, always blank for
+                          P4P.
         Rank           -> int, 1..N, contiguous within a snapshot
         FighterID      -> int, FK -> fighters.csv
+        FighterWeightLimit -> int, FK -> weights.csv. The fighter's own
+                          registered division AT THE TIME of this
+                          snapshot -- a per-entry fact, not part of the
+                          snapshot's identity. For DIVISION rows this
+                          always equals WeightLimit (fighters can only be
+                          ranked in their own division). For P4P rows,
+                          where WeightLimit is blank, this is what lets
+                          later analysis ask "which divisions are
+                          strongest in the P4P list" or "does divisional
+                          rank correlate with P4P rank". Computed and
+                          stored automatically at save time from
+                          fighters.csv -- nothing in the UI sets this
+                          directly. Blank for rows saved before this
+                          column existed (old data is read back with
+                          this as None rather than raising).
         Wins/Knockouts/Losses/Draws -> int, the fighter's record AS OF
                           this snapshot (records.csv only holds current
                           values, so these are stored for historical
@@ -52,7 +71,7 @@ FAN_RANKINGS_FILE = os.path.join(RANKINGS_DIR, "fan_rankings.csv")
 
 RANKING_FIELDNAMES = [
     "SnapshotMonth", "RankingType", "WeightLimit", "Rank", "FighterID",
-    "Wins", "Knockouts", "Losses", "Draws", "Title",
+    "FighterWeightLimit", "Wins", "Knockouts", "Losses", "Draws", "Title",
 ]
 FAN_FIELDNAMES = [
     "SnapshotMonth", "Rank", "FighterID", "TotalFans",
@@ -110,21 +129,26 @@ class Rankings:
     def get_all(self) -> list:
         self._ensure_files_exist()
         with open(self.rankings_file, newline="", encoding="utf-8") as f:
-            return [
-                {
+            rows = []
+            for row in csv.DictReader(f):
+                # .get() rather than [] -- rankings.csv written before this
+                # column existed won't have it in its header at all, and a
+                # missing/blank value both mean "not recorded".
+                raw_fighter_weight = row.get("FighterWeightLimit")
+                rows.append({
                     "month": row["SnapshotMonth"],
                     "ranking_type": row["RankingType"],
                     "weight_limit": int(row["WeightLimit"]) if row["WeightLimit"] else None,
                     "rank": int(row["Rank"]),
                     "fighter_id": int(row["FighterID"]),
+                    "fighter_weight_limit": int(raw_fighter_weight) if raw_fighter_weight else None,
                     "wins": int(row["Wins"]),
                     "knockouts": int(row["Knockouts"]),
                     "losses": int(row["Losses"]),
                     "draws": int(row["Draws"]),
                     "title": int(row["Title"]),
-                }
-                for row in csv.DictReader(f)
-            ]
+                })
+            return rows
 
     def get_snapshot(self, month: str, ranking_type: str, weight_limit=None) -> list:
         """Return the ranked entries for one division (or P4P) in one month."""
@@ -165,6 +189,9 @@ class Rankings:
                     "WeightLimit": "" if row["weight_limit"] is None else row["weight_limit"],
                     "Rank": row["rank"],
                     "FighterID": row["fighter_id"],
+                    "FighterWeightLimit": (
+                        "" if row.get("fighter_weight_limit") is None else row["fighter_weight_limit"]
+                    ),
                     "Wins": row["wins"],
                     "Knockouts": row["knockouts"],
                     "Losses": row["losses"],
@@ -179,7 +206,9 @@ class Rankings:
         `entries` is an ordered list (index 0 = rank #1) of dicts with
         keys: fighter_id, wins, knockouts, losses, draws, title.
         Ranks are assigned from the list order, so they're always
-        contiguous 1..N by construction.
+        contiguous 1..N by construction. Each entry's division
+        (fighter_weight_limit) is looked up from fighters.csv and stored
+        automatically -- it isn't something the caller passes in.
         """
         month = validate_month(month)
 
@@ -222,6 +251,12 @@ class Rankings:
                 "weight_limit": weight_limit,
                 "rank": index,
                 "fighter_id": fighter_id,
+                # The fighter's own registered division right now. For
+                # DIVISION rows this is always == weight_limit (enforced
+                # above); for P4P it's the whole point -- weight_limit is
+                # blank there, so this is the only place a P4P entry's
+                # division gets recorded.
+                "fighter_weight_limit": fighter["weightclass"],
                 "wins": wins,
                 "knockouts": knockouts,
                 "losses": losses,

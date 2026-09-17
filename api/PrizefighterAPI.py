@@ -1,14 +1,3 @@
-"""
-PrizefighterAPI.py
-
-Central facade for all data access in the Prizefighters Promoter ML app.
-UI code should never touch files under data/ directly -- it should only
-ever call through this class. This keeps storage details (CSV today,
-maybe SQLite later) hidden from the UI layer, and gives one place to
-coordinate logic that spans more than one table (e.g. creating a
-zeroed-out record whenever a new fighter is added).
-"""
-
 from api.Weight_Classes import WeightClasses, WeightClassError  # noqa: F401
 from api.Country import Country, CountryError, CountryFlags, CountryFlagError  # noqa: F401
 from api.Fighter import Fighter, FighterError  # noqa: F401
@@ -16,6 +5,10 @@ from api.Records import Records, RecordError  # noqa: F401
 from api.Rankings import (  # noqa: F401
     Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS,
 )
+from api.Arenas import Arenas, ArenaError  # noqa: F401
+from api.Fights import Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED  # noqa: F401
+from api.Events import Events, EventError  # noqa: F401
+
 
 class PrizefighterAPI:
     """Single entry point the UI layer talks to."""
@@ -27,8 +20,12 @@ class PrizefighterAPI:
         self.fighters = Fighter()
         self.records = Records()
         self.rankings = Rankings(fighter_api=self.fighters, records_api=self.records)
+        self.arenas = Arenas(country_api=self.countries)
+        self.fights = Fights(fighter_api=self.fighters)
+        self.events = Events(arena_api=self.arenas, fights_api=self.fights)
 
     # ---- Weight class passthroughs ----
+
     def get_weight_classes(self):
         return self.weight_classes.get_all()
 
@@ -56,6 +53,7 @@ class PrizefighterAPI:
         self.countries.delete(a2)
 
     # ---- Country flags (read-only in the UI today, full CRUD available) ----
+
     def get_flag_path(self, a2: str):
         return self.flags.get_path(a2)
 
@@ -72,6 +70,7 @@ class PrizefighterAPI:
         self.flags.delete(a2)
 
     # ---- Fighters ----
+
     def get_fighters(self):
         return self.fighters.get_all()
 
@@ -129,6 +128,7 @@ class PrizefighterAPI:
         return self.rankings.carry_forward(ranking_type, weight_limit, from_month)
 
     # ---- Fan rankings ----
+
     def get_fan_snapshot(self, month: str):
         return self.rankings.get_fan_snapshot(month)
 
@@ -143,3 +143,120 @@ class PrizefighterAPI:
 
     def carry_forward_fan_rankings(self, from_month: str = None):
         return self.rankings.carry_forward_fans(from_month)
+
+    # ---- Arenas ----
+
+    def get_arenas(self):
+        return self.arenas.get_all()
+
+    def get_arena(self, arena_id: int):
+        return self.arenas.get_by_id(arena_id)
+
+    def add_arena(self, name: str, country: str):
+        return self.arenas.add(name, country)
+
+    def update_arena(self, arena_id: int, name: str, country: str):
+        self.arenas.update(arena_id, name, country)
+
+    def delete_arena(self, arena_id: int):
+        self.arenas.delete(arena_id)
+
+    # ---- Fights ----
+
+    def get_fights(self):
+        return self.fights.get_all()
+
+    def get_fight(self, fight_id: str):
+        return self.fights.get_by_id(fight_id)
+
+    def get_fight_full(self, fight_id: str):
+        return self.fights.get_full(fight_id)
+
+    def get_fights_by_status(self, status: str):
+        return self.fights.get_by_status(status)
+
+    def get_scheduled_fights_on_date(self, date: str):
+        return self.fights.get_scheduled_on_date(date)
+
+    def get_fights_by_fighter(self, fighter_id: int):
+        return self.fights.get_by_fighter(fighter_id)
+
+    def get_championship_fights(self, weight_limit=None):
+        return self.fights.get_championship_fights(weight_limit)
+
+    def schedule_fight(self, date: str, weight_limit: int, red_corner_fighter_id: int,
+                       blue_corner_fighter_id: int, rounds: int, round_minutes: int,
+                       championship: bool = False) -> dict:
+        return self.fights.schedule(
+            date, weight_limit, red_corner_fighter_id, blue_corner_fighter_id,
+            rounds, round_minutes, championship,
+        )
+
+    def cancel_fight(self, fight_id: str) -> None:
+        self.fights.cancel(fight_id)
+
+    def delete_fight(self, fight_id: str) -> None:
+        self.fights.delete(fight_id)
+
+    # ---- Events ----
+
+    def get_events(self):
+        return self.events.get_all()
+
+    def get_event(self, event_id: int):
+        return self.events.get_by_id(event_id)
+
+    def create_event(self, headliner: str, date: str, arena_id: int, main_event_fight_id: str,
+                     co_main_fight_ids: list = None, undercard_fight_ids: list = None,
+                     slogan: str = "") -> dict:
+        """
+        Create an event card, then flip every included fight's status to
+        Evented. Events.add() already validated every fight exists, is
+        Scheduled, and shares the card's date -- so the status updates
+        below shouldn't fail, but if one somehow does, the event is
+        rolled back rather than left referencing a fight whose status
+        didn't actually change.
+        """
+        new_event = self.events.add(
+            headliner, date, arena_id, main_event_fight_id,
+            co_main_fight_ids, undercard_fight_ids, slogan,
+        )
+
+        all_fight_ids = (
+            [main_event_fight_id]
+            + list(co_main_fight_ids or [])
+            + list(undercard_fight_ids or [])
+        )
+
+        updated = []
+        try:
+            for fight_id in all_fight_ids:
+                self.fights.update_status(fight_id, STATUS_EVENTED)
+                self.fights.set_event_id(fight_id, new_event["event_id"])
+                updated.append(fight_id)
+        except FightError:
+            for fight_id in updated:
+                self.fights.update_status(fight_id, STATUS_SCHEDULED)
+                self.fights.set_event_id(fight_id, None)
+            self.events.delete(new_event["event_id"])
+            raise
+
+        return new_event
+
+    def delete_event(self, event_id: int) -> None:
+        """Delete an event card and revert its fights back to Scheduled,
+        so they can be re-assigned to a different card."""
+        event = self.events.get_by_id(event_id)
+        if event is None:
+            raise EventError(f"No event found with EventID {event_id}.")
+
+        all_fight_ids = (
+            [event["main_event_fight_id"]]
+            + event["co_main_fight_ids"]
+            + event["undercard_fight_ids"]
+        )
+        for fight_id in all_fight_ids:
+            self.fights.update_status(fight_id, STATUS_SCHEDULED)
+            self.fights.set_event_id(fight_id, None)
+
+        self.events.delete(event_id)

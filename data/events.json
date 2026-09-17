@@ -1,0 +1,30 @@
+[
+  {
+    "event_id": 1,
+    "headliner": "Ram\u00edrez vs. Ward",
+    "slogan": "Night of the Champions",
+    "arena_id": 8,
+    "date": "08-01-2000",
+    "main_event_fight_id": "000001",
+    "co_main_fight_ids": [
+      "000002"
+    ],
+    "undercard_fight_ids": [
+      "000003",
+      "000004",
+      "000005",
+      "000006",
+      "000007",
+      "000008",
+      "000009",
+      "00000A",
+      "00000B",
+      "00000C",
+      "00000D",
+      "00000E",
+      "00000F",
+      "000010",
+      "000011"
+    ]
+  }
+]
