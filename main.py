@@ -1,15 +1,9 @@
-"""
-main.py
-
-Entry point for the Prizefighters Promoter ML data tracker.
-Builds a tabbed (Notebook) window so each UI script can be developed
-and tested independently.
-"""
-
 import tkinter as tk
+
 from tkinter import ttk
 
 from api.PrizefighterAPI import PrizefighterAPI
+
 from ui.settings import SettingsTab
 from ui.add_fighter import AddFighterTab
 from ui.edit_fighter import EditFighterTab
