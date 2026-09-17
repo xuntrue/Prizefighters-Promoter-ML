@@ -6,7 +6,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 5,Eduardo,Moreira,,None,Uruguay,UY,23-08-1969,300,74,0,2
 6,Ricardo,Perez,,None,Camaguey,CU,27-02-1963,300,71,0,2
 7,Kron,Luan,,None,Elbasan,AL,09-07-1961,300,70,0,3
-8,Juan,Diaz,,None,Ponce,PR,16-05-1972,300,64,0,1
+8,José,Delgado,,None,Bayamón,PR,16-05-1972,300,64,0,1
 9,David,Ramirez,,None,Santa Tecla,SV,26-03-1962,300,70,1,2
 10,Cian,Sullivan,The Irish Giant,Middle,Cork,IE,14-02-1965,300,70,0,3
 11,André,Almeida,,None,São Paulo,BR,08-07-1964,300,70,1,2
@@ -47,7 +47,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 46,He,Shaoyu,,None,Wuhan,CN,17-08-1964,160,67,1,1
 47,Narin,Xayavong,Iron Tiger,Middle,Bangkok,TH,04-05-1962,160,66,0,3
 48,Mohamed,Chebbi,,None,Gafsa,TN,28-02-1970,160,63,0,1
-49,Joseph,Cruz,,None,Trujillo Alto,PR,31-10-1965,160,66,0,1
+49,Javier,Cruz,,None,Trujillo Alto,PR,31-10-1965,160,66,0,1
 50,Miko,Suzuki,,None,Kyoto,JP,12-10-1971,160,69,0,2
 51,Marios,Ioannou,,None,Heraklion,GR,06-06-1970,160,70,1,2
 52,Ilya,Petrova,,None,Novosibirsk,RU,20-04-1971,160,67,0,4
@@ -109,7 +109,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 108,Salvador,Castro,,None,Ciudad Juarez,MX,03-05-1968,130,66,0,3
 109,Gabriel,Sultiao,Pep,Middle,Davao,PH,02-05-1975,130,65,1,4
 110,Manuel,Martin,,None,Bilbao,ES,10-03-1971,130,65,0,1
-111,Micha,Moon,,None,Changwon,KR,19-06-1961,126,67,0,4
+111,Matías Ignacio,Medina,,None,Córdoba,AR,19-06-1961,126,67,0,4
 112,Aaron,Sullivan,,None,Sacramento,US,09-06-1960,126,63,0,1
 113,Peter,Peterson,,None,New York City,US,11-05-1966,126,68,1,1
 114,Eero,Salminen,,None,Jyvaskyla,FI,23-07-1960,126,71,0,2
@@ -119,7 +119,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 118,Yan,Leng,,None,Phnom Penh,KH,19-02-1971,126,66,1,1
 119,Héctor,Juárez,Manos Rápidas,Middle,Ciudad,MX,08-06-1970,126,70,1,4
 120,Óscar,de la Cruz,Señor,Prefix,Málaga,ES,29-12-1974,126,71,0,3
-121,Dereck,Diaz,,None,Bayamon,PR,27-06-1971,126,70,1,2
+121,Diego,Díaz,,None,Mayagüez,PR,27-06-1971,126,70,1,2
 122,Anan,Anuman,,None,Pattaya,TH,19-04-1960,122,67,1,4
 123,Said,Naji,,None,Tangier,MA,16-02-1964,122,68,0,1
 124,Angel,Rodriguez,,None,Arecibo,PR,10-06-1970,122,73,0,2
@@ -130,11 +130,11 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 129,Marvin,Morales,,None,Matagalpa,NI,17-09-1970,122,64,0,1
 130,Kim,binti Ibrahim,,None,Malacca,MY,09-07-1971,122,67,0,1
 131,Cesar,Rodriguez,,None,Santo Dominogo,DO,29-06-1972,122,64,1,1
-132,Derek,Cruz,,None,San Juan,PR,04-10-1972,122,72,0,2
+132,David,Colón,,None,San Juan,PR,04-10-1972,122,72,0,2
 133,Ricardo,Flores,,None,Puebla,MX,08-11-1962,118,67,1,3
 134,Tiago,Rivera,The Hound,Prefix,San Pedro Sula,HN,01-04-1960,118,66,0,3
 135,Damin,Shin,,None,Ulsan,KR,26-08-1960,118,73,0,4
-136,Luiz,Perez,,None,Carolina,PR,01-02-1966,118,71,0,2
+136,Luiz,Pacheco,,None,Carolina,PR,01-02-1966,118,71,0,2
 137,Zachary,Kelly,Zac,Middle,Sydney,AU,30-06-1960,118,66,0,4
 138,Aaron,Kelly,,None,Belfast,IE,06-03-1964,118,64,0,1
 139,Charles,Morgan,,None,Montego Bay,JM,08-03-1969,118,64,0,4

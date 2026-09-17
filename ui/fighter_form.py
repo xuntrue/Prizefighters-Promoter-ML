@@ -180,7 +180,7 @@ class FighterFormFrame(ttk.Frame):
 
         country = self.api.countries.get_by_code(fighter["country"])
         if country:
-            self.country_var.set(f"[{country['a2']}] - {country['country_name']}")
+            self.country_var.set(f"[{country['a2']}] {country['country_name']}")
 
         self.birthdate_var.set(fighter["birthdate"])
 
