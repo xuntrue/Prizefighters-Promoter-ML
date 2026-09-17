@@ -26,5 +26,59 @@
       "000010",
       "000011"
     ]
+  },
+  {
+    "event_id": 2,
+    "headliner": "Ju\u00e1rez vs. Sanchez",
+    "slogan": "Small Weight, Big Action",
+    "arena_id": 2,
+    "date": "22-01-2000",
+    "main_event_fight_id": "000012",
+    "co_main_fight_ids": [
+      "000013"
+    ],
+    "undercard_fight_ids": [
+      "000014",
+      "000015",
+      "000016",
+      "000017",
+      "000018"
+    ]
+  },
+  {
+    "event_id": 3,
+    "headliner": "Stewart vs. Ju\u00e1rez",
+    "slogan": "The Little Warriors",
+    "arena_id": 3,
+    "date": "29-01-2000",
+    "main_event_fight_id": "000019",
+    "co_main_fight_ids": [
+      "00001A"
+    ],
+    "undercard_fight_ids": [
+      "00001B",
+      "00001C",
+      "00001D",
+      "00001E",
+      "00001F"
+    ]
+  },
+  {
+    "event_id": 4,
+    "headliner": "Katt\u00e1n vs. McKenzie",
+    "slogan": "A Night of Lightning",
+    "arena_id": 3,
+    "date": "05-02-2000",
+    "main_event_fight_id": "000020",
+    "co_main_fight_ids": [
+      "000021"
+    ],
+    "undercard_fight_ids": [
+      "000022",
+      "000023",
+      "000024",
+      "000025",
+      "000026"
+    ]
   }
 ]

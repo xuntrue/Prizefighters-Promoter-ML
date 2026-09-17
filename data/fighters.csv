@@ -185,3 +185,18 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 184,Jack,Moore,,None,Galway,IE,24-09-1973,105,68,0,3
 185,Jamal,Awad,,None,Battir,PS,01-03-1972,105,73,0,2
 186,Stanislav,Balav,,None,Trnava,SK,27-02-1971,105,67,1,4
+187,Manas,Arjarn,,None,Chiang Mai,TH,18-10-1973,118,64,0,4
+188,Marcos,Schmitz,,None,Curitiba,BR,28-02-1977,122,70,0,2
+189,Jesus,Garcia,,None,Trujillo,PE,25-06-1981,122,68,0,3
+190,Kyle,Martin,The Ghost,Middle,New Orleans,US,25-09-1977,115,68,0,1
+191,Hugo,Castro,,None,Uruguay,UY,21-10-1962,118,69,0,4
+192,Leonard,Schäfer,,None,Essen,DE,31-07-1979,135,72,0,4
+193,Vladimir,Kovacevic,,None,Belgrade,RS,18-08-1978,135,70,0,3
+194,Daniel,Valdez,,None,Pasig,PH,05-02-1978,135,71,1,3
+195,Maximiliano,Gonzalez,,None,Arica,CL,25-08-1978,135,71,0,2
+196,Ralph,Brooks,Andy,Middle,Jacksonville,US,28-10-1971,108,66,1,1
+197,Luis,Reyes,,None,Choluteca,HN,03-05-1980,108,71,0,3
+198,Jean,Ramos,,None,Baymon,PR,17-02-1977,108,68,0,3
+199,Ricardo,Gomez,,None,San Francisco de Macoris,DO,31-05-1978,130,66,1,4
+200,Karl,Schwarz,,None,Hamburg,DE,28-09-1980,130,71,0,2
+201,Carlos,Suarez,,None,Uruguay,UY,09-05-1972,112,72,1,2
