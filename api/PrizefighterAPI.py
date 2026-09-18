@@ -1,3 +1,14 @@
+"""
+PrizefighterAPI.py
+
+Central facade for all data access in the Prizefighters Promoter ML app.
+UI code should never touch files under data/ directly -- it should only
+ever call through this class. This keeps storage details (CSV today,
+maybe SQLite later) hidden from the UI layer, and gives one place to
+coordinate logic that spans more than one table (e.g. creating a
+zeroed-out record whenever a new fighter is added).
+"""
+
 from api.Weight_Classes import WeightClasses, WeightClassError  # noqa: F401
 from api.Country import Country, CountryError, CountryFlags, CountryFlagError  # noqa: F401
 from api.Fighter import Fighter, FighterError  # noqa: F401
@@ -118,6 +129,9 @@ class PrizefighterAPI:
     def get_ranking_months(self, ranking_type: str = None, weight_limit=None):
         return self.rankings.get_months(ranking_type, weight_limit)
 
+    def get_next_ranking_month(self, ranking_type: str, weight_limit=None):
+        return self.rankings.get_next_month(ranking_type, weight_limit)
+
     def save_ranking_snapshot(self, month: str, ranking_type: str, entries: list, weight_limit=None):
         self.rankings.save_snapshot(month, ranking_type, entries, weight_limit)
 
@@ -134,6 +148,9 @@ class PrizefighterAPI:
 
     def get_fan_months(self):
         return self.rankings.get_fan_months()
+
+    def get_next_fan_month(self):
+        return self.rankings.get_next_fan_month()
 
     def save_fan_snapshot(self, month: str, entries: list):
         self.rankings.save_fan_snapshot(month, entries)

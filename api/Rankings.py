@@ -46,6 +46,15 @@ or concatenating per-month files:
         SnapshotMonth  -> str, "YYYY-MM"
         Rank           -> int, 1..9
         FighterID      -> int, FK -> fighters.csv
+        FighterWeightLimit -> int, FK -> weights.csv. The fighter's own
+                          registered division AT THE TIME of this
+                          snapshot -- same idea as rankings.csv's column
+                          of the same name: fan favourites aren't
+                          restricted to one division, so this is what
+                          lets later analysis ask which divisions draw
+                          the most fan interest. Computed automatically
+                          at save time; blank for rows saved before this
+                          column existed.
         TotalFans      -> int
         Wins/Knockouts/Losses/Draws -> int, record as of this snapshot
 
@@ -74,7 +83,7 @@ RANKING_FIELDNAMES = [
     "FighterWeightLimit", "Wins", "Knockouts", "Losses", "Draws", "Title",
 ]
 FAN_FIELDNAMES = [
-    "SnapshotMonth", "Rank", "FighterID", "TotalFans",
+    "SnapshotMonth", "Rank", "FighterID", "FighterWeightLimit", "TotalFans",
     "Wins", "Knockouts", "Losses", "Draws",
 ]
 
@@ -96,6 +105,30 @@ def validate_month(month: str) -> str:
     if not MONTH_PATTERN.match(month):
         raise RankingError('Snapshot month must be in "YYYY-MM" format (e.g. "2026-03").')
     return month
+
+
+def next_month_str(month: str) -> str:
+    """'2026-03' -> '2026-04'; '2026-12' -> '2027-01'."""
+    month = validate_month(month)
+    year, mon = (int(part) for part in month.split("-"))
+    mon += 1
+    if mon > 12:
+        mon = 1
+        year += 1
+    return f"{year:04d}-{mon:02d}"
+
+
+def next_month(month_str: str) -> str:
+    """'2026-03' -> '2026-04', '2026-12' -> '2027-01'. Used to auto-fill
+    the target month when carrying a snapshot forward, so the user isn't
+    doing the date arithmetic by hand every time they start a new month."""
+    month_str = validate_month(month_str)
+    year, month = (int(part) for part in month_str.split("-"))
+    if month == 12:
+        year, month = year + 1, 1
+    else:
+        month += 1
+    return f"{year:04d}-{month:02d}"
 
 
 def _validate_record(wins, knockouts, losses, draws):
@@ -173,6 +206,13 @@ class Rankings:
     def get_latest_month(self, ranking_type: str = None, weight_limit=None):
         months = self.get_months(ranking_type, weight_limit)
         return months[-1] if months else None
+
+    def get_next_month(self, ranking_type: str, weight_limit=None):
+        """The month after the most recent existing snapshot for this
+        division (or P4P) -- or None if there's no snapshot yet to
+        advance from, since there's nothing to compute "next" from."""
+        latest = self.get_latest_month(ranking_type, weight_limit)
+        return next_month_str(latest) if latest else None
 
     def _save_all(self, rows: list):
         with open(self.rankings_file, "w", newline="", encoding="utf-8") as f:
@@ -289,19 +329,21 @@ class Rankings:
     def get_all_fan_rankings(self) -> list:
         self._ensure_files_exist()
         with open(self.fan_file, newline="", encoding="utf-8") as f:
-            return [
-                {
+            rows = []
+            for row in csv.DictReader(f):
+                raw_fighter_weight = row.get("FighterWeightLimit")
+                rows.append({
                     "month": row["SnapshotMonth"],
                     "rank": int(row["Rank"]),
                     "fighter_id": int(row["FighterID"]),
+                    "fighter_weight_limit": int(raw_fighter_weight) if raw_fighter_weight else None,
                     "total_fans": int(row["TotalFans"]),
                     "wins": int(row["Wins"]),
                     "knockouts": int(row["Knockouts"]),
                     "losses": int(row["Losses"]),
                     "draws": int(row["Draws"]),
-                }
-                for row in csv.DictReader(f)
-            ]
+                })
+            return rows
 
     def get_fan_snapshot(self, month: str) -> list:
         return sorted(
@@ -316,6 +358,10 @@ class Rankings:
         months = self.get_fan_months()
         return months[-1] if months else None
 
+    def get_next_fan_month(self):
+        latest = self.get_latest_fan_month()
+        return next_month_str(latest) if latest else None
+
     def _save_all_fan_rankings(self, rows: list):
         with open(self.fan_file, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=FAN_FIELDNAMES)
@@ -325,6 +371,9 @@ class Rankings:
                     "SnapshotMonth": row["month"],
                     "Rank": row["rank"],
                     "FighterID": row["fighter_id"],
+                    "FighterWeightLimit": (
+                        "" if row.get("fighter_weight_limit") is None else row["fighter_weight_limit"]
+                    ),
                     "TotalFans": row["total_fans"],
                     "Wins": row["wins"],
                     "Knockouts": row["knockouts"],
@@ -336,7 +385,9 @@ class Rankings:
         """
         Replace the fan-favourite snapshot for one month. `entries` is an
         ordered list (index 0 = rank #1, max 9) of dicts with keys:
-        fighter_id, total_fans, wins, knockouts, losses, draws.
+        fighter_id, total_fans, wins, knockouts, losses, draws. Each
+        entry's division (fighter_weight_limit) is looked up from
+        fighters.csv and stored automatically, same as in save_snapshot().
         """
         month = validate_month(month)
 
@@ -352,7 +403,8 @@ class Rankings:
                 raise RankingError(f"FighterID {fighter_id} appears more than once in the fan rankings.")
             seen.add(fighter_id)
 
-            if self.fighter_api.get_by_id(fighter_id) is None:
+            fighter = self.fighter_api.get_by_id(fighter_id)
+            if fighter is None:
                 raise RankingError(f"No fighter found with FighterID {fighter_id}.")
 
             total_fans = int(entry.get("total_fans", 0))
@@ -367,6 +419,7 @@ class Rankings:
 
             validated.append({
                 "month": month, "rank": index, "fighter_id": fighter_id,
+                "fighter_weight_limit": fighter["weightclass"],
                 "total_fans": total_fans, "wins": wins, "knockouts": knockouts,
                 "losses": losses, "draws": draws,
             })

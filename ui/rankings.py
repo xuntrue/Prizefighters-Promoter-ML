@@ -47,6 +47,8 @@ class DivisionRankingsSection(ttk.Frame):
             side="left", padx=(0, 5))
         ttk.Button(button_row, text="Load This Month", command=self._on_load_month).pack(
             side="left", padx=5)
+        ttk.Button(button_row, text="Load Next Month", command=self._on_load_next_month).pack(
+            side="left", padx=5)
 
         self.status_label = ttk.Label(box, text="", foreground="gray",
                                       wraplength=600, justify="left")
@@ -73,7 +75,7 @@ class DivisionRankingsSection(ttk.Frame):
         self._refresh_eligible_fighters()
 
     def _current_division(self):
-        """Return (ranking_type, weight_limit) for the selected dropdown item."""
+        """ Return (ranking_type, weight_limit) for the selected dropdown item """
         label = self.division_var.get()
         for weight_limit, option_label in self._division_options:
             if option_label == label:
@@ -83,7 +85,7 @@ class DivisionRankingsSection(ttk.Frame):
         return None, None
 
     def _refresh_eligible_fighters(self):
-        """ P4P is open to everyone; a division is restricted to fighters registered at that weight class in fighters.csv """
+        """ P4P is open to all """
         ranking_type, weight_limit = self._current_division()
         fighters = self.api.get_fighters()
 
@@ -147,7 +149,34 @@ class DivisionRankingsSection(ttk.Frame):
             for row in snapshot
         ])
         self.status_label.config(
-            text=f"Loaded existing {weight_limit}lbs rankings for {month} (saving will overwrite).")
+            text=f"Loaded existing rankings for {month} (saving will overwrite).")
+
+    def _on_load_next_month(self):
+        ranking_type, weight_limit = self._current_division()
+        if ranking_type is None:
+            messagebox.showerror("No Division", "Pick a division first.")
+            return
+
+        next_month = self.api.get_next_ranking_month(ranking_type, weight_limit)
+        if next_month is None:
+            messagebox.showinfo(
+                "No Existing Rankings",
+                "There's no previous snapshot for this division to advance from -- enter a starting month manually.",
+            )
+            return
+
+        result = self.api.carry_forward_rankings(ranking_type, weight_limit)
+        self.month_var.set(next_month)
+        self.editor.load_entries(result["entries"])
+
+        message = f'Advanced to {next_month}, starting from {result["source_month"]}\'s roster.'
+        if result["dropped"]:
+            parts = []
+            for d in result["dropped"]:
+                who = d.get("name") or f'FighterID {d["fighter_id"]}'
+                parts.append(f'#{d["previous_rank"]} {who} ({d["reason"]})')
+            message += " Dropped and everyone below moved up: " + "; ".join(parts) + "."
+        self.status_label.config(text=message)
 
     # ---------- Saving ----------
     def _on_save(self):

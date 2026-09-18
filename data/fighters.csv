@@ -3,7 +3,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 2,Edgar,Guzman,,None,Leon,MX,12-07-1969,300,66,0,3
 3,David,Stankevic,,None,Marijampole,LT,04-01-1961,300,71,0,3
 4,Takashi,Sato,,None,Sapporo,JP,19-05-1970,300,64,0,1
-5,Eduardo,Moreira,,None,Uruguay,UY,23-08-1969,300,74,0,2
+5,Elias,Matthias,Koloss,Middle,Hamburg,DE,23-08-1969,300,74,0,2
 6,Ricardo,Perez,,None,Camaguey,CU,27-02-1963,300,71,0,2
 7,Kron,Luan,,None,Elbasan,AL,09-07-1961,300,70,0,3
 8,José,Delgado,,None,Bayamón,PR,16-05-1972,300,64,0,1
@@ -13,10 +13,10 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 12,Robert,O'Brien,,None,Derry,IE,29-05-1972,200,70,0,2
 13,Lahiru,Gamage,,None,Trincomalee,LK,12-12-1963,200,66,0,3
 14,Mateo,Anderson,,None,Edmonton,CA,5-12-1961,200,65,0,1
-15,Imran,Mia,,None,Rajshahi,BD,17-02-1966,200,64,1,4
+15,Isaiah,Martinez,,None,Las Vegas,US,17-02-1966,200,64,1,4
 16,Roberto,Álvarez,,None,Bayamo,CU,29-11-1964,200,66,0,1
 17,Laura,dos Santos,,None,Bettembourg,LU,16-07-1967,200,74,0,2
-18,Felix,Reyes,,None,Santo Dominigo Este,DO,03-08-1968,200,69,1,3
+18,František,Roman,Bohemian,Middle,Ostrava,CZ,03-08-1968,200,69,1,3
 19,Akmal,Yuldashyev,,None,Namangan,UZ,09-12-1968,200,65,1,1
 20,Sultan,Ivanova,,None,Shymkent,KZ,08-05-1970,200,69,0,3
 21,Aaron,Murphy,,None,Galway,IE,19-06-1973,200,70,0,3
@@ -26,7 +26,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 25,Carlos,López,,None,Cuenca,EC,12-10-1967,175,65,1,1
 26,Delbert,Meyer,,None,Munich,DE,02-03-1961,175,67,0,1
 27,Ibrahim,Ahmed,,None,Batroun,LB,10-07-1969,175,70,0,2
-28,Francisco,Fuentes,,None,San Cristobal,DO,29-08-1969,175,73,0,2
+28,Fumihiro,Fujimoto,Iron Blade,Middle,Osaka,JP,29-08-1969,175,73,0,2
 29,Alexandru,Mihai,,None,Constanta,RO,30-10-1970,175,66,1,3
 30,Omar,Mokhtari,,None,Djelfa,DZ,01-08-1969,175,67,0,3
 31,Ahmad,Pour,,None,Qom,IR,16-04-1970,175,67,0,1
@@ -37,7 +37,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 36,Aleksei,Yvanov,,None,Donetsk,UA,01-05-1963,168,70,0,3
 37,Nico,Martini,,None,Bologn,IT,26-03-1964,168,73,0,4
 38,Sombun,Cherinsuk,,None,Chiang Mai,TH,30-04-1969,168,66,0,4
-39,Juan,Cruz,,None,Villa Canales,GT,28-10-1961,168,74,0,4
+39,Christian,Conrad,Der Sturm,Middle,Berlin,DE,28-10-1961,168,74,0,4
 40,Jack,Anderson,,None,Ottawa-Gatineau,CA,28-12-1970,168,63,0,1
 41,Cyril,Adámek,Občan,Middle,Brno,CZ,10-11-1974,168,64,1,4
 42,Jorge,Castillo,El Martillo,Middle,Ecatepec,MX,14-07-1970,168,64,0,4
@@ -48,7 +48,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 47,Narin,Xayavong,Iron Tiger,Middle,Bangkok,TH,04-05-1962,160,66,0,3
 48,Mohamed,Chebbi,,None,Gafsa,TN,28-02-1970,160,63,0,1
 49,Javier,Cruz,,None,Trujillo Alto,PR,31-10-1965,160,66,0,1
-50,Miko,Suzuki,,None,Kyoto,JP,12-10-1971,160,69,0,2
+50,Maximilian,Schneider,Stefen,Middle,Munich,DE,12-10-1971,160,69,0,2
 51,Marios,Ioannou,,None,Heraklion,GR,06-06-1970,160,70,1,2
 52,Ilya,Petrova,,None,Novosibirsk,RU,20-04-1971,160,67,0,4
 53,Jakob,Pettersen,,None,Stravanger,NO,17-03-1972,160,74,0,4
@@ -56,7 +56,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 55,Valentin,Stoyanova,,None,Stara Zagora,BG,08-05-1960,154,68,0,4
 56,Zheng,Zhiwei,,None,Taipei,TW,10-07-1962,154,66,0,3
 57,Xavier,Quinn,Blackstorm,Middle,Belfast,IE,19-06-1964,154,68,1,3
-58,Robert,Mercado,,None,Davao City,PH,12-11-1970,154,66,0,4
+58,Ryan,Moore,Tantalum,Middle,Oakland,US,12-11-1970,154,66,0,4
 59,Willem,Ndlovu,,None,Kinshasa,ZA,14-02-1971,154,65,1,1
 60,Christopher,Alvarez,,None,Manila,PH,26-07-1969,154,70,1,3
 61,Syergyei,Akhmyedov,,None,Qarshi,UZ,12-03-1972,154,70,0,4
@@ -75,7 +75,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 74,Otabek,Sharipova,,None,Kokand,UZ,21-10-1968,147,69,0,2
 75,Ki-Ho,Jang,The Falcon,Prefix,Ulsan,KR,08-01-1961,140,71,0,2
 76,Manuel,Martinez,,None,Chihuahua,MX,02-06-1961,140,69,1,2
-77,Sebastian,Contreras,,None,Iquique,CL,18-06-1964,140,63,0,4
+77,Samuel,Carter,The Bulldog,Prefix,Pittsburg,US,18-06-1964,140,63,0,4
 78,Jack,Byrne,,None,Dundalk,IE,14-08-1968,140,66,0,1
 79,Mino,Nguyen,Maestro,Middle,Ho Chi Minh City,VN,31-12-1971,140,67,1,3
 80,Wichian,Yang,,None,Udon Thani,TH,15-06-1965,140,67,0,3
@@ -86,10 +86,10 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 85,Brayden,Parker,,None,Adelaide,AU,08-08-1968,140,72,0,4
 86,Neil,Jones,,None,Sheffield,UK,07-04-1960,135,67,0,4
 87,Diego,Ramos,,None,Barcelona,ES,03-09-1965,135,74,0,2
-88,Jiang,Zhihao,,None,Tainan,TW,14-09-1966,135,71,0,4
+88,Jian,Zheng,Harbour Harlem,Middle,Queenstown,SG,14-09-1966,135,71,0,4
 89,Carlos,Jiménez,El Toro,Middle,Puebla,MX,10-03-1970,135,68,0,1
 90,Daniel,Svensson,,None,Goteborg,SE,02-01-1970,135,69,1,2
-91,Jean,Mukalay,,None,Lubumbashi,CG,19-07-1969,135,70,1,3
+91,Julian,Matheiu,Éclair,Middle,Lyon,FR,19-07-1969,135,70,1,3
 92,Zachary,Santos,El Relámpago,Prefix,Los Angeles,US,20-02-1970,135,69,0,4
 93,Alexander,Romero,,None,Barelona,VE,07-01-1970,135,71,0,3
 94,Ceng,Zhengyi,,None,Taichung,TW,27-10-1971,135,66,0,4
@@ -99,10 +99,10 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 98,Jimmy,Willems,Paul,Middle,London,UK,17-11-1978,135,73,0,4
 99,Chan-woo,Seo,Silver Bullet,Middle,Incheon,KR,18-10-1970,130,71,0,3
 100,Zafar,Yusupova,,None,Namangan,UZ,14-04-1969,130,70,0,2
-101,Karel,Pospisilova,,None,Olomouc,CZ,28-09-1964,130,69,0,4
+101,Karel,Procházka,,None,Olomouc,CZ,28-09-1964,130,69,0,4
 102,Martin,Grech,,None,Qormi,MT,15-12-1969,130,73,1,4
 103,Jason,Thomas,The Technician,Prefix,Baltimore,US,09-04-1971,130,66,1,3
-104,Stephen,Turner,,None,Bristol,UK,12-10-1969,130,69,1,4
+104,Sean,Tan,,None,Toa Payoh,SG,12-10-1969,130,69,1,4
 105,Stelios,Christoforou,,None,Protaras,CY,17-12-1970,130,66,0,4
 106,Javier,Cedeno,,None,Panama,PA,12-09-1967,130,70,0,4
 107,Walter,Miller,,None,Seattle,US,15-12-1966,130,66,1,3
@@ -125,7 +125,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 124,Angel,Rodriguez,,None,Arecibo,PR,10-06-1970,122,73,0,2
 125,Maciej,Kozlowskoi,,None,Lodz,PL,02-09-1964,122,65,0,1
 126,Ian,Tolentino,,None,Taguig,PH,14-06-1969,122,71,1,3
-127,Robert,Marshall,,None,Bridgetown,BB,23-07-1971,122,68,0,3
+127,Radek,Marek,,None,Brno,CZ,23-07-1971,122,68,0,3
 128,Kevin,Amador,The Ghost,Middle,Tegucigalpa,HN,21-12-1968,122,74,0,2
 129,Marvin,Morales,,None,Matagalpa,NI,17-09-1970,122,64,0,1
 130,Kim,binti Ibrahim,,None,Malacca,MY,09-07-1971,122,67,0,1
@@ -150,7 +150,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 149,Serhii,Romanenko,Steel Heart,Middle,Odesa,UA,18-06-1961,115,69,0,3
 150,Felipe,Gomes,Mãos,Middle,Recife,BR,31-01-1971,115,68,0,1
 151,Chingiz,Ospanov,,None,Karaganda,KZ,31-03-1970,115,71,0,4
-152,Thien,Au,,None,Hue,VN,28-12-1968,115,66,0,4
+152,Tomáš,Adámek,,None,Brno,CZ,28-12-1968,115,66,0,4
 153,Tyler,McKenzie,The Rangler,Prefix,Darwin,AU,13-09-1968,115,67,0,3
 154,Jack,Collins,Quickfire,Middle,Dundalk,IE,06-07-1973,115,71,0,3
 155,Callum,Sheridan,The Hound,Prefix,Dublin,IE,08-09-1971,115,74,0,4
@@ -200,3 +200,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 199,Ricardo,Gomez,,None,San Francisco de Macoris,DO,31-05-1978,130,66,1,4
 200,Karl,Schwarz,,None,Hamburg,DE,28-09-1980,130,71,0,2
 201,Carlos,Suarez,,None,Uruguay,UY,09-05-1972,112,72,1,2
+202,Chris,Castro,,None,Caloocan,PH,01-09-1968,105,69,0,3
+203,Leo,Johnson,,None,Winnipeg,CA,23-10-1965,108,67,0,1
+204,Dante,Martini,,None,Milan,IT,18-01-1981,108,71,0,2
+205,Doumi,Abbas,,None,Al Fahahil,KW,18-11-1977,108,70,0,3

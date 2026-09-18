@@ -1,9 +1,11 @@
 import tkinter as tk
+
 from tkinter import ttk, messagebox
 
 from api.PrizefighterAPI import PrizefighterAPI
 from api.Rankings import RankingError, MAX_FAN_RANKS
 from ui.ranking_editor import RankingEditorFrame, MODE_FANS
+
 
 class RecordFansSection(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
@@ -33,15 +35,19 @@ class RecordFansSection(ttk.Frame):
             row=0, column=2, sticky="w", padx=5, pady=5)
         ttk.Button(box, text="Load This Month", command=self._on_load_month).grid(
             row=0, column=3, sticky="w", padx=5, pady=5)
+        ttk.Button(box, text="Load Next Month", command=self._on_load_next_month).grid(
+            row=0, column=4, sticky="w", padx=5, pady=5)
 
         self.status_label = ttk.Label(box, text="", foreground="gray", wraplength=600, justify="left")
-        self.status_label.grid(row=1, column=0, columnspan=4, sticky="w", padx=5, pady=(0, 5))
+        self.status_label.grid(row=1, column=0, columnspan=5, sticky="w", padx=5, pady=(0, 5))
 
+    # ---------- Lifecycle ----------
     def refresh_reference_data(self):
-        """ Any fighter can be a fan favourite, so the dropdown is everyone """
+        """Any fighter can be a fan favourite, so the dropdown is everyone."""
         self.editor.set_eligible_fighters(self.api.get_fighters())
         self.editor.refresh_table()
 
+    # ---------- Loading ----------
     def _on_carry_forward(self):
         result = self.api.carry_forward_fan_rankings()
 
@@ -74,6 +80,30 @@ class RecordFansSection(ttk.Frame):
             for row in snapshot
         ])
         self.status_label.config(text=f"Loaded existing fan rankings for {month} (saving will overwrite).")
+
+    def _on_load_next_month(self):
+        """One-click "figure out next month, then load last month's roster"."""
+        next_month = self.api.get_next_fan_month()
+        if next_month is None:
+            messagebox.showinfo(
+                "No Existing Rankings",
+                "There's no previous fan rankings snapshot to advance from -- "
+                "enter a starting month manually.",
+            )
+            return
+
+        result = self.api.carry_forward_fan_rankings()
+        self.month_var.set(next_month)
+        self.editor.load_entries(result["entries"])
+
+        message = f'Advanced to {next_month}, starting from {result["source_month"]}\'s roster.'
+        if result["dropped"]:
+            parts = [
+                f'#{d["previous_rank"]} FighterID {d["fighter_id"]} ({d["reason"]})'
+                for d in result["dropped"]
+            ]
+            message += " Dropped: " + "; ".join(parts) + "."
+        self.status_label.config(text=message)
 
     # ---------- Saving ----------
     def _on_save(self):

@@ -8,6 +8,7 @@ from api.Fighter import format_full_name
 MODE_RANKING = "ranking"   # divisional / P4P: has a Title flag
 MODE_FANS = "fans"         # fan favourites: has a Total Fans count
 
+
 class RankingEditorFrame(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI, mode: str = MODE_RANKING, max_entries=None):
         super().__init__(parent)
@@ -22,7 +23,6 @@ class RankingEditorFrame(ttk.Frame):
         self._build_entry_controls()
 
     # ---------- Construction ----------
-
     def _build_table(self):
         frame = ttk.Frame(self)
         frame.pack(fill="both", expand=True, padx=5, pady=5)
@@ -31,10 +31,10 @@ class RankingEditorFrame(ttk.Frame):
             columns = ("rank", "fighter", "division", "record", "title")
             headings = ("#", "Fighter", "Division", "Record", "Title")
             widths = (40, 190, 150, 110, 60)
-        else:
-            columns = ("rank", "fighter", "record", "fans")
-            headings = ("#", "Fighter", "Record", "Total Fans")
-            widths = (40, 220, 120, 100)
+        else: # self.mode == MODE_FANS 
+            columns = ("rank", "fighter", "division", "record", "fans")
+            headings = ("#", "Fighter", "Division", "Record", "Total Fans")
+            widths = (40, 190, 150, 110, 100)
 
         self.tree = ttk.Treeview(frame, columns=columns, show="headings", height=12)
         for col, heading, width in zip(columns, headings, widths):
@@ -62,9 +62,8 @@ class RankingEditorFrame(ttk.Frame):
 
         ttk.Label(box, text="Fighter:").grid(row=0, column=0, sticky="w", padx=5, pady=4)
         self.fighter_var = tk.StringVar()
-        self.fighter_combo = ttk.Combobox(box, textvariable=self.fighter_var,
-                                            state="readonly", width=34)
-        self.fighter_combo.grid(row=0, column=1, sticky="w", padx=5, pady=4)
+        self.fighter_combo = ttk.Combobox(box, textvariable=self.fighter_var, state="readonly", width=34)
+        self.fighter_combo.grid(row=0, column=1, columnspan=3, sticky="w", padx=5, pady=4)
 
         record_row = ttk.Frame(box)
         record_row.grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=4)
@@ -99,10 +98,8 @@ class RankingEditorFrame(ttk.Frame):
         ttk.Button(button_row, text="Update Selected", command=self._update_selected).pack(side="left", padx=5)
         ttk.Button(button_row, text="Fill Record From File", command=self._fill_record_from_file).pack(side="left", padx=5)
 
-
     # ---------- Eligible fighters ----------
     def set_eligible_fighters(self, fighters: list):
-        """ Restrict the fighter dropdown to a given list of fighter dicts """
         self._fighter_options = sorted(
             (
                 (
@@ -152,14 +149,13 @@ class RankingEditorFrame(ttk.Frame):
         for index, entry in enumerate(self.entries):
             record = f'{entry["wins"]}-{entry["losses"]}-{entry["draws"]} ({entry["knockouts"]} KO)'
             fighter_label = self._label_for_fighter(entry["fighter_id"])
+            division_label = self._division_label_for_fighter(entry["fighter_id"])
 
             if self.mode == MODE_RANKING:
-                division_label = self._division_label_for_fighter(entry["fighter_id"])
-                last_col = "Yes" if entry.get("title") else ""
-                values = (index + 1, fighter_label, division_label, record, last_col)
+                last_col = "\u2605" if entry.get("title") else ""
             else:
                 last_col = f'{entry.get("total_fans", 0):,}'
-                values = (index + 1, fighter_label, record, last_col)
+            values = (index + 1, fighter_label, division_label, record, last_col)
 
             self.tree.insert("", "end", iid=str(index), values=values)
 
@@ -186,7 +182,6 @@ class RankingEditorFrame(ttk.Frame):
             self.total_fans_var.set(entry.get("total_fans", 0))
 
     # ---------- Editing ----------
-
     def _read_form(self):
         """Read the entry controls into a dict, or None after showing an error."""
         fighter_id = self._selected_fighter_id()
@@ -266,7 +261,8 @@ class RankingEditorFrame(ttk.Frame):
         self.refresh_table()
 
     def _fill_record_from_file(self):
-        """ Pull fighter's current record from records.csv """
+        """Pull the fighter's current record out of records.csv into the
+        record spinboxes, so the user doesn't retype what we already know."""
         fighter_id = self._selected_fighter_id()
         if fighter_id is None:
             messagebox.showerror("No Fighter", "Pick a fighter from the dropdown first.")
@@ -308,6 +304,7 @@ class RankingEditorFrame(ttk.Frame):
     # ---------- Bulk load ----------
 
     def load_entries(self, entries: list):
-        """ Replace the working snapshot wholesale (used by carry-forward and when viewing an existing month) """
+        """Replace the working snapshot wholesale (used by carry-forward
+        and when viewing an existing month)."""
         self.entries = [dict(e) for e in entries]
         self.refresh_table()

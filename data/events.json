@@ -80,5 +80,23 @@
       "000025",
       "000026"
     ]
+  },
+  {
+    "event_id": 5,
+    "headliner": "Pavlov vs. Ospanov",
+    "slogan": "A Night at the Garden",
+    "arena_id": 1,
+    "date": "12-02-2000",
+    "main_event_fight_id": "000027",
+    "co_main_fight_ids": [
+      "000028"
+    ],
+    "undercard_fight_ids": [
+      "000029",
+      "00002A",
+      "00002B",
+      "00002C",
+      "00002D"
+    ]
   }
 ]

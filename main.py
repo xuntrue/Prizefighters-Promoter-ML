@@ -11,11 +11,10 @@ from ui.rankings import RankingsTab
 from ui.schedule_fight import ScheduleFightTab
 from ui.create_event import CreateEventTab
 
-
 def main():
     root = tk.Tk()
     root.title("Prizefighters Promoter ML - Data Tracker")
-    root.geometry("950x750")
+    root.geometry("1000x800")
 
     api = PrizefighterAPI()
 
