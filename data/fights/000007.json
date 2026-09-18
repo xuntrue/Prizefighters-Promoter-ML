@@ -108,9 +108,21 @@
           "xp": 0
         },
         "signature_traits": {
-          "group_1": "Agile",
-          "group_2": "Evasive",
-          "group_3": "Exhaust",
+          "group_1": {
+            "name": "Agile",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Evasive",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Exhaust",
+            "level": 1,
+            "xp": 0
+          },
           "group_4": null
         }
       },

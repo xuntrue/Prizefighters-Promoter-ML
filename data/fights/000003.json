@@ -50,9 +50,21 @@
           "xp": 0
         },
         "signature_traits": {
-          "group_1": "Agile",
-          "group_2": "Combo Puncher",
-          "group_3": "Iron Fists",
+          "group_1": {
+            "name": "Agile",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Combo Puncher",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Iron Fists",
+            "level": 1,
+            "xp": 0
+          },
           "group_4": null
         }
       },
@@ -108,9 +120,21 @@
           "xp": 0
         },
         "signature_traits": {
-          "group_1": "Thick Skin",
-          "group_2": "Body Blows",
-          "group_3": "Fan Favourite",
+          "group_1": {
+            "name": "Thick Skin",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Body Blows",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Fan Favourite",
+            "level": 1,
+            "xp": 0
+          },
           "group_4": null
         }
       },

@@ -50,8 +50,16 @@
           "xp": 0
         },
         "signature_traits": {
-          "group_1": "Extra Padding",
-          "group_2": "Iron Jaw",
+          "group_1": {
+            "name": "Extra Padding",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Iron Jaw",
+            "level": 1,
+            "xp": 0
+          },
           "group_3": null,
           "group_4": null
         }
@@ -108,8 +116,16 @@
           "xp": 0
         },
         "signature_traits": {
-          "group_1": "Agile",
-          "group_2": "Body Blows",
+          "group_1": {
+            "name": "Agile",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Body Blows",
+            "level": 1,
+            "xp": 0
+          },
           "group_3": null,
           "group_4": null
         }

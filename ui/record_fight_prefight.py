@@ -9,7 +9,8 @@ from api.Fighter import (
     CAREER_STAT_FIELDS, PHYSICAL_ATTRIBUTE_FIELDS, PUNCH_ATTRIBUTE_FIELDS,
     TENDENCY_FIELDS, SIGNATURE_TRAIT_GROUPS,
     MIN_ATTRIBUTE, MAX_ATTRIBUTE, ATTRIBUTE_STEP,
-    MIN_LEVEL, MAX_LEVEL, MIN_TENDENCY, MAX_TENDENCY,
+    MIN_LEVEL, MAX_LEVEL, MIN_XP, MIN_TENDENCY, MAX_TENDENCY,
+    MIN_TRAIT_LEVEL, MAX_TRAIT_LEVEL, MIN_TRAIT_XP, MAX_TRAIT_XP,
     max_xp_for_level, validate_last_6_entry, MAX_LAST_6_ENTRIES,
 )
 from api.Fights import DATE_FORMAT, FightError
@@ -25,9 +26,8 @@ def _fight_display_label(api: PrizefighterAPI, fight_id: str, role: str) -> str:
     blue_name = format_full_name(blue["first_name"], blue["last_name"], blue["nickname"], blue["placement"]) if blue else "?"
     return f'[{role}] {fight_id}: {red_name} vs {blue_name} ({fight["weight_limit"]} lbs) -- {fight["status"]}'
 
-
 class CornerMetaForm(ttk.Frame):
-    """Single corner's full pre-fight form """
+    """ Single corner's full pre-fight form """
     def __init__(self, parent, api: PrizefighterAPI, corner: str, corner_label: str):
         super().__init__(parent)
         self.api = api
@@ -152,33 +152,47 @@ class CornerMetaForm(ttk.Frame):
     def _build_skills_tab(self, notebook):
         tab = ttk.Frame(notebook)
         notebook.add(tab, text="Skills")
-
+ 
         ttk.Label(tab, text="Experience Level:").grid(row=0, column=0, sticky="w", padx=5, pady=4)
         self.level_var = tk.IntVar(value=MIN_LEVEL)
         level_spin = ttk.Spinbox(tab, from_=MIN_LEVEL, to=MAX_LEVEL, textvariable=self.level_var,
                                  width=5, command=self._on_level_changed)
         level_spin.grid(row=0, column=1, sticky="w", padx=5, pady=4)
-
+ 
         ttk.Label(tab, text="XP:").grid(row=1, column=0, sticky="w", padx=5, pady=4)
-        self.xp_var = tk.IntVar(value=1)
-        self.xp_spin = ttk.Spinbox(tab, from_=1, to=max_xp_for_level(MIN_LEVEL),
+        self.xp_var = tk.IntVar(value=MIN_XP)
+        self.xp_spin = ttk.Spinbox(tab, from_=MIN_XP, to=max_xp_for_level(MIN_LEVEL),
                                    textvariable=self.xp_var, width=6)
         self.xp_spin.grid(row=1, column=1, sticky="w", padx=5, pady=4)
         self.xp_max_label = ttk.Label(tab, text=f"/ {max_xp_for_level(MIN_LEVEL)}", foreground="gray")
         self.xp_max_label.grid(row=1, column=2, sticky="w", padx=5, pady=4)
-
+ 
         ttk.Label(tab, text="Signature Traits", font=("TkDefaultFont", 9, "bold")).grid(
             row=2, column=0, columnspan=3, sticky="w", padx=5, pady=(12, 4))
-
+ 
         self.trait_vars = {}
         for i, (group, options) in enumerate(SIGNATURE_TRAIT_GROUPS.items()):
             ttk.Label(tab, text=f"Group {i + 1}:").grid(row=3 + i, column=0, sticky="w", padx=5, pady=3)
-            var = tk.StringVar(value="None")
-            ttk.Combobox(tab, textvariable=var, values=["None"] + options,
-                        state="readonly", width=22).grid(row=3 + i, column=1, columnspan=2,
-                                                          sticky="w", padx=5, pady=3)
-            self.trait_vars[group] = var
-
+ 
+            row_frame = ttk.Frame(tab)
+            row_frame.grid(row=3 + i, column=1, columnspan=2, sticky="w", padx=5, pady=3)
+ 
+            name_var = tk.StringVar(value="None")
+            ttk.Combobox(row_frame, textvariable=name_var, values=["None"] + options,
+                        state="readonly", width=18).pack(side="left")
+ 
+            ttk.Label(row_frame, text="Lv:").pack(side="left", padx=(8, 2))
+            level_var = tk.IntVar(value=MIN_TRAIT_LEVEL)
+            ttk.Spinbox(row_frame, from_=MIN_TRAIT_LEVEL, to=MAX_TRAIT_LEVEL,
+                       textvariable=level_var, width=3).pack(side="left")
+ 
+            ttk.Label(row_frame, text="XP:").pack(side="left", padx=(8, 2))
+            xp_var = tk.IntVar(value=MIN_TRAIT_XP)
+            ttk.Spinbox(row_frame, from_=MIN_TRAIT_XP, to=MAX_TRAIT_XP,
+                       textvariable=xp_var, width=3).pack(side="left")
+ 
+            self.trait_vars[group] = {"name": name_var, "level": level_var, "xp": xp_var}
+ 
     def _on_level_changed(self):
         max_xp = max_xp_for_level(self.level_var.get())
         self.xp_spin.config(to=max_xp)
@@ -205,7 +219,6 @@ class CornerMetaForm(ttk.Frame):
             self.tendency_vars[key] = var
 
     # ---------- Load / gather ----------
-
     def load_fight(self, fight_id: str, fighter_label: str, weight_limit: int):
         self.current_fight_id = fight_id
         self.current_weight_limit = weight_limit
@@ -235,10 +248,17 @@ class CornerMetaForm(ttk.Frame):
         self.level_var.set(meta["skills"]["experience"]["level"])
         self._on_level_changed()
         self.xp_var.set(meta["skills"]["experience"]["xp"])
-
-        for group, var in self.trait_vars.items():
+ 
+        for group, trait_vars in self.trait_vars.items():
             pick = meta["skills"]["signature_traits"].get(group)
-            var.set(pick if pick else "None")
+            if pick:
+                trait_vars["name"].set(pick["name"])
+                trait_vars["level"].set(pick["level"])
+                trait_vars["xp"].set(pick["xp"])
+            else:
+                trait_vars["name"].set("None")
+                trait_vars["level"].set(MIN_TRAIT_LEVEL)
+                trait_vars["xp"].set(MIN_TRAIT_XP)
 
         for key, var in self.tendency_vars.items():
             var.set(meta["tendencies"][key])
@@ -265,15 +285,21 @@ class CornerMetaForm(ttk.Frame):
             "skills": {
                 "experience": {"level": self.level_var.get(), "xp": self.xp_var.get()},
                 "signature_traits": {
-                    group: (None if var.get() == "None" else var.get())
-                    for group, var in self.trait_vars.items()
+                    group: (
+                        None if trait_vars["name"].get() == "None"
+                        else {
+                            "name": trait_vars["name"].get(),
+                            "level": trait_vars["level"].get(),
+                            "xp": trait_vars["xp"].get(),
+                        }
+                    )
+                    for group, trait_vars in self.trait_vars.items()
                 },
             },
             "tendencies": {key: var.get() for key, var in self.tendency_vars.items()},
         }
 
     # ---------- Save ----------
-
     def _on_save(self):
         if self.current_fight_id is None:
             messagebox.showerror("No Fight Selected", "Select a bout before saving.")
@@ -290,7 +316,6 @@ class CornerMetaForm(ttk.Frame):
         messagebox.showinfo("Saved", f"{self.corner.replace('_', ' ').title()} meta saved.")
         self.status_label.config(text=f"Saved. Fight status is now: {fight['status']}.")
 
-
 class RecordFightPrefightTab(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
         super().__init__(parent)
@@ -305,7 +330,6 @@ class RecordFightPrefightTab(ttk.Frame):
         self.refresh_reference_data()
 
     # ---------- Construction ----------
-
     def _build_reference_date(self):
         date_frame = ttk.LabelFrame(self, text="Game's Current Date")
         date_frame.pack(fill="x", padx=10, pady=(10, 5))
@@ -355,7 +379,6 @@ class RecordFightPrefightTab(ttk.Frame):
         self.blue_form.pack(side="left", fill="both", expand=True, padx=(5, 0))
 
     # ---------- Lifecycle ----------
-
     def on_tab_shown(self):
         self.refresh_reference_data()
 
@@ -363,7 +386,6 @@ class RecordFightPrefightTab(ttk.Frame):
         self._refresh_event_list()
 
     # ---------- Event / bout selection ----------
-
     def _refresh_event_list(self):
         try:
             ref_date = date(int(self.ref_year_var.get()), int(self.ref_month_var.get()),
@@ -375,10 +397,10 @@ class RecordFightPrefightTab(ttk.Frame):
             e for e in self.api.get_events()
             if self._parse_date(e["date"]) and self._parse_date(e["date"]) >= ref_date
         ]
-        events.sort(key=lambda e: e["date"])
+        events.sort(key=lambda e: e["event_id"]) # Sort by eventID
 
         self._event_options = [
-            (e["event_id"], f'{e["date"]} -- {e["headliner"]} (Event #{e["event_id"]})')
+            (e["event_id"], f'{e["date"]} -- {e["headliner"]}') #(Event #{e["event_id"]})')
             for e in events
         ]
         self.event_combo["values"] = [label for _eid, label in self._event_options]

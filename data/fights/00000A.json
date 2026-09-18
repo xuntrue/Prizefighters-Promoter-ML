@@ -50,9 +50,21 @@
           "xp": 0
         },
         "signature_traits": {
-          "group_1": "Invigorate",
-          "group_2": "Combo Puncher",
-          "group_3": "Wolverine",
+          "group_1": {
+            "name": "Invigorate",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Combo Puncher",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Wolverine",
+            "level": 1,
+            "xp": 0
+          },
           "group_4": null
         }
       },
@@ -108,10 +120,26 @@
           "xp": 0
         },
         "signature_traits": {
-          "group_1": "Heart",
-          "group_2": "Combo Puncher",
-          "group_3": "Fan Favourite",
-          "group_4": "Powerful Hooks"
+          "group_1": {
+            "name": "Heart",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Combo Puncher",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Fan Favourite",
+            "level": 1,
+            "xp": 0
+          },
+          "group_4": {
+            "name": "Powerful Hooks",
+            "level": 1,
+            "xp": 0
+          }
         }
       },
       "tendencies": {

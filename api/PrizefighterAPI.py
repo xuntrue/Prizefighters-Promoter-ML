@@ -1,29 +1,15 @@
-"""
-PrizefighterAPI.py
-
-Central facade for all data access in the Prizefighters Promoter ML app.
-UI code should never touch files under data/ directly -- it should only
-ever call through this class. This keeps storage details (CSV today,
-maybe SQLite later) hidden from the UI layer, and gives one place to
-coordinate logic that spans more than one table (e.g. creating a
-zeroed-out record whenever a new fighter is added).
-"""
-
 import copy
+
 from datetime import datetime
 
-from api.Weight_Classes import WeightClasses, WeightClassError  # noqa: F401
-from api.Country import Country, CountryError, CountryFlags, CountryFlagError  # noqa: F401
-from api.Fighter import Fighter, FighterError, blank_meta_section, validate_meta_section  # noqa: F401
-from api.Records import Records, RecordError  # noqa: F401
-from api.Rankings import (  # noqa: F401
-    Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS,
-)
-from api.Arenas import Arenas, ArenaError  # noqa: F401
-from api.Fights import (  # noqa: F401
-    Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, DATE_FORMAT,
-)
-from api.Events import Events, EventError  # noqa: F401
+from api.Weight_Classes import WeightClasses, WeightClassError 
+from api.Country import Country, CountryError, CountryFlags, CountryFlagError
+from api.Fighter import Fighter, FighterError, blank_meta_section, validate_meta_section
+from api.Records import Records, RecordError
+from api.Rankings import Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS
+from api.Arenas import Arenas, ArenaError 
+from api.Fights import Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, DATE_FORMAT
+from api.Events import Events, EventError 
 
 
 class PrizefighterAPI:
@@ -347,14 +333,7 @@ class PrizefighterAPI:
         return base
 
     def save_fight_meta(self, fight_id: str, corner: str, meta: dict) -> None:
-        """
-        Validate and save one corner's pre-fight meta into the fight's
-        JSON file, correct records.csv to match whatever record was
-        entered (the "adjustment" workflow), and flip the fight to Meta
-        status once BOTH corners have meta recorded -- not before, so a
-        half-completed fight can still be found by searching for
-        Evented fights that still need work.
-        """
+        """ Validate and save one corner's pre-fight meta into the fight's JSON file """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
             raise FightError(f"No fight found with FightID {fight_id}.")
@@ -365,7 +344,8 @@ class PrizefighterAPI:
             )
 
         fighter_id = self._corner_fighter_id(fight, corner)
-        cleaned = validate_meta_section(meta, fight["weight_limit"])
+        min_weigh_in = self.weight_classes.get_min_weigh_in(fight["weight_limit"])
+        cleaned = validate_meta_section(meta, fight["weight_limit"], min_weigh_in)
 
         full = self.fights.get_full(fight_id)
         meta_obj = dict(full.get("meta") or {})

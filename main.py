@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from api.PrizefighterAPI import PrizefighterAPI
+
 from ui.settings import SettingsTab
 from ui.add_fighter import AddFighterTab
 from ui.edit_fighter import EditFighterTab
@@ -10,7 +11,6 @@ from ui.rankings import RankingsTab
 from ui.schedule_fight import ScheduleFightTab
 from ui.create_event import CreateEventTab
 from ui.record_fight_prefight import RecordFightPrefightTab
-
 
 def main():
     root = tk.Tk()
@@ -38,8 +38,6 @@ def main():
     notebook.add(record_prefight_tab, text="Pre-Fight Meta")
     notebook.add(settings_tab, text="Settings")
 
-    # Refresh country / weight-class dropdowns whenever a fighter tab is
-    # opened, in case they were changed on the Settings tab in the meantime.
     def on_tab_changed(event):
         current = notebook.nametowidget(notebook.select())
         if hasattr(current, "on_tab_shown"):
@@ -48,7 +46,6 @@ def main():
     notebook.bind("<<NotebookTabChanged>>", on_tab_changed)
 
     root.mainloop()
-
 
 if __name__ == "__main__":
     main()
