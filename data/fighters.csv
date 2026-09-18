@@ -11,7 +11,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 10,Cian,Sullivan,The Irish Giant,Middle,Cork,IE,14-02-1965,300,70,0,3
 11,André,Almeida,,None,São Paulo,BR,08-07-1964,300,70,1,2
 12,Robert,O'Brien,,None,Derry,IE,29-05-1972,200,70,0,2
-13,Lahiru,Gamage,,None,Trincomalee,LK,12-12-1963,200,66,0,3
+13,Lars,Gustafsson,Supergiant,Middle,Stockholm,SE,12-12-1963,200,66,0,3
 14,Mateo,Anderson,,None,Edmonton,CA,5-12-1961,200,65,0,1
 15,Isaiah,Martinez,,None,Las Vegas,US,17-02-1966,200,64,1,4
 16,Roberto,Álvarez,,None,Bayamo,CU,29-11-1964,200,66,0,1
@@ -28,7 +28,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 27,Ibrahim,Ahmed,,None,Batroun,LB,10-07-1969,175,70,0,2
 28,Fumihiro,Fujimoto,Iron Blade,Middle,Osaka,JP,29-08-1969,175,73,0,2
 29,Alexandru,Mihai,,None,Constanta,RO,30-10-1970,175,66,1,3
-30,Omar,Mokhtari,,None,Djelfa,DZ,01-08-1969,175,67,0,3
+30,Oskar,Magnusson,The Blizzard,Middle,Malmö,SE,01-08-1969,175,67,0,3
 31,Ahmad,Pour,,None,Qom,IR,16-04-1970,175,67,0,1
 32,Dereck,Ramos,,None,Mayaguez,PR,09-04-1968,175,67,1,3
 33,Julio,Cedeno,,None,Santiago,PA,23-09-1967,175,66,0,1
@@ -88,7 +88,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 87,Diego,Ramos,,None,Barcelona,ES,03-09-1965,135,74,0,2
 88,Jian,Zheng,Harbour Harlem,Middle,Queenstown,SG,14-09-1966,135,71,0,4
 89,Carlos,Jiménez,El Toro,Middle,Puebla,MX,10-03-1970,135,68,0,1
-90,Daniel,Svensson,,None,Goteborg,SE,02-01-1970,135,69,1,2
+90,David,Sjöberg,Ice Fists,Middle,Gothenborg,SE,02-01-1970,135,69,1,2
 91,Julian,Matheiu,Éclair,Middle,Lyon,FR,19-07-1969,135,70,1,3
 92,Zachary,Santos,El Relámpago,Prefix,Los Angeles,US,20-02-1970,135,69,0,4
 93,Alexander,Romero,,None,Barelona,VE,07-01-1970,135,71,0,3

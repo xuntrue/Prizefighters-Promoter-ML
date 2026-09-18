@@ -7,8 +7,125 @@
   "championship": true,
   "rounds": 12,
   "round_minutes": 1,
-  "status": "Evented",
+  "status": "Meta",
   "event_id": 1,
-  "meta": {},
+  "meta": {
+    "red_corner": {
+      "profile": {
+        "weigh_in": 219,
+        "record": {
+          "wins": 14,
+          "knockouts": 6,
+          "losses": 0,
+          "draws": 0
+        },
+        "last_6": []
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 4811
+      },
+      "attributes": {
+        "strength": 5.0,
+        "speed": 5.0,
+        "stamina": 5.0,
+        "endurance": 5.0,
+        "chin": 2.5,
+        "jab": 5.5,
+        "cross": 5.5,
+        "lead_hook": 4.5,
+        "rear_hook": 5.0,
+        "lead_uppercut": 5.5,
+        "rear_uppercut": 5.5
+      },
+      "skills": {
+        "experience": {
+          "level": 3,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": null,
+          "group_2": null,
+          "group_3": null,
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 73,
+        "single_punches_combinations": 74,
+        "speed_power": 36,
+        "inside_outside": 11,
+        "block_dodge": 25,
+        "counter_aggressive_first_half": 47,
+        "cautious_reckless_first_half": 29,
+        "counter_aggressive_second_half": 48,
+        "cautious_reckless_second_half": 42
+      }
+    },
+    "blue_corner": {
+      "profile": {
+        "weigh_in": 235,
+        "record": {
+          "wins": 13,
+          "knockouts": 6,
+          "losses": 0,
+          "draws": 0
+        },
+        "last_6": []
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 4462
+      },
+      "attributes": {
+        "strength": 5.0,
+        "speed": 2.5,
+        "stamina": 4.0,
+        "endurance": 4.5,
+        "chin": 6.0,
+        "jab": 3.0,
+        "cross": 5.0,
+        "lead_hook": 6.0,
+        "rear_hook": 4.0,
+        "lead_uppercut": 5.0,
+        "rear_uppercut": 5.0
+      },
+      "skills": {
+        "experience": {
+          "level": 3,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": "Agile",
+          "group_2": "Evasive",
+          "group_3": "Exhaust",
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 54,
+        "single_punches_combinations": 34,
+        "speed_power": 50,
+        "inside_outside": 45,
+        "block_dodge": 15,
+        "counter_aggressive_first_half": 55,
+        "cautious_reckless_first_half": 49,
+        "counter_aggressive_second_half": 77,
+        "cautious_reckless_second_half": 18
+      }
+    }
+  },
   "result": {}
 }

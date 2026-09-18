@@ -290,6 +290,19 @@ class Fights:
         full["event_id"] = event_id
         self._save_full(fight_id, full)
 
+    def save_meta(self, fight_id: str, meta: dict) -> None:
+        """Overwrite the full meta object (both corners) for one fight.
+        Used by PrizefighterAPI.save_fight_meta(), which builds the
+        merged {red_corner, blue_corner} dict one corner at a time --
+        this module doesn't know anything about the meta schema itself
+        (that lives in Fighter.py), it just stores whatever dict it's
+        handed under "meta"."""
+        full = self.get_full(fight_id)
+        if full is None:
+            raise FightError(f"No fight found with FightID {fight_id}.")
+        full["meta"] = meta
+        self._save_full(fight_id, full)
+
     def cancel(self, fight_id: str) -> None:
         fight = self.get_by_id(fight_id)
         if fight is None:

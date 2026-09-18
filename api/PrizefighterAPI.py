@@ -9,15 +9,20 @@ coordinate logic that spans more than one table (e.g. creating a
 zeroed-out record whenever a new fighter is added).
 """
 
+import copy
+from datetime import datetime
+
 from api.Weight_Classes import WeightClasses, WeightClassError  # noqa: F401
 from api.Country import Country, CountryError, CountryFlags, CountryFlagError  # noqa: F401
-from api.Fighter import Fighter, FighterError  # noqa: F401
+from api.Fighter import Fighter, FighterError, blank_meta_section, validate_meta_section  # noqa: F401
 from api.Records import Records, RecordError  # noqa: F401
 from api.Rankings import (  # noqa: F401
     Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS,
 )
 from api.Arenas import Arenas, ArenaError  # noqa: F401
-from api.Fights import Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED  # noqa: F401
+from api.Fights import (  # noqa: F401
+    Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, DATE_FORMAT,
+)
 from api.Events import Events, EventError  # noqa: F401
 
 
@@ -277,3 +282,99 @@ class PrizefighterAPI:
             self.fights.set_event_id(fight_id, None)
 
         self.events.delete(event_id)
+
+    # ---- Pre-fight metadata ----
+
+    CORNERS = ("red_corner", "blue_corner")
+
+    def _corner_fighter_id(self, fight: dict, corner: str) -> int:
+        if corner not in self.CORNERS:
+            raise FightError(f"corner must be one of {self.CORNERS}.")
+        return fight["red_corner_fighter_id"] if corner == "red_corner" else fight["blue_corner_fighter_id"]
+
+    def get_default_meta_for_fighter(self, fight_id: str, corner: str) -> dict:
+        """
+        Build a starting point for the pre-fight meta form ("_load_default").
+
+        attributes/skills/tendencies/career_stats/last_6 are carried
+        forward from the fighter's most recently recorded meta -- their
+        most recent OTHER fight (by date) that has meta saved for them,
+        regardless of which corner they were in that fight. If they have
+        no prior recorded meta at all (a debut fighter, or one whose
+        earlier fights predate this feature), a blank default is used
+        instead.
+
+        profile.record and profile.weigh_in are NOT carried forward --
+        record always reflects the live value in records.csv (the
+        source of truth), and weigh-in is fight-specific with no
+        meaningful previous value, so it defaults to this fight's own
+        weight_limit as a starting guess for the user to adjust down.
+        """
+        fight = self.fights.get_by_id(fight_id)
+        if fight is None:
+            raise FightError(f"No fight found with FightID {fight_id}.")
+
+        fighter_id = self._corner_fighter_id(fight, corner)
+
+        base = None
+        other_fights = sorted(
+            (f for f in self.fights.get_by_fighter(fighter_id) if f["fight_id"] != fight_id),
+            key=lambda f: datetime.strptime(f["date"], DATE_FORMAT),
+            reverse=True,
+        )
+        for candidate in other_fights:
+            full = self.fights.get_full(candidate["fight_id"])
+            if not full:
+                continue
+            candidate_corner = (
+                "red_corner" if full["red_corner_fighter_id"] == fighter_id else "blue_corner"
+            )
+            prior_meta = (full.get("meta") or {}).get(candidate_corner)
+            if prior_meta:
+                base = copy.deepcopy(prior_meta)
+                break
+
+        if base is None:
+            base = blank_meta_section(fight["weight_limit"])
+
+        current_record = self.records.get_by_fighter_id(fighter_id)
+        base["profile"]["record"] = (
+            {k: current_record[k] for k in ("wins", "knockouts", "losses", "draws")}
+            if current_record else {"wins": 0, "knockouts": 0, "losses": 0, "draws": 0}
+        )
+        base["profile"]["weigh_in"] = fight["weight_limit"] - 1
+
+        return base
+
+    def save_fight_meta(self, fight_id: str, corner: str, meta: dict) -> None:
+        """
+        Validate and save one corner's pre-fight meta into the fight's
+        JSON file, correct records.csv to match whatever record was
+        entered (the "adjustment" workflow), and flip the fight to Meta
+        status once BOTH corners have meta recorded -- not before, so a
+        half-completed fight can still be found by searching for
+        Evented fights that still need work.
+        """
+        fight = self.fights.get_by_id(fight_id)
+        if fight is None:
+            raise FightError(f"No fight found with FightID {fight_id}.")
+        if fight["status"] not in (STATUS_EVENTED, STATUS_META):
+            raise FightError(
+                f'Fight {fight_id} is {fight["status"]} -- pre-fight meta can only be '
+                f"recorded once a fight has been added to an event card."
+            )
+
+        fighter_id = self._corner_fighter_id(fight, corner)
+        cleaned = validate_meta_section(meta, fight["weight_limit"])
+
+        full = self.fights.get_full(fight_id)
+        meta_obj = dict(full.get("meta") or {})
+        meta_obj[corner] = cleaned
+        self.fights.save_meta(fight_id, meta_obj)
+
+        record = cleaned["profile"]["record"]
+        self.records.update(fighter_id, record["wins"], record["knockouts"],
+                            record["losses"], record["draws"])
+
+        if all(c in meta_obj for c in self.CORNERS):
+            self.fights.update_status(fight_id, STATUS_META)

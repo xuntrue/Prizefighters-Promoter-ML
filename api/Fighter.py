@@ -1,19 +1,43 @@
+"""
+Fighter.py
+
+CRUD + validation for fighters stored in data/fighters.csv.
+
+Columns:
+    FighterID    -> int, auto-assigned (sequential, starting at 1), primary key
+    FirstName    -> str
+    LastName     -> str
+    Nickname     -> str (may be empty)
+    Placement    -> one of "Prefix", "Middle", "Suffix", "None"
+    Hometown     -> str
+    Country      -> str, A-2 code, foreign key -> countries.csv
+    Birthdate    -> str, "dd-mm-yyyy"
+    Weightclass  -> int, weight_limit, foreign key -> weights.csv
+    Reach        -> int, 63-75 inclusive (inches)
+    Stance       -> int, 0 = Orthodox, 1 = Southpaw
+    Style        -> int, 1 = In Fighter, 2 = Out Boxer, 3 = Brawler, 4 = Boxer Puncher
+
+Win/loss record is intentionally NOT stored here -- see Records.py.
+This module validates the Country and Weightclass foreign keys against
+the Country and WeightClasses modules, but never touches records.csv.
+"""
+
 import csv
 import os
+import re
 from datetime import datetime
 
 from api.Country import Country
 from api.Weight_Classes import WeightClasses
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+DATA_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"
+)
 FIGHTERS_FILE = os.path.join(DATA_DIR, "fighters.csv")
 
 FIELDNAMES = [
     "FighterID", "FirstName", "LastName", "Nickname", "Placement",
-    "Hometown", "Country",
-    "Birthdate",
-    "Weightclass", "Reach",
-    "Stance", "Style"
+    "Hometown", "Country", "Birthdate", "Weightclass", "Reach", "Stance", "Style",
 ]
 
 PLACEMENTS = ["Prefix", "Middle", "Suffix", "None"]
@@ -29,8 +53,9 @@ MAX_REACH = 75
 
 BIRTHDATE_FORMAT = "%d-%m-%Y"
 
+
 class FighterError(Exception):
-    """ Raised when a fighter record fails validation """
+    """Raised when a fighter record fails validation."""
     pass
 
 
@@ -41,6 +66,10 @@ def format_full_name(first_name: str, last_name: str, nickname: str = "", placem
         format_full_name("Conor", "McGregor", "The Notorious", "Prefix") -> "'The Notorious' Conor McGregor"
         format_full_name("Phillip", "Willems", "The Count", "Suffix") -> "Phillip Willems 'The Count'"
         format_full_name("Logan", "Reed", "", "None") -> "Logan Reed"
+
+    Pure formatting logic (no validation) so it can be reused anywhere a
+    fighter's name needs to be displayed -- UI previews, printed cards,
+    rankings, exports -- without duplicating the placement rules.
     """
     first_name = (first_name or "").strip()
     last_name = (last_name or "").strip()
@@ -67,7 +96,8 @@ def _ordinal(n: int) -> str:
 
 
 def format_birthdate_readable(birthdate: str):
-    """ Convert 'dd-mm-yyyy' into e.g. 'August 23rd 1993' """
+    """Convert 'dd-mm-yyyy' into e.g. 'August 23rd 1993'. Returns None if
+    `birthdate` isn't a valid date in that format."""
     try:
         parsed = datetime.strptime(birthdate, BIRTHDATE_FORMAT)
     except (ValueError, TypeError):
@@ -76,6 +106,11 @@ def format_birthdate_readable(birthdate: str):
 
 
 def compute_age(birthdate: str, as_of):
+    """
+    Return (years, months) between a fighter's birthdate ('dd-mm-yyyy')
+    and `as_of` (a datetime.date). Returns None if birthdate is invalid
+    or `as_of` falls before the birthdate.
+    """
     try:
         born = datetime.strptime(birthdate, BIRTHDATE_FORMAT).date()
     except (ValueError, TypeError):
@@ -98,6 +133,8 @@ def compute_age(birthdate: str, as_of):
 
 
 class Fighter:
+    """CRUD for fighters stored in fighters.csv."""
+
     def __init__(self, filepath: str = FIGHTERS_FILE):
         self.filepath = filepath
         self.country_api = Country()
@@ -111,35 +148,6 @@ class Fighter:
                 writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
                 writer.writeheader()
 
-    # --- CREATE ---
-    def add(self, first_name, last_name, nickname, placement, hometown,
-            country, birthdate, weightclass, reach, stance, style) -> dict:
-        first_name, last_name, nickname, hometown, country = self._validate(
-            first_name, last_name, nickname, placement, hometown,
-            country, birthdate, weightclass, reach, stance, style,
-        )
-
-        new_row = {
-            "fighter_id": self._next_id(),
-            "first_name": first_name,
-            "last_name": last_name,
-            "nickname": nickname,
-            "placement": placement,
-            "hometown": hometown,
-            "country": country,
-            "birthdate": birthdate,
-            "weightclass": weightclass,
-            "reach": reach,
-            "stance": stance,
-            "style": style,
-        }
-
-        existing = self.get_all()
-        existing.append(new_row)
-        self._save_all(existing)
-        return new_row
-
-    # --- READ ---
     def get_all(self) -> list:
         self._ensure_file_exists()
         with open(self.filepath, newline="", encoding="utf-8") as f:
@@ -259,10 +267,35 @@ class Fighter:
 
         return first_name, last_name, nickname, hometown, country
 
-    # --- UPDATE ---
+    def add(self, first_name, last_name, nickname, placement, hometown,
+            country, birthdate, weightclass, reach, stance, style) -> dict:
+        first_name, last_name, nickname, hometown, country = self._validate(
+            first_name, last_name, nickname, placement, hometown,
+            country, birthdate, weightclass, reach, stance, style,
+        )
+
+        new_row = {
+            "fighter_id": self._next_id(),
+            "first_name": first_name,
+            "last_name": last_name,
+            "nickname": nickname,
+            "placement": placement,
+            "hometown": hometown,
+            "country": country,
+            "birthdate": birthdate,
+            "weightclass": weightclass,
+            "reach": reach,
+            "stance": stance,
+            "style": style,
+        }
+
+        existing = self.get_all()
+        existing.append(new_row)
+        self._save_all(existing)
+        return new_row
+
     def update(self, fighter_id, first_name, last_name, nickname, placement, hometown,
                country, birthdate, weightclass, reach, stance, style) -> None:
-
         first_name, last_name, nickname, hometown, country = self._validate(
             first_name, last_name, nickname, placement, hometown,
             country, birthdate, weightclass, reach, stance, style,
@@ -291,7 +324,6 @@ class Fighter:
         )
         self._save_all(others)
 
-    # --- DELETE ---
     def delete(self, fighter_id: int) -> None:
         existing = self.get_all()
         remaining = [row for row in existing if row["fighter_id"] != fighter_id]
@@ -300,3 +332,262 @@ class Fighter:
             raise FighterError(f"No fighter found with FighterID {fighter_id}.")
 
         self._save_all(remaining)
+
+
+# =====================================================================
+# Pre-fight metadata schema
+#
+# This defines the shape of one CORNER's entry in a fight's meta object
+# (fights/<FightID>.json -> meta.red_corner / meta.blue_corner) -- see
+# record_fight_prefight.py, which is the only thing that writes it, via
+# PrizefighterAPI.save_fight_meta(). It lives here rather than in
+# Fights.py because it's fundamentally about what a fighter IS at a
+# point in time, not about the fight itself -- Fights.py stays generic
+# and just stores whatever dict it's handed under "meta".
+#
+# One corner's meta:
+#   {
+#     "profile": {
+#       "weigh_in": int,               -- must be < the fight's weight_limit
+#       "record": {"wins": int, "knockouts": int, "losses": int, "draws": int},
+#       "last_6": [str, ...]           -- up to 6 entries, most recent bout
+#                                          first, each like "W-TKO(8)"
+#     },
+#     "career_stats": {8 non-negative ints, see CAREER_STAT_FIELDS},
+#     "attributes": {11 floats 0.5-10.0 in steps of 0.5, see ATTRIBUTE_FIELDS},
+#     "skills": {
+#       "experience": {"level": int 1-10, "xp": int 1-max_xp_for_level(level)},
+#       "signature_traits": {"group_1": str|None, ..., "group_4": str|None}
+#     },
+#     "tendencies": {9 ints 0-100, see TENDENCY_FIELDS}
+#   }
+# =====================================================================
+
+CAREER_STAT_FIELDS = [
+    ("punches_thrown", "Punches Thrown"),
+    ("punches_landed", "Punches Landed"),
+    ("punches_taken", "Punches Taken"),
+    ("knockdowns", "Knockdowns"),
+    ("times_knocked_down", "Times Knocked Down"),
+    ("titles_won", "Titles Won"),
+    ("titles_defended", "Titles Defended"),
+    ("total_fans", "Total Fans"),
+]
+
+PHYSICAL_ATTRIBUTE_FIELDS = [
+    ("strength", "Strength"),
+    ("speed", "Speed"),
+    ("stamina", "Stamina"),
+    ("endurance", "Endurance"),
+    ("chin", "Chin"),
+]
+PUNCH_ATTRIBUTE_FIELDS = [
+    ("jab", "Jab"),
+    ("cross", "Cross"),
+    ("lead_hook", "Lead Hook"),
+    ("rear_hook", "Rear Hook"),
+    ("lead_uppercut", "Lead Uppercut"),
+    ("rear_uppercut", "Rear Uppercut"),
+]
+ATTRIBUTE_FIELDS = PHYSICAL_ATTRIBUTE_FIELDS + PUNCH_ATTRIBUTE_FIELDS
+
+MIN_ATTRIBUTE = 0.5
+MAX_ATTRIBUTE = 10.0
+ATTRIBUTE_STEP = 0.5
+
+MIN_LEVEL = 1
+MAX_LEVEL = 10
+MIN_XP = 1
+
+
+def max_xp_for_level(level: int) -> int:
+    return 100 * (level + 1)
+
+
+# Signature traits: up to one pick per group, any group may be None.
+SIGNATURE_TRAIT_GROUPS = {
+    "group_1": ["Agile", "Extra Padding", "Heart", "Invigorate", "Rage",
+                "Recovery", "Thick Skin", "Warmed Up"],
+    "group_2": ["Body Blows", "Combo Puncher", "Counter Puncher", "Evasive",
+                "Hard Core", "Iron Jaw"],
+    "group_3": ["Breathing", "Exhaust", "Fan Favourite", "Iron Fists",
+                "Show Stopper", "Wolverine"],
+    "group_4": ["Rapid Jabs", "Liver Shot", "Powerful Hooks", "Weaving Uppercut"],
+}
+
+# (key, "A" label, "B" label) -- value is 0-100, 0 = pure A, 100 = pure B.
+TENDENCY_FIELDS = [
+    ("body_head", "Body", "Head"),
+    ("single_punches_combinations", "Single Punches", "Combinations"),
+    ("speed_power", "Speed", "Power"),
+    ("inside_outside", "Inside", "Outside"),
+    ("block_dodge", "Block", "Dodge"),
+    ("counter_aggressive_first_half", "Counter (First Half)", "Aggressive (First Half)"),
+    ("cautious_reckless_first_half", "Cautious (First Half)", "Reckless (First Half)"),
+    ("counter_aggressive_second_half", "Counter (Second Half)", "Aggressive (Second Half)"),
+    ("cautious_reckless_second_half", "Cautious (Second Half)", "Reckless (Second Half)"),
+]
+MIN_TENDENCY = 0
+MAX_TENDENCY = 100
+
+# "W-TKO(8)": win/loss/draw, dash, method, round in parentheses. Method is
+# restricted to a fixed set rather than free text so last_6 data stays
+# analysable -- a typo'd method code would silently become its own
+# category in any later groupby.
+LAST_6_METHODS = ("KO", "TKO", "UD", "SD", "MD")
+LAST_6_PATTERN = re.compile(r"^([WLD])-(" + "|".join(LAST_6_METHODS) + r")\((\d{1,2})\)$")
+MAX_LAST_6_ENTRIES = 6
+
+
+def validate_last_6_entry(entry: str) -> str:
+    entry = (entry or "").strip()
+    match = LAST_6_PATTERN.match(entry)
+    if not match:
+        raise FighterError(
+            f'"{entry}" is not a valid last-6 result. Expected format like "W-TKO(8)" '
+            f'(W/L/D, then one of {LAST_6_METHODS}, then the round in parentheses).'
+        )
+    round_number = int(match.group(3))
+    if not (1 <= round_number <= 12):
+        raise FighterError(f'"{entry}": round must be between 1 and 12.')
+    return entry
+
+
+def blank_meta_section(weight_limit: int = None) -> dict:
+    """A fresh, blank corner meta block -- used when a fighter has no
+    prior recorded meta to carry forward from. Attributes start at a
+    neutral mid-scale value (5.0) and tendencies at a neutral 50 rather
+    than the scale minimums, since 0.5-everywhere is a much less
+    reasonable "unknown fighter" guess than "roughly average"."""
+    return {
+        "profile": {
+            "weigh_in": (weight_limit - 1) if weight_limit is not None else None,
+            "record": {"wins": 0, "knockouts": 0, "losses": 0, "draws": 0},
+            "last_6": [],
+        },
+        "career_stats": {key: 0 for key, _ in CAREER_STAT_FIELDS},
+        "attributes": {key: 5.0 for key, _ in ATTRIBUTE_FIELDS},
+        "skills": {
+            "experience": {"level": MIN_LEVEL, "xp": MIN_XP},
+            "signature_traits": {group: None for group in SIGNATURE_TRAIT_GROUPS},
+        },
+        "tendencies": {key: 50 for key, _, _ in TENDENCY_FIELDS},
+    }
+
+
+def validate_meta_section(meta: dict, weight_limit: int) -> dict:
+    """Validate one corner's full meta block. Returns a cleaned copy (int/
+    float types normalised) or raises FighterError naming the first
+    problem found. weight_limit is the fight's weight_limit -- passed in
+    rather than looked up, since this is a pure data-shape check with no
+    access to a specific fight."""
+    cleaned = {}
+
+    # --- profile ---
+    profile = meta.get("profile", {})
+    try:
+        weigh_in = int(profile["weigh_in"])
+    except (KeyError, TypeError, ValueError):
+        raise FighterError("Weigh-in is required and must be a whole number.")
+    if weigh_in >= weight_limit:
+        raise FighterError(f"Weigh-in ({weigh_in} lbs) must be below the {weight_limit} lbs limit.")
+    if weigh_in <= 0:
+        raise FighterError("Weigh-in must be a positive number.")
+
+    record = profile.get("record", {})
+    try:
+        wins = int(record["wins"])
+        knockouts = int(record["knockouts"])
+        losses = int(record["losses"])
+        draws = int(record["draws"])
+    except (KeyError, TypeError, ValueError):
+        raise FighterError("Record (wins/knockouts/losses/draws) must be whole numbers.")
+    if min(wins, knockouts, losses, draws) < 0:
+        raise FighterError("Record values cannot be negative.")
+    if knockouts > wins:
+        raise FighterError("Knockouts cannot exceed total wins.")
+
+    last_6 = profile.get("last_6", [])
+    if len(last_6) > MAX_LAST_6_ENTRIES:
+        raise FighterError(f"last_6 holds at most {MAX_LAST_6_ENTRIES} entries.")
+    last_6 = [validate_last_6_entry(entry) for entry in last_6]
+
+    cleaned["profile"] = {
+        "weigh_in": weigh_in,
+        "record": {"wins": wins, "knockouts": knockouts, "losses": losses, "draws": draws},
+        "last_6": last_6,
+    }
+
+    # --- career_stats ---
+    stats = meta.get("career_stats", {})
+    cleaned_stats = {}
+    for key, label in CAREER_STAT_FIELDS:
+        try:
+            value = int(stats[key])
+        except (KeyError, TypeError, ValueError):
+            raise FighterError(f"{label} is required and must be a whole number.")
+        if value < 0:
+            raise FighterError(f"{label} cannot be negative.")
+        cleaned_stats[key] = value
+    if cleaned_stats["punches_landed"] > cleaned_stats["punches_thrown"]:
+        raise FighterError("Punches Landed cannot exceed Punches Thrown.")
+    cleaned["career_stats"] = cleaned_stats
+
+    # --- attributes ---
+    attrs = meta.get("attributes", {})
+    cleaned_attrs = {}
+    for key, label in ATTRIBUTE_FIELDS:
+        try:
+            value = float(attrs[key])
+        except (KeyError, TypeError, ValueError):
+            raise FighterError(f"{label} is required and must be a number.")
+        if not (MIN_ATTRIBUTE <= value <= MAX_ATTRIBUTE):
+            raise FighterError(f"{label} must be between {MIN_ATTRIBUTE} and {MAX_ATTRIBUTE}.")
+        if round(value / ATTRIBUTE_STEP) != value / ATTRIBUTE_STEP:
+            raise FighterError(f"{label} must be in steps of {ATTRIBUTE_STEP}.")
+        cleaned_attrs[key] = value
+    cleaned["attributes"] = cleaned_attrs
+
+    # --- skills ---
+    skills = meta.get("skills", {})
+    experience = skills.get("experience", {})
+    try:
+        level = int(experience["level"])
+        xp = int(experience["xp"])
+    except (KeyError, TypeError, ValueError):
+        raise FighterError("Experience level and XP must be whole numbers.")
+    if not (MIN_LEVEL <= level <= MAX_LEVEL):
+        raise FighterError(f"Experience level must be between {MIN_LEVEL} and {MAX_LEVEL}.")
+    max_xp = max_xp_for_level(level)
+    if not (MIN_XP <= xp <= max_xp):
+        raise FighterError(f"XP at level {level} must be between {MIN_XP} and {max_xp}.")
+
+    traits = skills.get("signature_traits", {})
+    cleaned_traits = {}
+    for group, options in SIGNATURE_TRAIT_GROUPS.items():
+        pick = traits.get(group)
+        if pick is not None and pick not in options:
+            raise FighterError(f'"{pick}" is not a valid signature trait for {group}.')
+        cleaned_traits[group] = pick
+
+    cleaned["skills"] = {
+        "experience": {"level": level, "xp": xp},
+        "signature_traits": cleaned_traits,
+    }
+
+    # --- tendencies ---
+    tendencies = meta.get("tendencies", {})
+    cleaned_tendencies = {}
+    for key, label_a, label_b in TENDENCY_FIELDS:
+        try:
+            value = int(tendencies[key])
+        except (KeyError, TypeError, ValueError):
+            raise FighterError(f'"{label_a}/{label_b}" is required and must be a whole number.')
+        if not (MIN_TENDENCY <= value <= MAX_TENDENCY):
+            raise FighterError(
+                f'"{label_a}/{label_b}" must be between {MIN_TENDENCY} and {MAX_TENDENCY}.'
+            )
+        cleaned_tendencies[key] = value
+    cleaned["tendencies"] = cleaned_tendencies
+
+    return cleaned
