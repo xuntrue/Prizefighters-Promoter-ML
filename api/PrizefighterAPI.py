@@ -1,15 +1,31 @@
-import copy
+"""
+PrizefighterAPI.py
 
+Central facade for all data access in the Prizefighters Promoter ML app.
+UI code should never touch files under data/ directly -- it should only
+ever call through this class. This keeps storage details (CSV today,
+maybe SQLite later) hidden from the UI layer, and gives one place to
+coordinate logic that spans more than one table (e.g. creating a
+zeroed-out record whenever a new fighter is added).
+"""
+
+import copy
 from datetime import datetime
 
-from api.Weight_Classes import WeightClasses, WeightClassError 
-from api.Country import Country, CountryError, CountryFlags, CountryFlagError
-from api.Fighter import Fighter, FighterError, blank_meta_section, validate_meta_section
-from api.Records import Records, RecordError
-from api.Rankings import Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS
-from api.Arenas import Arenas, ArenaError 
-from api.Fights import Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, DATE_FORMAT
-from api.Events import Events, EventError 
+from api.Weight_Classes import WeightClasses, WeightClassError  # noqa: F401
+from api.Country import Country, CountryError, CountryFlags, CountryFlagError  # noqa: F401
+from api.Fighter import Fighter, FighterError, blank_meta_section, validate_meta_section  # noqa: F401
+from api.Records import Records, RecordError  # noqa: F401
+from api.Rankings import (  # noqa: F401
+    Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS,
+)
+from api.Arenas import Arenas, ArenaError  # noqa: F401
+from api.Gyms import Gyms, GymError  # noqa: F401
+from api.Fights import (  # noqa: F401
+    Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, STATUS_COMPLETE,
+    DATE_FORMAT, CORNERS, validate_result,
+)
+from api.Events import Events, EventError  # noqa: F401
 
 
 class PrizefighterAPI:
@@ -23,11 +39,11 @@ class PrizefighterAPI:
         self.records = Records()
         self.rankings = Rankings(fighter_api=self.fighters, records_api=self.records)
         self.arenas = Arenas(country_api=self.countries)
+        self.gyms = Gyms(country_api=self.countries)
         self.fights = Fights(fighter_api=self.fighters)
         self.events = Events(arena_api=self.arenas, fights_api=self.fights)
 
     # ---- Weight class passthroughs ----
-
     def get_weight_classes(self):
         return self.weight_classes.get_all()
 
@@ -40,8 +56,10 @@ class PrizefighterAPI:
     def delete_weight_class(self, weight_limit: int):
         self.weight_classes.delete(weight_limit)
 
-    # ---- Country passthroughs (read-only in the UI today, full CRUD available) ----
+    def get_min_weigh_in(self, weight_limit: int) -> int:
+        return self.weight_classes.get_min_weigh_in(weight_limit)
 
+    # ---- Country passthroughs (read-only in the UI today, full CRUD available) ----
     def get_countries(self):
         return self.countries.get_all()
 
@@ -55,7 +73,6 @@ class PrizefighterAPI:
         self.countries.delete(a2)
 
     # ---- Country flags (read-only in the UI today, full CRUD available) ----
-
     def get_flag_path(self, a2: str):
         return self.flags.get_path(a2)
 
@@ -72,7 +89,6 @@ class PrizefighterAPI:
         self.flags.delete(a2)
 
     # ---- Fighters ----
-
     def get_fighters(self):
         return self.fighters.get_all()
 
@@ -105,7 +121,6 @@ class PrizefighterAPI:
             pass  # record may already be missing; fighter deletion still succeeds
 
     # ---- Records ----
-
     def get_record(self, fighter_id: int):
         return self.records.get_by_fighter_id(fighter_id)
 
@@ -113,7 +128,6 @@ class PrizefighterAPI:
         self.records.update(fighter_id, wins, knockouts, losses, draws)
 
     # ---- Rankings (divisional + P4P) ----
-
     def get_ranking_snapshot(self, month: str, ranking_type: str, weight_limit=None):
         return self.rankings.get_snapshot(month, ranking_type, weight_limit)
 
@@ -133,7 +147,6 @@ class PrizefighterAPI:
         return self.rankings.carry_forward(ranking_type, weight_limit, from_month)
 
     # ---- Fan rankings ----
-
     def get_fan_snapshot(self, month: str):
         return self.rankings.get_fan_snapshot(month)
 
@@ -170,12 +183,14 @@ class PrizefighterAPI:
         self.arenas.delete(arena_id)
 
     # ---- Fights ----
-
     def get_fights(self):
         return self.fights.get_all()
 
     def get_fight(self, fight_id: str):
         return self.fights.get_by_id(fight_id)
+
+    def get_fight_rounds(self, fight_id: str):
+        return self.fights.get_scheduled_rounds(fight_id)
 
     def get_fight_full(self, fight_id: str):
         return self.fights.get_full(fight_id)
@@ -207,7 +222,6 @@ class PrizefighterAPI:
         self.fights.delete(fight_id)
 
     # ---- Events ----
-
     def get_events(self):
         return self.events.get_all()
 
@@ -270,7 +284,6 @@ class PrizefighterAPI:
         self.events.delete(event_id)
 
     # ---- Pre-fight metadata ----
-
     CORNERS = ("red_corner", "blue_corner")
 
     def _corner_fighter_id(self, fight: dict, corner: str) -> int:
@@ -279,23 +292,7 @@ class PrizefighterAPI:
         return fight["red_corner_fighter_id"] if corner == "red_corner" else fight["blue_corner_fighter_id"]
 
     def get_default_meta_for_fighter(self, fight_id: str, corner: str) -> dict:
-        """
-        Build a starting point for the pre-fight meta form ("_load_default").
-
-        attributes/skills/tendencies/career_stats/last_6 are carried
-        forward from the fighter's most recently recorded meta -- their
-        most recent OTHER fight (by date) that has meta saved for them,
-        regardless of which corner they were in that fight. If they have
-        no prior recorded meta at all (a debut fighter, or one whose
-        earlier fights predate this feature), a blank default is used
-        instead.
-
-        profile.record and profile.weigh_in are NOT carried forward --
-        record always reflects the live value in records.csv (the
-        source of truth), and weigh-in is fight-specific with no
-        meaningful previous value, so it defaults to this fight's own
-        weight_limit as a starting guess for the user to adjust down.
-        """
+        """ Build a starting point for the pre-fight meta form ("_load_default") """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
             raise FightError(f"No fight found with FightID {fight_id}.")
@@ -328,12 +325,19 @@ class PrizefighterAPI:
             {k: current_record[k] for k in ("wins", "knockouts", "losses", "draws")}
             if current_record else {"wins": 0, "knockouts": 0, "losses": 0, "draws": 0}
         )
-        base["profile"]["weigh_in"] = fight["weight_limit"] - 1
+        base["profile"]["weigh_in"] = fight["weight_limit"]
 
         return base
 
     def save_fight_meta(self, fight_id: str, corner: str, meta: dict) -> None:
-        """ Validate and save one corner's pre-fight meta into the fight's JSON file """
+        """
+        Validate and save one corner's pre-fight meta into the fight's
+        JSON file, correct records.csv to match whatever record was
+        entered (the "adjustment" workflow), and flip the fight to Meta
+        status once BOTH corners have meta recorded -- not before, so a
+        half-completed fight can still be found by searching for
+        Evented fights that still need work.
+        """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
             raise FightError(f"No fight found with FightID {fight_id}.")
@@ -358,3 +362,66 @@ class PrizefighterAPI:
 
         if all(c in meta_obj for c in self.CORNERS):
             self.fights.update_status(fight_id, STATUS_META)
+
+    # ---- Gyms ----
+
+    def get_gyms(self):
+        return self.gyms.get_all()
+
+    def get_gym(self, gym_id: int):
+        return self.gyms.get_by_id(gym_id)
+
+    def add_gym(self, name: str, location: str, training_coach: int,
+               conditioning_coach: int, fight_promoter: int) -> dict:
+        return self.gyms.add(name, location, training_coach, conditioning_coach, fight_promoter)
+
+    def update_gym(self, gym_id: int, name: str, location: str, training_coach: int,
+                  conditioning_coach: int, fight_promoter: int) -> None:
+        self.gyms.update(gym_id, name, location, training_coach, conditioning_coach, fight_promoter)
+
+    def delete_gym(self, gym_id: int) -> None:
+        self.gyms.delete(gym_id)
+
+    # ---- Post-fight results ----
+
+    def save_fight_result(self, fight_id: str, result: dict) -> None:
+        """
+        Validate and save a fight's full post-fight result (gyms,
+        round-by-round punch stats, judges' scorecards, stoppage,
+        outcome, and each corner's post-fight changes), then correct
+        records.csv for both fighters and flip the fight to Complete.
+
+        Only callable once pre-fight meta has been recorded for both
+        corners (status Meta) -- recording a result for a fight nobody
+        weighed in for doesn't make sense, and Complete/Cancelled fights
+        shouldn't have their result silently overwritten by resaving.
+        """
+        fight = self.fights.get_by_id(fight_id)
+        if fight is None:
+            raise FightError(f"No fight found with FightID {fight_id}.")
+        if fight["status"] != STATUS_META:
+            raise FightError(
+                f'Fight {fight_id} is {fight["status"]} -- results can only be recorded '
+                f"once pre-fight meta has been saved for both corners."
+            )
+
+        gyms = result.get("gyms", {})
+        for corner in self.CORNERS:
+            gym_id = gyms.get(corner)
+            if gym_id is not None and not self.gyms.exists(gym_id):
+                raise GymError(f"No gym found with id {gym_id} ({corner}).")
+
+        full = self.fights.get_full(fight_id)
+        cleaned = validate_result(result, full)
+
+        self.fights.save_result(fight_id, cleaned)
+
+        for corner, fighter_id in (
+            ("red_corner", fight["red_corner_fighter_id"]),
+            ("blue_corner", fight["blue_corner_fighter_id"]),
+        ):
+            new_record = cleaned["post_fight"][corner]["new_record"]
+            self.records.update(fighter_id, new_record["wins"], new_record["knockouts"],
+                                new_record["losses"], new_record["draws"])
+
+        self.fights.update_status(fight_id, STATUS_COMPLETE)
