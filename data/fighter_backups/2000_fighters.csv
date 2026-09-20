@@ -1,0 +1,206 @@
+FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weightclass,Reach,Stance,Style
+1,Ricardo,López,,None,Guantanamo,CU,23-04-1961,300,66,1,1
+2,Edgar,Guzman,,None,Leon,MX,12-07-1969,300,66,0,3
+3,David,Stankevic,,None,Marijampole,LT,04-01-1961,300,71,0,3
+4,Takashi,Sato,,None,Sapporo,JP,19-05-1970,300,64,0,1
+5,Elias,Matthias,Koloss,Middle,Hamburg,DE,23-08-1969,300,74,0,2
+6,Ricardo,Perez,,None,Camaguey,CU,27-02-1963,300,71,0,2
+7,Kron,Luan,,None,Elbasan,AL,09-07-1961,300,70,0,3
+8,José,Delgado,,None,Bayamón,PR,16-05-1972,300,64,0,1
+9,David,Ramirez,,None,Santa Tecla,SV,26-03-1962,300,70,1,2
+10,Cian,Sullivan,The Irish Giant,Middle,Cork,IE,14-02-1965,300,70,0,3
+11,André,Almeida,,None,São Paulo,BR,08-07-1964,300,70,1,2
+12,Robert,O'Brien,,None,Derry,IE,29-05-1972,200,70,0,2
+13,Lars,Gustafsson,Supergiant,Middle,Stockholm,SE,12-12-1963,200,66,0,3
+14,Mateo,Anderson,,None,Edmonton,CA,5-12-1961,200,65,0,1
+15,Isaiah,Martinez,,None,Las Vegas,US,17-02-1966,200,64,1,4
+16,Roberto,Álvarez,,None,Bayamo,CU,29-11-1964,200,66,0,1
+17,Laura,dos Santos,,None,Bettembourg,LU,16-07-1967,200,74,0,2
+18,František,Roman,Bohemian,Middle,Ostrava,CZ,03-08-1968,200,69,1,3
+19,Akmal,Yuldashyev,,None,Namangan,UZ,09-12-1968,200,65,1,1
+20,Sultan,Ivanova,,None,Shymkent,KZ,08-05-1970,200,69,0,3
+21,Aaron,Murphy,,None,Galway,IE,19-06-1973,200,70,0,3
+22,Ritthichai,Phromphong,,None,Phuket,TH,26-06-1966,200,71,0,3
+23,Pedro,Castillo,,None,Choloma,HN,01-04-1964,200,64,0,1
+24,Alonso,Gomez,,None,Liberia,CR,03-01-1966,175,66,0,3
+25,Carlos,López,,None,Cuenca,EC,12-10-1967,175,65,1,1
+26,Delbert,Meyer,,None,Munich,DE,02-03-1961,175,67,0,1
+27,Ibrahim,Ahmed,,None,Batroun,LB,10-07-1969,175,70,0,2
+28,Fumihiro,Fujimoto,Iron Blade,Middle,Osaka,JP,29-08-1969,175,73,0,2
+29,Alexandru,Mihai,,None,Constanta,RO,30-10-1970,175,66,1,3
+30,Oskar,Magnusson,The Blizzard,Middle,Malmö,SE,01-08-1969,175,67,0,3
+31,Ahmad,Pour,,None,Qom,IR,16-04-1970,175,67,0,1
+32,Dereck,Ramos,,None,Mayaguez,PR,09-04-1968,175,67,1,3
+33,Julio,Cedeno,,None,Santiago,PA,23-09-1967,175,66,0,1
+34,Adam,Ryan,,None,Waterford,IE,09-04-1960,168,70,0,2
+35,Stuart,Ward,,None,Galsgow,UK,16-12-1962,168,70,0,3
+36,Aleksei,Yvanov,,None,Donetsk,UA,01-05-1963,168,70,0,3
+37,Nico,Martini,,None,Bologn,IT,26-03-1964,168,73,0,4
+38,Sombun,Cherinsuk,,None,Chiang Mai,TH,30-04-1969,168,66,0,4
+39,Christian,Conrad,Der Sturm,Middle,Berlin,DE,28-10-1961,168,74,0,4
+40,Jack,Anderson,,None,Ottawa-Gatineau,CA,28-12-1970,168,63,0,1
+41,Cyril,Adámek,Občan,Middle,Brno,CZ,10-11-1974,168,64,1,4
+42,Jorge,Castillo,El Martillo,Middle,Ecatepec,MX,14-07-1970,168,64,0,4
+43,Vitalii,Yaremchuk,,None,Donetsk,UA,23-11-1970,168,64,0,4
+44,Rubén,Velásquez,El Dorado,Prefix,Chihuahua,MX,02-07-1978,168,71,1,3
+45,Javier,Suazo,Eye of the Tiger,Middle,Danlí,HN,18-11-1964,160,65,1,4
+46,He,Shaoyu,,None,Wuhan,CN,17-08-1964,160,67,1,1
+47,Narin,Xayavong,Iron Tiger,Middle,Bangkok,TH,04-05-1962,160,66,0,3
+48,Mohamed,Chebbi,,None,Gafsa,TN,28-02-1970,160,63,0,1
+49,Javier,Cruz,,None,Trujillo Alto,PR,31-10-1965,160,66,0,1
+50,Maximilian,Schneider,Stefen,Middle,Munich,DE,12-10-1971,160,69,0,2
+51,Marios,Ioannou,,None,Heraklion,GR,06-06-1970,160,70,1,2
+52,Ilya,Petrova,,None,Novosibirsk,RU,20-04-1971,160,67,0,4
+53,Jakob,Pettersen,,None,Stravanger,NO,17-03-1972,160,74,0,4
+54,Joseph,Jacquet,Cogneur,Middle,Marseille,FR,28-08-1977,160,68,1,4
+55,Valentin,Stoyanova,,None,Stara Zagora,BG,08-05-1960,154,68,0,4
+56,Zheng,Zhiwei,,None,Taipei,TW,10-07-1962,154,66,0,3
+57,Xavier,Quinn,Blackstorm,Middle,Belfast,IE,19-06-1964,154,68,1,3
+58,Ryan,Moore,Tantalum,Middle,Oakland,US,12-11-1970,154,66,0,4
+59,Willem,Ndlovu,,None,Kinshasa,ZA,14-02-1971,154,65,1,1
+60,Christopher,Alvarez,,None,Manila,PH,26-07-1969,154,70,1,3
+61,Syergyei,Akhmyedov,,None,Qarshi,UZ,12-03-1972,154,70,0,4
+62,Pavel,Andreeva,,None,Chelyabinsk,RU,20-02-1970,154,71,1,2
+63,Joe Gunner,Grant,Justice,Prefix,Indianapolis,US,24-05-1972,154,71,0,4
+64,Daniel,Thomas,,None,Edinburgh,UK,15-05-1970,154,71,0,4
+65,An Rui,An,Golden Arrow,Middle,Kunming,CN,09-07-1961,147,67,1,1
+66,Udon,Suwan,,None,Si Racha,TH,04-05-1968,147,69,0,4
+67,Joel,Gutierrez,Jawbreaker,Middle,Manila,PH,23-04-1971,147,67,0,3
+68,Santos,Anguilar,The Takeover,Middle,La Ceiba,HN,28-04-1971,147,71,1,3
+69,Alexey,Barat,,None,Karaganda,KZ,15-05-1967,147,66,0,1
+70,Ustym,Shevchenko,Iron Step,Middle,Zaporizhzhia,UA,17-09-1969,147,68,1,3
+71,Sung Ho,Joo,,None,Daegu,KR,24-09-1965,147,72,0,2
+72,Sengphet,Phommavong,,None,Muang Xay,LA,09-08-1965,147,67,0,1
+73,Theo,Thompson,,None,Edmonton,CA,31-01-1972,147,63,0,2
+74,Otabek,Sharipova,,None,Kokand,UZ,21-10-1968,147,69,0,2
+75,Ki-Ho,Jang,The Falcon,Prefix,Ulsan,KR,08-01-1961,140,71,0,2
+76,Manuel,Martinez,,None,Chihuahua,MX,02-06-1961,140,69,1,2
+77,Samuel,Carter,The Bulldog,Prefix,Pittsburg,US,18-06-1964,140,63,0,4
+78,Jack,Byrne,,None,Dundalk,IE,14-08-1968,140,66,0,1
+79,Mino,Nguyen,Maestro,Middle,Ho Chi Minh City,VN,31-12-1971,140,67,1,3
+80,Wichian,Yang,,None,Udon Thani,TH,15-06-1965,140,67,0,3
+81,George,Okello,,None,Kampala,UG,13-10-1969,140,64,0,1
+82,George,Roberts,,None,Liverpool,UK,02-07-1969,140,66,0,3
+83,Ales,Turk,,None,Koper,SI,29-12-1970,140,72,0,4
+84,Ali,Shehadeh,,None,Khan Yunis,PS,04-02-1971,140,72,1,4
+85,Brayden,Parker,,None,Adelaide,AU,08-08-1968,140,72,0,4
+86,Neil,Jones,,None,Sheffield,UK,07-04-1960,135,67,0,4
+87,Diego,Ramos,,None,Barcelona,ES,03-09-1965,135,74,0,2
+88,Jian,Zheng,Harbour Harlem,Middle,Queenstown,SG,14-09-1966,135,71,0,4
+89,Carlos,Jiménez,El Toro,Middle,Puebla,MX,10-03-1970,135,68,0,1
+90,David,Sjöberg,Ice Fists,Middle,Gothenborg,SE,02-01-1970,135,69,1,2
+91,Julian,Matheiu,Éclair,Middle,Lyon,FR,19-07-1969,135,70,1,3
+92,Zachary,Santos,El Relámpago,Prefix,Los Angeles,US,20-02-1970,135,69,0,4
+93,Alexander,Romero,,None,Barelona,VE,07-01-1970,135,71,0,3
+94,Ceng,Zhengyi,,None,Taichung,TW,27-10-1971,135,66,0,4
+95,Conor,Ahearn,The Celtic Fox,Prefix,Dublin,IE,20-05-1970,135,65,1,4
+96,Lucas,Romero,,None,Resistencia,AR,24-11-1968,135,72,0,2
+97,Andreas,Müller,Lightning,Middle,Catfish,AT,26-09-1979,135,69,0,2
+98,Jimmy,Willems,Paul,Middle,London,UK,17-11-1978,135,73,0,4
+99,Chan-woo,Seo,Silver Bullet,Middle,Incheon,KR,18-10-1970,130,71,0,3
+100,Zafar,Yusupova,,None,Namangan,UZ,14-04-1969,130,70,0,2
+101,Karel,Procházka,,None,Olomouc,CZ,28-09-1964,130,69,0,4
+102,Martin,Grech,,None,Qormi,MT,15-12-1969,130,73,1,4
+103,Jason,Thomas,The Technician,Prefix,Baltimore,US,09-04-1971,130,66,1,3
+104,Sean,Tan,,None,Toa Payoh,SG,12-10-1969,130,69,1,4
+105,Stelios,Christoforou,,None,Protaras,CY,17-12-1970,130,66,0,4
+106,Javier,Cedeno,,None,Panama,PA,12-09-1967,130,70,0,4
+107,Walter,Miller,,None,Seattle,US,15-12-1966,130,66,1,3
+108,Salvador,Castro,,None,Ciudad Juarez,MX,03-05-1968,130,66,0,3
+109,Gabriel,Sultiao,Pep,Middle,Davao,PH,02-05-1975,130,65,1,4
+110,Manuel,Martin,,None,Bilbao,ES,10-03-1971,130,65,0,1
+111,Matías Ignacio,Medina,,None,Córdoba,AR,19-06-1961,126,67,0,4
+112,Aaron,Sullivan,,None,Sacramento,US,09-06-1960,126,63,0,1
+113,Peter,Peterson,,None,New York City,US,11-05-1966,126,68,1,1
+114,Eero,Salminen,,None,Jyvaskyla,FI,23-07-1960,126,71,0,2
+115,Hryhorii,Melnyk,Swiftblade,Middle,Kyiv,UA,25-05-1969,126,70,1,4
+116,William,Walker,,None,Montego Bay,JM,31-07-1970,126,66,0,3
+117,Jose,Sanchez,,None,Barcelona,VE,01-07-1972,126,67,0,3
+118,Yan,Leng,,None,Phnom Penh,KH,19-02-1971,126,66,1,1
+119,Héctor,Juárez,Manos Rápidas,Middle,Ciudad,MX,08-06-1970,126,70,1,4
+120,Óscar,de la Cruz,Señor,Prefix,Málaga,ES,29-12-1974,126,71,0,3
+121,Diego,Díaz,,None,Mayagüez,PR,27-06-1971,126,70,1,2
+122,Anan,Anuman,,None,Pattaya,TH,19-04-1960,122,67,1,4
+123,Said,Naji,,None,Tangier,MA,16-02-1964,122,68,0,1
+124,Angel,Rodriguez,,None,Arecibo,PR,10-06-1970,122,73,0,2
+125,Maciej,Kozlowskoi,,None,Lodz,PL,02-09-1964,122,65,0,1
+126,Ian,Tolentino,,None,Taguig,PH,14-06-1969,122,71,1,3
+127,Radek,Marek,,None,Brno,CZ,23-07-1971,122,68,0,3
+128,Kevin,Amador,The Ghost,Middle,Tegucigalpa,HN,21-12-1968,122,74,0,2
+129,Marvin,Morales,,None,Matagalpa,NI,17-09-1970,122,64,0,1
+130,Kim,binti Ibrahim,,None,Malacca,MY,09-07-1971,122,67,0,1
+131,Cesar,Rodriguez,,None,Santo Dominogo,DO,29-06-1972,122,64,1,1
+132,David,Colón,,None,San Juan,PR,04-10-1972,122,72,0,2
+133,Ricardo,Flores,,None,Puebla,MX,08-11-1962,118,67,1,3
+134,Tiago,Rivera,The Hound,Prefix,San Pedro Sula,HN,01-04-1960,118,66,0,3
+135,Damin,Shin,,None,Ulsan,KR,26-08-1960,118,73,0,4
+136,Luiz,Pacheco,,None,Carolina,PR,01-02-1966,118,71,0,2
+137,Zachary,Kelly,Zac,Middle,Sydney,AU,30-06-1960,118,66,0,4
+138,Aaron,Kelly,,None,Belfast,IE,06-03-1964,118,64,0,1
+139,Charles,Morgan,,None,Montego Bay,JM,08-03-1969,118,64,0,4
+140,David,Batista,,None,Penonome,PA,01-09-1970,118,67,1,1
+141,Damien,Simon,,None,Petange,LU,16-03-1969,118,74,0,1
+142,Detchi,Muangchai,The Cobra,Prefix,Nakhon Ratcasima,TH,07-02-1969,118,68,1,4
+143,Roman,Marchenko,,None,Kyiv,UA,02-11-1970,118,70,0,3
+144,Minoru,Hashimoto,,None,Tokyo,JP,05-12-1972,118,70,0,3
+145,Carlos,Kattán,Guerrero,Middle,San Pedro Sula,HN,14-04-1965,115,64,0,1
+146,Ramazan,Cetin,,None,Ankara,TR,26-09-1963,115,66,0,3
+147,Artem,Pavlov,,None,Postov-on-Don,RU,15-05-1970,115,64,0,4
+148,Phetsamone,Lao,,None,Pakxan,LA,02-05-1967,115,67,0,3
+149,Serhii,Romanenko,Steel Heart,Middle,Odesa,UA,18-06-1961,115,69,0,3
+150,Felipe,Gomes,Mãos,Middle,Recife,BR,31-01-1971,115,68,0,1
+151,Chingiz,Ospanov,,None,Karaganda,KZ,31-03-1970,115,71,0,4
+152,Tomáš,Adámek,,None,Brno,CZ,28-12-1968,115,66,0,4
+153,Tyler,McKenzie,The Rangler,Prefix,Darwin,AU,13-09-1968,115,67,0,3
+154,Jack,Collins,Quickfire,Middle,Dundalk,IE,06-07-1973,115,71,0,3
+155,Callum,Sheridan,The Hound,Prefix,Dublin,IE,08-09-1971,115,74,0,4
+156,Caleb,Nash,Plant,Middle,Philadelphia,US,03-08-1979,115,67,0,3
+157,Phichai,Saengeuk,Siam Thunder,Suffix,Udom Thani,TH,24-09-1963,112,70,1,3
+158,Patrick,Mhlongo,,None,Johannesburg,ZA,08-11-1964,112,66,0,3
+159,Richard,Davis,,None,Liverpool,UK,08-01-1971,112,72,0,2
+160,Gabriel,Torres,,None,San Miguel de Tucuman,AR,12-11-1970,112,68,0,3
+161,Akio,Chiba,Blitz,Middle,Tokyo,JP,10-06-1974,112,63,0,1
+162,Steven,Serrano,Little Thunder,Middle,Fresno,US,25-11-1971,112,69,1,3
+163,Lee Jun,Han,,None,Changwon,KR,21-06-1968,112,70,0,2
+164,Sean,White,,None,Milwaukee,US,10-04-1973,112,63,0,1
+165,Jose,Rodriguez,,None,Carloina,PR,09-10-1971,112,74,0,4
+166,Rudolph,Schneider,,None,Berlin,DE,20-06-1971,112,67,0,1
+167,Albert,Stewart,,None,Indianapolis,US,06-07-1963,108,68,0,4
+168,Sander,Larsen,,None,Tonsberg,NO,19-12-1960,108,70,0,2
+169,Fang Ming,Jie,,None,Nanjing,CN,18-07-1963,108,71,0,3
+170,Diego,Mendoza,La Avispa,Middle,Puebla,MX,12-12-1968,108,72,0,2
+171,Edwin,Juárez,,None,Tagucigalpa,HN,07-02-1963,108,72,0,4
+172,Samuel,Whitaker,,None,Portland,US,26-08-1963,108,63,0,1
+173,Aiman,Lim,,None,Seremban,MY,15-12-1969,108,71,1,2
+174,John,Gonzales,,None,Pasig,PH,23-12-1969,108,63,0,1
+175,Salisu,John,,None,Kaduna,NG,12-05-1964,108,68,0,1
+176,Manuel,Lopez,,None,Havana,CU,28-04-1968,108,68,0,4
+177,Oscar,Ramírez,Chico,Middle,Guadalajara,MX,07-11-1969,105,70,1,3
+178,Matilde,Petrov,,None,Kuressaare,EE,02-02-1962,105,63,0,1
+179,Ronald,Ward,,None,Nottingham,UK,30-08-1970,105,72,0,2
+180,David,Sultanov,,None,Semey,KZ,25-12-1964,105,70,1,2
+181,Tal,Ahmad,,None,Syria,SY,03-06-1962,105,73,1,2
+182,Samu,Makela,,None,Oulu,FI,14-07-1973,105,73,1,2
+183,Grayson,Miller,,None,Edmonton,CA,23-08-1966,105,65,0,4
+184,Jack,Moore,,None,Galway,IE,24-09-1973,105,68,0,3
+185,Jamal,Awad,,None,Battir,PS,01-03-1972,105,73,0,2
+186,Stanislav,Balav,,None,Trnava,SK,27-02-1971,105,67,1,4
+187,Manas,Arjarn,,None,Chiang Mai,TH,18-10-1973,118,64,0,4
+188,Marcos,Schmitz,,None,Curitiba,BR,28-02-1977,122,70,0,2
+189,Jesus,Garcia,,None,Trujillo,PE,25-06-1981,122,68,0,3
+190,Kyle,Martin,The Ghost,Middle,New Orleans,US,25-09-1977,115,68,0,1
+191,Hugo,Castro,,None,Uruguay,UY,21-10-1962,118,69,0,4
+192,Leonard,Schäfer,,None,Essen,DE,31-07-1979,135,72,0,4
+193,Vladimir,Kovacevic,,None,Belgrade,RS,18-08-1978,135,70,0,3
+194,Daniel,Valdez,,None,Pasig,PH,05-02-1978,135,71,1,3
+195,Maximiliano,Gonzalez,,None,Arica,CL,25-08-1978,135,71,0,2
+196,Ralph,Brooks,Andy,Middle,Jacksonville,US,28-10-1971,108,66,1,1
+197,Luis,Reyes,,None,Choluteca,HN,03-05-1980,108,71,0,3
+198,Jean,Ramos,,None,Baymon,PR,17-02-1977,108,68,0,3
+199,Ricardo,Gomez,,None,San Francisco de Macoris,DO,31-05-1978,130,66,1,4
+200,Karl,Schwarz,,None,Hamburg,DE,28-09-1980,130,71,0,2
+201,Carlos,Suarez,,None,Uruguay,UY,09-05-1972,112,72,1,2
+202,Chris,Castro,,None,Caloocan,PH,01-09-1968,105,69,0,3
+203,Leo,Johnson,,None,Winnipeg,CA,23-10-1965,108,67,0,1
+204,Dante,Martini,,None,Milan,IT,18-01-1981,108,71,0,2
+205,Doumi,Abbas,,None,Al Fahahil,KW,18-11-1977,108,70,0,3

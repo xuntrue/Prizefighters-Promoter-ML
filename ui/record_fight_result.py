@@ -1,25 +1,5 @@
-"""
-record_fight_result.py
-
-Tab for recording a fight's "result" block on fight day: cornering
-gyms, round-by-round punch stats, judges' scorecards, the stoppage (if
-any), the outcome, and each corner's post-fight changes.
-
-Workflow: pick a bout the same way as Pre-Fight Meta (game date filters
-the event list, then pick a bout on that event's card) -- but only
-fights already in Meta status are offered, since a result can't be
-recorded before pre-fight meta exists for both corners. Set how the
-fight ended, click "Build Rounds & Scorecards" to lay out the grids for
-however many rounds actually happened, fill everything in, then Save.
-
-This screen deliberately doesn't try to be clever: nothing is
-auto-computed except "power" (which the user never sees a field for --
-it's derived silently), and nothing is pre-filled from a "sensible
-default" the way Pre-Fight Meta's carry-forward is. Every number here
-gets typed in by hand.
-"""
-
 import tkinter as tk
+
 from tkinter import ttk, messagebox
 from datetime import date, datetime
 
@@ -44,6 +24,47 @@ PUNCH_STAT_ROWS = [(key, key.replace("_", " ").title()) for key in PUNCH_TYPE_FI
 DECISION = "Decision"
 STOPPED = "Stopped (KO/TKO)"
 DRAW_LABEL = "Draw"
+
+
+class VScrollFrame(ttk.Frame):
+    """A frame with a vertical scrollbar -- wraps this whole tab's content.
+    Without it, everything past the punch-stats section (which is tall
+    on its own) would be permanently off-screen with no way to reach it,
+    since the tab itself has no scrolling by default."""
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        canvas = tk.Canvas(self, highlightthickness=0)
+        vbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=vbar.set)
+
+        self.inner = ttk.Frame(canvas)
+        self.inner.bind(
+            "<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        window_id = canvas.create_window((0, 0), window=self.inner, anchor="nw")
+        # Keep the inner frame's width matched to the canvas's visible
+        # width, so fill="x" widgets inside it span the real window width
+        # instead of shrinking to their own requested size.
+        canvas.bind("<Configure>", lambda e: canvas.itemconfigure(window_id, width=e.width))
+
+        canvas.pack(side="left", fill="both", expand=True)
+        vbar.pack(side="right", fill="y")
+
+        canvas.bind("<Enter>", lambda e: self._bind_mousewheel(canvas))
+        canvas.bind("<Leave>", lambda e: self._unbind_mousewheel(canvas))
+
+    @staticmethod
+    def _bind_mousewheel(canvas):
+        canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
+        canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))
+        canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))
+
+    @staticmethod
+    def _unbind_mousewheel(canvas):
+        canvas.unbind_all("<MouseWheel>")
+        canvas.unbind_all("<Button-4>")
+        canvas.unbind_all("<Button-5>")
 
 
 class HScrollFrame(ttk.Frame):
@@ -88,6 +109,9 @@ class RecordFightResultTab(ttk.Frame):
         self.punch_vars = {}            # [corner][round_index][field] -> {"thrown": var, "landed": var}
         self.knocked_down_vars = {}     # [corner][round_index] -> var
 
+        self.scroll = VScrollFrame(self)
+        self.scroll.pack(fill="both", expand=True)
+
         self._build_reference_date()
         self._build_selectors()
         self._build_gyms_and_ending()
@@ -100,7 +124,7 @@ class RecordFightResultTab(ttk.Frame):
     # ---------- Top: reference date + bout selection ----------
 
     def _build_reference_date(self):
-        date_frame = ttk.LabelFrame(self, text="Game's Current Date")
+        date_frame = ttk.LabelFrame(self.scroll.inner, text="Game's Current Date")
         date_frame.pack(fill="x", padx=10, pady=(10, 5))
 
         today = date.today()
@@ -122,7 +146,7 @@ class RecordFightResultTab(ttk.Frame):
             var.trace_add("write", lambda *args: self._refresh_event_list())
 
     def _build_selectors(self):
-        box = ttk.LabelFrame(self, text="Select a Bout (only bouts with completed Pre-Fight Meta are shown)")
+        box = ttk.LabelFrame(self.scroll.inner, text="Select a Bout (only bouts with completed Pre-Fight Meta are shown)")
         box.pack(fill="x", padx=10, pady=5)
 
         ttk.Label(box, text="Event:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
@@ -138,9 +162,8 @@ class RecordFightResultTab(ttk.Frame):
         self.bout_combo.bind("<<ComboboxSelected>>", lambda _e: self._on_bout_selected())
 
     # ---------- Gyms + how the fight ended ----------
-
     def _build_gyms_and_ending(self):
-        box = ttk.LabelFrame(self, text="Corners & How It Ended")
+        box = ttk.LabelFrame(self.scroll.inner, text="Corners & How It Ended")
         box.pack(fill="x", padx=10, pady=5)
 
         ttk.Label(box, text="Red Corner Gym:").grid(row=0, column=0, sticky="w", padx=5, pady=4)
@@ -206,15 +229,17 @@ class RecordFightResultTab(ttk.Frame):
                 pass  # plain Labels don't have a state option
 
     # ---------- Scorecards ----------
+
     def _build_scorecards_area(self):
-        frame = ttk.LabelFrame(self, text="Judges' Scorecards")
+        frame = ttk.LabelFrame(self.scroll.inner, text="Judges' Scorecards")
         frame.pack(fill="x", padx=10, pady=5)
-        self.scorecards_scroll = HScrollFrame(frame, height=160)
+        self.scorecards_scroll = HScrollFrame(frame, height=200)
         self.scorecards_scroll.pack(fill="x", padx=5, pady=5)
 
     # ---------- Punch stats ----------
+
     def _build_punch_stats_area(self):
-        frame = ttk.LabelFrame(self, text="Round-by-Round Punch Stats (Thrown / Landed)")
+        frame = ttk.LabelFrame(self.scroll.inner, text="Round-by-Round Punch Stats (Thrown / Landed)")
         frame.pack(fill="both", expand=True, padx=10, pady=5)
 
         self.punch_notebook = ttk.Notebook(frame)
@@ -227,8 +252,9 @@ class RecordFightResultTab(ttk.Frame):
             self.punch_scrolls[corner] = scroll
 
     # ---------- Outcome + post-fight ----------
+
     def _build_outcome_and_post_fight(self):
-        frame = ttk.LabelFrame(self, text="Outcome & Post-Fight")
+        frame = ttk.LabelFrame(self.scroll.inner, text="Outcome & Post-Fight")
         frame.pack(fill="x", padx=10, pady=(5, 10))
 
         outcome_row = ttk.Frame(frame)
@@ -296,6 +322,7 @@ class RecordFightResultTab(ttk.Frame):
         return vars_out
 
     # ---------- Lifecycle ----------
+
     def on_tab_shown(self):
         self.refresh_reference_data()
 
@@ -319,6 +346,7 @@ class RecordFightResultTab(ttk.Frame):
         return None
 
     # ---------- Event / bout selection ----------
+
     def _refresh_event_list(self):
         try:
             ref_date = date(int(self.ref_year_var.get()), int(self.ref_month_var.get()),
@@ -378,7 +406,7 @@ class RecordFightResultTab(ttk.Frame):
         fight = self.api.get_fight(fight_id)
         red = self.api.get_fighter(fight["red_corner_fighter_id"])
         blue = self.api.get_fighter(fight["blue_corner_fighter_id"])
-        #format_full_name(red["first_name"], red["last_name"], red["nickname"], red["placement"])
+        # format_full_name(red["first_name"], red["last_name"], red["nickname"], red["placement"])
         red_name = f'{red["first_name"]} {red["last_name"]}'
         blue_name = f'{blue["first_name"]} {blue["last_name"]}'
         rounds = self.api.get_fight_rounds(fight_id)
@@ -398,11 +426,11 @@ class RecordFightResultTab(ttk.Frame):
 
         self.current_fight_id = fight_id
         self.current_fight = self.api.get_fight(fight_id)
-        scheduled_rounds = self.api.get_fight_rounds(fight_id)
+        rounds = self.api.get_fight_rounds(fight_id)
 
-        self.stoppage_round_spin.config(to=scheduled_rounds)
-        if int(self.stoppage_round_var.get()) > scheduled_rounds:
-            self.stoppage_round_var.set(str(scheduled_rounds))
+        self.stoppage_round_spin.config(to=rounds)
+        if int(self.stoppage_round_var.get()) > rounds:
+            self.stoppage_round_var.set(str(rounds))
 
         red = self.api.get_fighter(self.current_fight["red_corner_fighter_id"])
         blue = self.api.get_fighter(self.current_fight["blue_corner_fighter_id"])
@@ -420,7 +448,7 @@ class RecordFightResultTab(ttk.Frame):
             messagebox.showerror("No Bout Selected", "Select a bout first.")
             return
 
-        sanctioned_rounds = self.api.get_fight_rounds(self._selected_fight_id())
+        sanctioned_rounds = self.api.get_fight_rounds(self.current_fight_id )
 
         if self.end_type_var.get() == STOPPED:
             try:
@@ -584,7 +612,7 @@ class RecordFightResultTab(ttk.Frame):
             return
 
         stoppage = self._gather_stoppage()
-        rounds_fought = stoppage["round"] if stoppage else self.current_fight["rounds"]
+        rounds_fought = stoppage["round"] if stoppage else self.api.get_fight_rounds(self.current_fight_id)
 
         red_id = self.current_fight["red_corner_fighter_id"]
         blue_id = self.current_fight["blue_corner_fighter_id"]
