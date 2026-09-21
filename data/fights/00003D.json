@@ -1,0 +1,14 @@
+{
+  "fight_id": "00003D",
+  "red_corner_fighter_id": 196,
+  "blue_corner_fighter_id": 171,
+  "weight_limit": 108,
+  "date": "22-04-2000",
+  "championship": false,
+  "rounds": 4,
+  "round_minutes": 1,
+  "status": "Scheduled",
+  "event_id": null,
+  "meta": {},
+  "result": {}
+}

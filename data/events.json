@@ -98,5 +98,41 @@
       "00002C",
       "00002D"
     ]
+  },
+  {
+    "event_id": 6,
+    "headliner": "Jim\u00e9nez vs. Ahearn",
+    "slogan": "No Mercy",
+    "arena_id": 2,
+    "date": "19-02-2000",
+    "main_event_fight_id": "00002E",
+    "co_main_fight_ids": [
+      "00002F"
+    ],
+    "undercard_fight_ids": [
+      "000032",
+      "000033",
+      "000030",
+      "000031",
+      "000034"
+    ]
+  },
+  {
+    "event_id": 7,
+    "headliner": "Gutierrez vs. Thompson",
+    "slogan": "Under the Philippine Sky",
+    "arena_id": 2,
+    "date": "26-02-2000",
+    "main_event_fight_id": "000035",
+    "co_main_fight_ids": [
+      "000036"
+    ],
+    "undercard_fight_ids": [
+      "000037",
+      "000038",
+      "000039",
+      "00003A",
+      "00003B"
+    ]
   }
 ]

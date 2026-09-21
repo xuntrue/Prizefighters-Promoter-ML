@@ -12,7 +12,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 11,André,Almeida,,None,São Paulo,BR,08-07-1964,300,70,1,2
 12,Robert,O'Brien,,None,Derry,IE,29-05-1972,200,70,0,2
 13,Lars,Gustafsson,Supergiant,Middle,Stockholm,SE,12-12-1963,200,66,0,3
-14,Mateo,Anderson,,None,Edmonton,CA,5-12-1961,200,65,0,1
+14,Mateo,Anderson,,None,Edmonton,CA,05-12-1961,200,65,0,1
 15,Isaiah,Martinez,,None,Las Vegas,US,17-02-1966,200,64,1,4
 16,Roberto,Álvarez,,None,Bayamo,CU,29-11-1964,200,66,0,1
 17,Laura,dos Santos,,None,Bettembourg,LU,16-07-1967,200,74,0,2
@@ -204,3 +204,48 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 203,Leo,Johnson,,None,Winnipeg,CA,23-10-1965,108,67,0,1
 204,Dante,Martini,,None,Milan,IT,18-01-1981,108,71,0,2
 205,Doumi,Abbas,,None,Al Fahahil,KW,18-11-1977,108,70,0,3
+206,Ronald,Mohammed,,None,Mon Repos,TT,21-02-1969,105,69,0,3
+207,Gregor,Turk,,None,Ljubljana,SI,19-07-1977,105,68,0,1
+208,Ji-ho,Jeon,,None,Changwon,KR,30-08-1972,105,66,0,3
+209,David,Sithole,,None,Nairobi,ZA,06-04-1961,105,72,0,2
+210,Joseph,Muhindo,,None,Njeru,UG,17-11-1967,105,67,1,3
+211,David,O'Connell,,None,Cork,IE,18-08-1978,105,67,0,3
+212,Pedro,Jiminez,,None,Caracas,VE,28-07-1975,108,68,0,3
+213,Hamid,Heydari,,None,Shiraz,IR,14-12-1981,108,74,0,4
+214,Panagiotis,Karagiannis,,None,Thessaloniki,GR,06-03-1978,108,73,0,2
+215,Lucas,Ribeiro,,None,Funchal,PT,15-03-1979,108,63,0,1
+216,Aharon,Reuben,,None,Bnei Brak,IL,27-05-1981,108,71,0,2
+217,Derek,Ayala,,None,Mayaguez,PR,28-02-1963,108,68,0,3
+218,Richard,Rolle,,None,Bahamas City,BS,01-06-1980,112,68,1,1
+219,Hossein,Mahmoudi,Madman,Middle,Ahvaz,IR,25-11-1981,112,70,1,3
+220,Peter,Mahlangu,,None,Cape Town,ZA,03-10-1979,112,63,0,1
+221,Jamie,O'Brien,,None,Limerick,IE,27-09-1962,112,63,0,1
+222,Roberto,Gonzalez,,None,La Romana,DO,09-02-1961,112,63,0,1
+223,Antonio,Martinez,,None,San Francisco de Macoris,DO,22-02-1982,115,68,0,1
+224,Ahmad,Tan,,None,Subang Jaya,MY,08-04-1966,115,72,0,4
+225,Joseph,Mhlongo,,None,Nairobi,ZA,30-01-1974,115,64,0,4
+226,Luis,Fernandes,,None,Porto,PT,14-07-1977,115,70,1,2
+227,Wichai,Zhang,,None,Samut Prakan,TH,17-09-1980,115,71,0,4
+228,Moez,Nasri,,None,Tunis,TN,03-09-1962,118,68,0,4
+229,Daniel,Ruiz,,None,Santa Fe de la Vera Cruz,AR,01-05-1977,118,67,0,3
+230,Kanon,Shimizu,,None,Yokohama,JP,28-12-1979,118,68,0,1
+231,Oliver,Scott,,None,Montreal,CA,26-10-1963,122,73,0,4
+232,Matthias,Fiser,Jewel,Middle,Liberec,CZ,18-08-1975,122,66,0,4
+233,Sean,Mitchell,,None,Boston,US,05-05-1975,122,67,0,3
+234,Pablo,Garza,,None,Monterrey,MX,19-07-1962,122,70,0,4
+235,Lei,Tang,,None,Shanghai,CN,19-05-1970,200,64,0,4
+236,Emil,Werner,Whirlwind,Middle,Hamburg,DE,03-03-1961,147,63,0,1
+237,Julius,Laine,,None,Helsinki,FI,20-07-1978,130,63,0,4
+238,Mohamed,Ammar,,None,Sousse,TN,15-11-1973,130,73,0,2
+239,David,Vasquez,,None,Puebla,MX,02-03-1973,130,74,1,2
+240,Ricardo,Rodriguez,,None,Santo Domingo Oeste,DO,20-08-1962,130,65,0,1
+241,Seng,Chanthalangsy,,None,Vientiane,LA,20-09-1979,130,64,0,4
+242,Alexander,Makarova,,None,Moscow,RU,01-07-1960,126,74,0,2
+243,Stephen,Schulz,,None,Dusseldorf,DE,13-10-1967,126,72,0,4
+244,Rok,Horvat,,None,Kamnik,SI,24-11-1974,126,69,0,2
+245,Anatoly,Shevchenko,,None,Kyiv,UA,12-06-1977,126,66,0,3
+246,Fernando,Sanchez,,None,Vincento Lopez,AR,18-01-1970,140,65,0,4
+247,Marcos,Henrique,Fantasma,Middle,Salvador,BR,13-12-1966,135,69,0,3
+248,Alaa,Salah,,None,Asyut,EG,16-08-1971,154,66,0,1
+249,Alfredo,Martinez,,None,Guantanamo,CU,24-02-1972,147,63,1,1
+250,Salvatore,Mancini,,None,Turin,IT,14-04-1975,115,70,0,4

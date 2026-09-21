@@ -1,0 +1,14 @@
+{
+  "fight_id": "000047",
+  "red_corner_fighter_id": 91,
+  "blue_corner_fighter_id": 94,
+  "weight_limit": 135,
+  "date": "15-04-2000",
+  "championship": true,
+  "rounds": 12,
+  "round_minutes": 1,
+  "status": "Scheduled",
+  "event_id": null,
+  "meta": {},
+  "result": {}
+}

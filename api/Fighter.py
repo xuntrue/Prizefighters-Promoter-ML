@@ -360,7 +360,7 @@ class Fighter:
 #     "career_stats": {8 non-negative ints, see CAREER_STAT_FIELDS},
 #     "attributes": {11 floats 0.5-10.0 in steps of 0.5, see ATTRIBUTE_FIELDS},
 #     "skills": {
-#       "experience": {"level": int 1-10, "xp": int 0-max_xp_for_level(level)},
+#       "experience": {"level": int 0-10, "xp": int 0-max_xp_for_level(level)},
 #       "signature_traits": {
 #         "group_1": {"name": str, "level": int 1-5, "xp": int 0-10} | None,
 #         ... same shape for group_2, group_3, group_4
@@ -402,14 +402,12 @@ MIN_ATTRIBUTE = 0.5
 MAX_ATTRIBUTE = 10.0
 ATTRIBUTE_STEP = 0.5
 
-MIN_LEVEL = 1
+MIN_LEVEL = 0
 MAX_LEVEL = 10
 MIN_XP = 0
 
-
 def max_xp_for_level(level: int) -> int:
     return 100 * (level + 1)
-
 
 # Signature traits: up to one pick per group, any group may be None.
 SIGNATURE_TRAIT_GROUPS = {
@@ -424,7 +422,7 @@ SIGNATURE_TRAIT_GROUPS = {
 
 # Each individual signature trait has its own level (1-5) and XP progress
 # (0-10) -- separate from the fighter's overall experience level/XP above.
-MIN_TRAIT_LEVEL = 1
+MIN_TRAIT_LEVEL = 0
 MAX_TRAIT_LEVEL = 5
 MIN_TRAIT_XP = 0
 MAX_TRAIT_XP = 10

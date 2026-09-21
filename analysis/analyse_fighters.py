@@ -1,8 +1,26 @@
+"""
+analyse_fighters.py
+
+Distributions and cross-cuts across the fighter roster, joining
+fighters.csv, countries.csv, records.csv, and (for division names)
+weights.csv.
+
+Same discipline as analyse_fights.py: every function takes an open
+sqlite3 connection and returns data -- nothing prints except main().
+Enum-style columns (Stance, Style) are translated to labels in Python
+using the SAME dicts the app itself uses (api.Fighter.INT_TO_STANCE /
+INT_TO_STYLE), rather than duplicating "0 = Orthodox" as a second,
+driftable copy inside a SQL CASE WHEN. Everything else -- the actual
+joins, grouping, filtering, aggregation -- is real SQL.
+
+Run from anywhere:
+    python analysis/analyse_fighters.py
+"""
+
 import csv
 import os
 import sqlite3
 import sys
-
 from datetime import date
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -14,6 +32,9 @@ FIGHTERS_CSV = os.path.join(PROJECT_ROOT, "data", "fighters.csv")
 COUNTRIES_CSV = os.path.join(PROJECT_ROOT, "data", "countries.csv")
 RECORDS_CSV = os.path.join(PROJECT_ROOT, "data", "records.csv")
 WEIGHTS_CSV = os.path.join(PROJECT_ROOT, "data", "weights.csv")
+
+
+# ============================= Loading =============================
 
 def load_fighters(conn: sqlite3.Connection) -> None:
     conn.execute(
@@ -77,15 +98,23 @@ def build_connection() -> sqlite3.Connection:
     load_weight_classes(conn)
     return conn
 
+
+# ============================= Queries =============================
+
 def count_total_fighters(conn: sqlite3.Connection) -> int:
-    query = conn.execute(
-        "SELECT COUNT(*) FROM fighters"
-    ).fetchone()[0]
-    return query
+    return conn.execute("SELECT COUNT(*) FROM fighters").fetchone()[0]
 
 
 def fighters_by_country(conn: sqlite3.Connection) -> list:
-    """Roster size per country """
+    """Roster size per country, busiest first.
+
+    LEFT JOIN rather than a plain JOIN, deliberately: the app itself
+    validates every fighter's Country against countries.csv at write
+    time, so an orphaned code shouldn't happen through normal use -- but
+    this script reads the CSVs directly, and CSVs get hand-edited. An
+    INNER JOIN would silently drop any fighter whose country code had no
+    match, quietly under-reporting the roster; COALESCE surfaces it as
+    an "Unknown" line instead."""
     cursor = conn.execute(
         """
         SELECT COALESCE(c.CountryName, 'Unknown (' || f.Country || ')') AS CountryLabel,
@@ -100,7 +129,7 @@ def fighters_by_country(conn: sqlite3.Connection) -> list:
 
 
 def fighters_by_weight_class(conn: sqlite3.Connection) -> list:
-    """Roster size per division, lightest to heaviest """
+    """Roster size per division, lightest to heaviest."""
     cursor = conn.execute(
         """
         SELECT w.WeightLimit, w.WeightClassName, COUNT(*) AS FighterCount
@@ -223,8 +252,11 @@ def nickname_coverage(conn: sqlite3.Connection) -> tuple:
     return cursor.fetchone()
 
 
-def age_bucket_histogram(conn: sqlite3.Connection, as_of: str = None) -> list:
-    """ Buckets the roster by current age, computed entirely in SQL """
+def age_bucket_histogram(conn: sqlite3.Connection, as_of: str = None, bucket_size: int = 5) -> list:
+    bucket_size = int(bucket_size)
+    if bucket_size <= 0:
+        raise ValueError(f"bucket_size must be a positive integer, got {bucket_size}")
+
     if as_of is None:
         as_of_sql = "julianday('now')"
         params = ()
@@ -235,13 +267,7 @@ def age_bucket_histogram(conn: sqlite3.Connection, as_of: str = None) -> list:
     cursor = conn.execute(
         f"""
         SELECT
-            CASE
-                WHEN Age < 25 THEN 'Under 25'
-                WHEN Age < 30 THEN '25-29'
-                WHEN Age < 35 THEN '30-34'
-                WHEN Age < 40 THEN '35-39'
-                ELSE '40+'
-            END AS AgeBucket,
+            (Age / {bucket_size}) * {bucket_size} AS BucketStart,
             COUNT(*) AS FighterCount
         FROM (
             SELECT
@@ -251,13 +277,36 @@ def age_bucket_histogram(conn: sqlite3.Connection, as_of: str = None) -> list:
                 AS INTEGER) AS Age
             FROM fighters
         )
-        GROUP BY AgeBucket
-        ORDER BY MIN(Age)
+        GROUP BY BucketStart
+        ORDER BY BucketStart
         """,
         params,
     )
-    return cursor.fetchall()
+    return [(f"{start}-{start + bucket_size - 1}", count) for start, count in cursor.fetchall()]
 
+
+def find_invalid_birthdates(conn: sqlite3.Connection) -> list:
+    rows = conn.execute(
+        """
+        SELECT
+            FighterID,
+            FirstName,
+            LastName,
+            Birthdate
+        FROM fighters
+        WHERE
+            Birthdate IS NULL
+            OR julianday(
+                substr(Birthdate, 7, 4) || '-' ||
+                substr(Birthdate, 4, 2) || '-' ||
+                substr(Birthdate, 1, 2)
+            ) IS NULL
+        ORDER BY FighterID
+        """
+    ).fetchall()
+    return rows
+
+# ============================= Printing =============================
 def main():
     conn = build_connection()
 
@@ -316,11 +365,18 @@ def main():
     print(f"Nickname coverage: {with_nick}/{total_fighters} ({with_nick / total_fighters:.1%})")
 
     print()
-    print("Age distribution (as of today's real date -- see age_bucket_histogram's caveat):")
-    for bucket, count in age_bucket_histogram(conn, as_of='01-01-2000'):
+    print("Age distribution")
+    invalid = find_invalid_birthdates(conn)
+    for fighter_id, first_name, last_name, birthdate in invalid:
+        print(
+            f"Invalid birthdate: "
+            f"{fighter_id} - {first_name} {last_name}: {birthdate!r}"
+        )
+    for bucket, count in age_bucket_histogram(conn, as_of='01-01-2000', bucket_size=5):
         print(f"  {bucket:<10}{count:>6}")
 
     conn.close()
+
 
 if __name__ == "__main__":
     main()

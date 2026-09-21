@@ -12,7 +12,6 @@ from ui.create_event import CreateEventTab
 from ui.record_fight_prefight import RecordFightPrefightTab
 from ui.record_fight_result import RecordFightResultTab
 
-
 def main():
     root = tk.Tk()
     root.title("Prizefighters Promoter ML - Data Tracker")
