@@ -128,13 +128,26 @@ class RankingEditorFrame(ttk.Frame):
         if fighter is None:
             return f"#{fighter_id} (unknown fighter)"
         return (f'#{fighter_id} '
-                f'{format_full_name(fighter["first_name"], fighter["last_name"], fighter["nickname"], fighter["placement"])}')
+                f'{fighter["first_name"]} {fighter["last_name"]}')
 
     def _division_label_for_fighter(self, fighter_id: int) -> str:
         fighter = self.api.get_fighter(fighter_id)
         if fighter is None:
             return "?"
         weight_limit = fighter["weightclass"]
+        for wc in self.api.get_weight_classes():
+            if wc["weight_limit"] == weight_limit:
+                return f'{wc["weight_class"]}'
+        return str(weight_limit)
+
+    def _division_label_for_entry(self, entry: dict) -> str:
+        weight_limit = entry.get("fighter_weight_limit")
+        if weight_limit is None:
+            fighter = self.api.get_fighter(entry["fighter_id"])
+            if fighter is None:
+                return "?"
+            weight_limit = fighter["weightclass"]
+
         for wc in self.api.get_weight_classes():
             if wc["weight_limit"] == weight_limit:
                 return f'{wc["weight_class"]}'
@@ -149,7 +162,7 @@ class RankingEditorFrame(ttk.Frame):
         for index, entry in enumerate(self.entries):
             record = f'{entry["wins"]}-{entry["losses"]}-{entry["draws"]} ({entry["knockouts"]} KO)'
             fighter_label = self._label_for_fighter(entry["fighter_id"])
-            division_label = self._division_label_for_fighter(entry["fighter_id"])
+            division_label = self._division_label_for_fighter(entry["fighter_id"]) # Error here
 
             if self.mode == MODE_RANKING:
                 last_col = "\u2605" if entry.get("title") else ""
@@ -302,9 +315,7 @@ class RankingEditorFrame(ttk.Frame):
         self.refresh_table()
 
     # ---------- Bulk load ----------
-
     def load_entries(self, entries: list):
-        """Replace the working snapshot wholesale (used by carry-forward
-        and when viewing an existing month)."""
+        """ Replace the working snapshot wholesale (used by carry-forward and when viewing an existing month) """
         self.entries = [dict(e) for e in entries]
         self.refresh_table()

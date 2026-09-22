@@ -422,7 +422,7 @@ SIGNATURE_TRAIT_GROUPS = {
 
 # Each individual signature trait has its own level (1-5) and XP progress
 # (0-10) -- separate from the fighter's overall experience level/XP above.
-MIN_TRAIT_LEVEL = 0
+MIN_TRAIT_LEVEL = 1
 MAX_TRAIT_LEVEL = 5
 MIN_TRAIT_XP = 0
 MAX_TRAIT_XP = 10
