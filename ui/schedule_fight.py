@@ -126,7 +126,6 @@ class ScheduleFightTab(ttk.Frame):
         self.tree.pack(fill="both", expand=True, padx=5, pady=(0, 5))
 
     # ---------- Reference data ----------
-
     def on_tab_shown(self):
         self.refresh_reference_data()
 
@@ -168,7 +167,6 @@ class ScheduleFightTab(ttk.Frame):
         return None
 
     # ---------- Table ----------
-
     def _refresh_table(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -208,7 +206,6 @@ class ScheduleFightTab(ttk.Frame):
             )
 
     # ---------- Actions ----------
-
     def _on_schedule(self):
         red_id = self._selected_fighter_id(self.red_var)
         blue_id = self._selected_fighter_id(self.blue_var)

@@ -134,5 +134,41 @@
       "00003A",
       "00003B"
     ]
+  },
+  {
+    "event_id": 8,
+    "headliner": "Vel\u00e1squez vs. Martini",
+    "slogan": "Under the Lights",
+    "arena_id": 1,
+    "date": "04-03-2000",
+    "main_event_fight_id": "000055",
+    "co_main_fight_ids": [
+      "000056"
+    ],
+    "undercard_fight_ids": [
+      "000057",
+      "000058",
+      "000059",
+      "00005A",
+      "00005B"
+    ]
+  },
+  {
+    "event_id": 9,
+    "headliner": "Matthias vs. Ramirez",
+    "slogan": "Clash of Titans",
+    "arena_id": 1,
+    "date": "11-03-2000",
+    "main_event_fight_id": "000062",
+    "co_main_fight_ids": [
+      "00005D"
+    ],
+    "undercard_fight_ids": [
+      "00005C",
+      "00005E",
+      "000061",
+      "00005F",
+      "000060"
+    ]
   }
 ]

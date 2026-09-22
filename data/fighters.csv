@@ -290,3 +290,6 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 289,Armando,Martinez,,None,Santa Clara,CU,16-02-1977,160,72,0,2
 290,Arthur,Oliveira,Tigre,Middle,Belo Horizonte,BR,21-06-1978,160,68,0,3
 291,Otabek,Usmanov,,None,Samaraqand,UZ,28-07-1978,160,68,0,1
+292,Pedro,Cruz,,None,Mexico City,MX,24-12-1978,175,64,0,1
+293,Costas,Nicolaou,,None,Kyrenia,CY,03-06-1977,175,73,0,2
+294,Émile,Fournier,,None,Grenoble,FR,23-03-1966,168,67,1,1

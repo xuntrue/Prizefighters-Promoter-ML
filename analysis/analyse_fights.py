@@ -8,24 +8,20 @@ from collections import Counter
 from itertools import combinations_with_replacement
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, PROJECT_ROOT)  # so `from api...` works when run directly
+sys.path.insert(0, PROJECT_ROOT)
 
-from api.Fights import STATUS_COMPLETE  # noqa: E402
-from api.Fighter import INT_TO_STANCE, INT_TO_STYLE, STYLE_TO_INT  # noqa: E402
+from api.Fights import STATUS_COMPLETE
+from api.Fighter import INT_TO_STANCE, INT_TO_STYLE, STYLE_TO_INT
 
 FIGHTS_CSV = os.path.join(PROJECT_ROOT, "data", "fights.csv")
 FIGHTS_DIR = os.path.join(PROJECT_ROOT, "data", "fights")
 WEIGHTS_CSV = os.path.join(PROJECT_ROOT, "data", "weights.csv")
 FIGHTERS_CSV = os.path.join(PROJECT_ROOT, "data", "fighters.csv")
 
-# The order the outcome-method report is printed in, regardless of how
-# many of each method actually occurred.
 METHOD_ORDER = ["UD", "MD", "SD", "KO", "TKO"]
 
-
-# ============================= Loading =============================
 def load_fights_into_sqlite(conn: sqlite3.Connection) -> None:
-    """CREATE TABLE + INSERT fights.csv into an in-memory SQL table."""
+    """ CREATE TABLE + INSERT fights.csv into an in-memory SQL table """
     conn.execute(
         """
         CREATE TABLE fights (
@@ -57,10 +53,7 @@ def load_fights_into_sqlite(conn: sqlite3.Connection) -> None:
     conn.executemany("INSERT INTO fights VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
     conn.commit()
 
-
 def load_weight_classes_into_sqlite(conn: sqlite3.Connection) -> None:
-    """A second table, loaded so the weight-class histogram can JOIN
-    against it and print division names instead of bare weight limits."""
     conn.execute(
         """
         CREATE TABLE weight_classes (
@@ -69,21 +62,13 @@ def load_weight_classes_into_sqlite(conn: sqlite3.Connection) -> None:
         )
         """
     )
-
     with open(WEIGHTS_CSV, newline="", encoding="utf-8") as f:
         rows = [(int(row["weight_limit"]), row["weight_class"]) for row in csv.DictReader(f)]
-
     conn.executemany("INSERT INTO weight_classes VALUES (?, ?)", rows)
     conn.commit()
 
 
 def load_fighters_into_sqlite(conn: sqlite3.Connection) -> None:
-    """A third table. Started out ID + name only for last_fight_per_fighter();
-    now also carries Reach/Stance/Style, since the matchup distributions
-    below need to compare each corner's fighter attributes directly. It
-    has to start from EVERY fighter in fighters.csv, not just the ones
-    who show up in fights.csv, so a fighter who's never been scheduled
-    for anything still gets a row."""
     conn.execute(
         """
         CREATE TABLE fighters (
@@ -92,7 +77,6 @@ def load_fighters_into_sqlite(conn: sqlite3.Connection) -> None:
         )
         """
     )
-
     with open(FIGHTERS_CSV, newline="", encoding="utf-8") as f:
         rows = [
             (
@@ -101,10 +85,8 @@ def load_fighters_into_sqlite(conn: sqlite3.Connection) -> None:
             )
             for row in csv.DictReader(f)
         ]
-
     conn.executemany("INSERT INTO fighters VALUES (?, ?, ?, ?, ?, ?)", rows)
     conn.commit()
-
 
 def build_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
@@ -113,13 +95,9 @@ def build_connection() -> sqlite3.Connection:
     load_fighters_into_sqlite(conn)
     return conn
 
-
-# ======================= Queries: one per count =======================
-
 def count_completed_fights(conn: sqlite3.Connection) -> int:
     cursor = conn.execute("SELECT COUNT(*) FROM fights WHERE Status = ?", (STATUS_COMPLETE,))
     return cursor.fetchone()[0]
-
 
 def count_completed_title_fights(conn: sqlite3.Connection) -> int:
     cursor = conn.execute(
@@ -276,7 +254,7 @@ def get_completed_fight_ids(conn: sqlite3.Connection) -> list:
     return [row[0] for row in cursor.fetchall()]
 
 
-def _load_fight_json(fight_id: str):
+def load_fight_json(fight_id: str):
     """The full parsed JSON for one fight, or None if the file is missing."""
     path = os.path.join(FIGHTS_DIR, f"{fight_id}.json")
     if not os.path.exists(path):
@@ -285,22 +263,22 @@ def _load_fight_json(fight_id: str):
         return json.load(f)
 
 
-def _load_fight_result(fight_id: str) -> dict:
+def load_fight_result(fight_id: str) -> dict:
     """The "result" object from a fight's JSON, or {} if missing."""
-    full = _load_fight_json(fight_id)
+    full = load_fight_json(fight_id)
     return (full or {}).get("result") or {}
 
 
-def _load_fight_meta(fight_id: str) -> dict:
+def load_fight_meta(fight_id: str) -> dict:
     """The "meta" object from a fight's JSON, or {} if missing."""
-    full = _load_fight_json(fight_id)
+    full = load_fight_json(fight_id)
     return (full or {}).get("meta") or {}
 
 
 def get_outcome_method(fight_id: str):
     """The outcome method isn't in fights.csv -- pull it from the
     fight's own JSON file."""
-    return _load_fight_result(fight_id).get("outcome", {}).get("method")
+    return load_fight_result(fight_id).get("outcome", {}).get("method")
 
 
 def outcome_method_distribution(conn: sqlite3.Connection) -> tuple:
@@ -401,7 +379,7 @@ def gym_matchup_distribution(conn: sqlite3.Connection) -> dict:
     own JSON (result.gyms), not a fixed fighters.csv column."""
     counts = {key: 0 for key in _all_matchup_keys(GYM_ORDER)}
     for fight_id in get_completed_fight_ids(conn):
-        gyms = _load_fight_result(fight_id).get("gyms")
+        gyms = load_fight_result(fight_id).get("gyms")
         if not gyms:
             continue
         red_label = "Gym" if gyms.get("red_corner") is not None else "Free Agent"
@@ -423,7 +401,7 @@ def corner_win_distribution(conn: sqlite3.Connection) -> dict:
         (STATUS_COMPLETE,),
     )
     for fight_id, red_id, blue_id in cursor.fetchall():
-        winner_id = _load_fight_result(fight_id).get("outcome", {}).get("winner_id")
+        winner_id = load_fight_result(fight_id).get("outcome", {}).get("winner_id")
         if winner_id is None:
             counts["Draw"] += 1
         elif winner_id == red_id:
@@ -464,7 +442,7 @@ def weight_difference_histogram(conn: sqlite3.Connection, bucket_size: int = 1) 
 
     counts = Counter()
     for fight_id in get_completed_fight_ids(conn):
-        meta = _load_fight_meta(fight_id)
+        meta = load_fight_meta(fight_id)
         red_weigh_in = (meta.get("red_corner") or {}).get("profile", {}).get("weigh_in")
         blue_weigh_in = (meta.get("blue_corner") or {}).get("profile", {}).get("weigh_in")
         if red_weigh_in is None or blue_weigh_in is None:
@@ -587,7 +565,7 @@ def main():
     print("  " + "-" * 24)
     for method in METHOD_ORDER:
         count = method_counts.get(method, 0)
-        share = f"{count / total_with_method:.1%}" if total_with_method else "--"
+        share = f"{count / total_with_method:.2%}" if total_with_method else "--"
         print(f"  {method:<8}{count:>8}{share:>10}")
 
     unexpected = set(method_counts) - set(METHOD_ORDER)

@@ -1,26 +1,8 @@
-"""
-analyse_fighters.py
-
-Distributions and cross-cuts across the fighter roster, joining
-fighters.csv, countries.csv, records.csv, and (for division names)
-weights.csv.
-
-Same discipline as analyse_fights.py: every function takes an open
-sqlite3 connection and returns data -- nothing prints except main().
-Enum-style columns (Stance, Style) are translated to labels in Python
-using the SAME dicts the app itself uses (api.Fighter.INT_TO_STANCE /
-INT_TO_STYLE), rather than duplicating "0 = Orthodox" as a second,
-driftable copy inside a SQL CASE WHEN. Everything else -- the actual
-joins, grouping, filtering, aggregation -- is real SQL.
-
-Run from anywhere:
-    python analysis/analyse_fighters.py
-"""
-
 import csv
 import os
 import sqlite3
 import sys
+
 from datetime import date
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,7 +17,6 @@ WEIGHTS_CSV = os.path.join(PROJECT_ROOT, "data", "weights.csv")
 
 
 # ============================= Loading =============================
-
 def load_fighters(conn: sqlite3.Connection) -> None:
     conn.execute(
         """
@@ -156,10 +137,8 @@ def style_distribution(conn: sqlite3.Connection) -> dict:
 
 
 def average_reach_by_weight_class(conn: sqlite3.Connection) -> list:
-    """Does reach scale with weight class, the way you'd expect? AVG()
-    plus a JOIN for the division name, ROUNDed to one decimal."""
     cursor = conn.execute(
-        """
+        f"""
         SELECT w.WeightLimit, w.WeightClassName, ROUND(AVG(f.Reach), 1) AS AvgReach, COUNT(*) AS FighterCount
         FROM fighters AS f
         JOIN weight_classes AS w ON w.WeightLimit = f.Weightclass
@@ -171,11 +150,6 @@ def average_reach_by_weight_class(conn: sqlite3.Connection) -> list:
 
 
 def record_totals_by_country(conn: sqlite3.Connection, min_fighters: int = 1) -> list:
-    """A real three-table JOIN: fighters -> records -> countries.
-    SUMs wins/losses/KOs per country and computes each country's overall
-    KO rate among its wins. HAVING filters out countries with too few
-    fighters to mean anything, the way min_fighters=1 (the default)
-    trivially doesn't, but min_fighters=5 would."""
     cursor = conn.execute(
         """
         SELECT
@@ -372,11 +346,10 @@ def main():
             f"Invalid birthdate: "
             f"{fighter_id} - {first_name} {last_name}: {birthdate!r}"
         )
-    for bucket, count in age_bucket_histogram(conn, as_of='01-01-2000', bucket_size=5):
+    for bucket, count in age_bucket_histogram(conn, as_of='01-03-2000', bucket_size=3):
         print(f"  {bucket:<10}{count:>6}")
 
     conn.close()
-
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,14 @@
+{
+  "fight_id": "000060",
+  "red_corner_fighter_id": 21,
+  "blue_corner_fighter_id": 20,
+  "weight_limit": 200,
+  "date": "11-03-2000",
+  "championship": false,
+  "rounds": 4,
+  "round_minutes": 1,
+  "status": "Evented",
+  "event_id": 9,
+  "meta": {},
+  "result": {}
+}
