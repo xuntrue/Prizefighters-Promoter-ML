@@ -170,5 +170,41 @@
       "00005F",
       "000060"
     ]
+  },
+  {
+    "event_id": 10,
+    "headliner": "Morgan vs. Marchenko",
+    "slogan": "Make or Break",
+    "arena_id": 3,
+    "date": "18-03-2000",
+    "main_event_fight_id": "000040",
+    "co_main_fight_ids": [
+      "000041"
+    ],
+    "undercard_fight_ids": [
+      "000064",
+      "000065",
+      "000066",
+      "000067",
+      "000068"
+    ]
+  },
+  {
+    "event_id": 11,
+    "headliner": "Lim vs. John",
+    "slogan": "Under the Garden Lights",
+    "arena_id": 1,
+    "date": "25-03-2000",
+    "main_event_fight_id": "000043",
+    "co_main_fight_ids": [
+      "000042"
+    ],
+    "undercard_fight_ids": [
+      "00006E",
+      "00006F",
+      "00006B",
+      "00006C",
+      "00006D"
+    ]
   }
 ]

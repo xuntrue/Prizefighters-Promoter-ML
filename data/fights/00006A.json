@@ -1,0 +1,14 @@
+{
+  "fight_id": "00006A",
+  "red_corner_fighter_id": 139,
+  "blue_corner_fighter_id": 144,
+  "weight_limit": 118,
+  "date": "20-05-2000",
+  "championship": true,
+  "rounds": 12,
+  "round_minutes": 1,
+  "status": "Scheduled",
+  "event_id": null,
+  "meta": {},
+  "result": {}
+}

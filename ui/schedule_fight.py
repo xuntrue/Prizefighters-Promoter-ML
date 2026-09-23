@@ -26,6 +26,7 @@ class ScheduleFightTab(ttk.Frame):
         self.refresh_reference_data()
 
     # ---------- Construction ----------
+
     def _build_reference_date(self):
         date_frame = ttk.LabelFrame(self, text="Game's Current Date (defines \"upcoming\")")
         date_frame.pack(fill="x", padx=10, pady=(10, 5))
@@ -126,6 +127,7 @@ class ScheduleFightTab(ttk.Frame):
         self.tree.pack(fill="both", expand=True, padx=5, pady=(0, 5))
 
     # ---------- Reference data ----------
+
     def on_tab_shown(self):
         self.refresh_reference_data()
 
@@ -167,6 +169,7 @@ class ScheduleFightTab(ttk.Frame):
         return None
 
     # ---------- Table ----------
+
     def _refresh_table(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -189,6 +192,22 @@ class ScheduleFightTab(ttk.Frame):
 
             fights = [f for f in fights if is_upcoming(f)]
 
+        # Sort by date, then FightID. Date is stored as "dd-mm-yyyy" text,
+        # which sorts wrong as a plain string (e.g. "05-02-2026" would
+        # come before "12-01-2026" even though January is earlier) -- so
+        # this parses it into a real date first. FightID itself is safe
+        # to compare as a plain string: it's always a fixed-width 6-digit
+        # hex value (see api/Fights.py), so string order already matches
+        # numeric order with no parsing needed.
+        def sort_key(fight):
+            try:
+                fight_date = datetime.strptime(fight["date"], DATE_FORMAT).date()
+            except ValueError:
+                fight_date = date.max  # unparseable dates sort last, not crash
+            return (fight_date, fight["fight_id"])
+
+        fights = sorted(fights, key=sort_key)
+
         for fight in fights:
             red = self.api.get_fighter(fight["red_corner_fighter_id"])
             blue = self.api.get_fighter(fight["blue_corner_fighter_id"])
@@ -206,6 +225,7 @@ class ScheduleFightTab(ttk.Frame):
             )
 
     # ---------- Actions ----------
+
     def _on_schedule(self):
         red_id = self._selected_fighter_id(self.red_var)
         blue_id = self._selected_fighter_id(self.blue_var)

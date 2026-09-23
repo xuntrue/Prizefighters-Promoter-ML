@@ -137,7 +137,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 136,Luiz,Pacheco,,None,Carolina,PR,01-02-1966,118,71,0,2
 137,Zachary,Kelly,Zac,Middle,Sydney,AU,30-06-1960,118,66,0,4
 138,Aaron,Kelly,,None,Belfast,IE,06-03-1964,118,64,0,1
-139,Charles,Morgan,,None,Montego Bay,JM,08-03-1969,118,64,0,4
+139,Charles,Morgan,Wrecker,Middle,Montego Bay,JM,08-03-1969,118,64,0,4
 140,David,Batista,,None,Penonome,PA,01-09-1970,118,67,1,1
 141,Damien,Simon,,None,Petange,LU,16-03-1969,118,74,0,1
 142,Detchi,Muangchai,The Cobra,Prefix,Nakhon Ratcasima,TH,07-02-1969,118,68,1,4
@@ -171,7 +171,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 170,Diego,Mendoza,La Avispa,Middle,Puebla,MX,12-12-1968,108,72,0,2
 171,Edwin,Juárez,,None,Tagucigalpa,HN,07-02-1963,108,72,0,4
 172,Samuel,Whitaker,,None,Portland,US,26-08-1963,108,63,0,1
-173,Aiman,Lim,,None,Seremban,MY,15-12-1969,108,71,1,2
+173,Aiman,Lim,The Flash,Prefix,Seremban,MY,15-12-1969,108,71,1,2
 174,John,Gonzales,,None,Pasig,PH,23-12-1969,108,63,0,1
 175,Salisu,John,,None,Kaduna,NG,12-05-1964,108,68,0,1
 176,Manuel,Lopez,,None,Havana,CU,28-04-1968,108,68,0,4
@@ -293,3 +293,13 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 292,Pedro,Cruz,,None,Mexico City,MX,24-12-1978,175,64,0,1
 293,Costas,Nicolaou,,None,Kyrenia,CY,03-06-1977,175,73,0,2
 294,Émile,Fournier,,None,Grenoble,FR,23-03-1966,168,67,1,1
+295,Mike,Castillo,,None,Cagayan de Oro,PH,22-10-1977,108,72,0,2
+296,Ezequiel,Gimenez,,None,Parana,AR,27-08-1977,108,63,0,1
+297,João,Mendes,Martelo,Middle,Porto Alegre,BR,14-01-1965,168,73,0,4
+298,Victor,Hernández,Vicious,Prefix,Choloma,HN,20-12-1973,200,66,1,4
+299,Mykola,Chernenko,,None,Mykolaiv,UA,09-11-1971,300,73,0,2
+300,Ahmad,Mohamed,,None,Zawiya,LY,29-02-1960,300,74,0,2
+301,Thomas,Miller,,None,Ottawa-Gatineau,CA,19-12-1967,300,71,0,3
+302,Michael,Malkah,,None,Netanya,IL,18-04-1977,300,71,0,2
+303,Kevin,Bodden,,None,North Side,KY,04-01-1964,300,73,0,2
+304,Dimitriy,Pavlova,,None,Chelyabinsk,RU,09-08-1964,300,68,0,1
