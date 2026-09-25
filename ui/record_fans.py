@@ -1,5 +1,16 @@
-import tkinter as tk
+"""
+record_fans.py
 
+Fan favourites section of the Rankings tab. Prizefighters 2 only exposes
+the top 9 fighters by Total Fans, so this records rank #1-#9 along with
+each fighter's Total Fans count and their record at the time.
+
+Unlike divisional rankings there's no weight class restriction (any
+fighter can be a fan favourite) and no Title concept -- see
+ranking_editor.py, which handles both shapes.
+"""
+
+import tkinter as tk
 from tkinter import ttk, messagebox
 
 from api.PrizefighterAPI import PrizefighterAPI
@@ -42,12 +53,14 @@ class RecordFansSection(ttk.Frame):
         self.status_label.grid(row=1, column=0, columnspan=5, sticky="w", padx=5, pady=(0, 5))
 
     # ---------- Lifecycle ----------
+
     def refresh_reference_data(self):
         """Any fighter can be a fan favourite, so the dropdown is everyone."""
         self.editor.set_eligible_fighters(self.api.get_fighters())
         self.editor.refresh_table()
 
     # ---------- Loading ----------
+
     def _on_carry_forward(self):
         result = self.api.carry_forward_fan_rankings()
 
@@ -76,7 +89,8 @@ class RecordFansSection(ttk.Frame):
             return
 
         self.editor.load_entries([
-            {k: row[k] for k in ("fighter_id", "fighter_weight_limit", "total_fans", "wins", "knockouts", "losses", "draws")}
+            {k: row[k] for k in ("fighter_id", "total_fans", "wins", "knockouts", "losses", "draws",
+                                 "fighter_weight_limit")}
             for row in snapshot
         ])
         self.status_label.config(text=f"Loaded existing fan rankings for {month} (saving will overwrite).")
@@ -106,6 +120,7 @@ class RecordFansSection(ttk.Frame):
         self.status_label.config(text=message)
 
     # ---------- Saving ----------
+
     def _on_save(self):
         month = self.month_var.get().strip()
 

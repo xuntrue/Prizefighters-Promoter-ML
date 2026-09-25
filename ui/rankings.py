@@ -1,13 +1,34 @@
+"""
+rankings.py
+
+Rankings tab. Like settings.py, this hosts an inner notebook so related
+screens live under one top-level tab:
+    Divisions / P4P -- DivisionRankingsSection (below)
+    Fan Favourites  -- RecordFansSection (record_fans.py)
+
+Divisional and P4P rankings share a shape (ranked list + Title flag), so
+one section handles both; picking "Pound-for-Pound" from the division
+dropdown just switches the ranking type and lifts the weight-class
+restriction on who can be ranked.
+
+Note that Title is recorded per-entry and is deliberately independent of
+Rank: a champion isn't necessarily #1, and a division can hold more than
+one title holder at once (e.g. a champion moving up a weight class and
+bringing a belt with them). Tracking a clean championship lineage is a
+separate future concern -- these monthly snapshots aren't trying to
+solve it.
+"""
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 
 from api.PrizefighterAPI import PrizefighterAPI
 from api.Rankings import RankingError, TYPE_DIVISION, TYPE_P4P
-
 from ui.ranking_editor import RankingEditorFrame, MODE_RANKING
 from ui.record_fans import RecordFansSection
 
 P4P_LABEL = "Pound-for-Pound (P4P)"
+
 
 class DivisionRankingsSection(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
@@ -55,8 +76,10 @@ class DivisionRankingsSection(ttk.Frame):
         self.status_label.grid(row=2, column=0, columnspan=4, sticky="w", padx=5, pady=(0, 5))
 
     # ---------- Reference data ----------
+
     def refresh_reference_data(self):
-        """ Rebuild the division dropdown from weights.csv and re-filter who's eligible to be ranked """
+        """Rebuild the division dropdown from weights.csv (it can change
+        in Settings) and re-filter who's eligible to be ranked."""
         previous = self.division_var.get()
 
         self._division_options = [
@@ -75,7 +98,7 @@ class DivisionRankingsSection(ttk.Frame):
         self._refresh_eligible_fighters()
 
     def _current_division(self):
-        """ Return (ranking_type, weight_limit) for the selected dropdown item """
+        """Return (ranking_type, weight_limit) for the selected dropdown item."""
         label = self.division_var.get()
         for weight_limit, option_label in self._division_options:
             if option_label == label:
@@ -85,7 +108,8 @@ class DivisionRankingsSection(ttk.Frame):
         return None, None
 
     def _refresh_eligible_fighters(self):
-        """ P4P is open to all """
+        """P4P is open to everyone; a division is restricted to fighters
+        registered at that weight class in fighters.csv."""
         ranking_type, weight_limit = self._current_division()
         fighters = self.api.get_fighters()
 
@@ -95,17 +119,12 @@ class DivisionRankingsSection(ttk.Frame):
         self.editor.set_eligible_fighters(fighters)
 
     def _on_division_changed(self):
-        ranking_type, weight_limit = self._current_division()
         self._refresh_eligible_fighters()
         self.editor.clear()
-        self._on_load_month()
-        
-        if ranking_type == "P4P":
-            self.status_label.config(text=f"Division changed to P4P")
-        else:
-            self.status_label.config(text=f"Division changed to {weight_limit}lbs")
+        self.status_label.config(text="Division changed -- load a snapshot or start adding fighters.")
 
     # ---------- Loading ----------
+
     def _on_carry_forward(self):
         ranking_type, weight_limit = self._current_division()
         if ranking_type is None:
@@ -145,13 +164,18 @@ class DivisionRankingsSection(ttk.Frame):
             return
 
         self.editor.load_entries([
-            {k: row[k] for k in ("fighter_id", "fighter_weight_limit", "wins", "knockouts", "losses", "draws", "title")}
+            {k: row[k] for k in
+             ("fighter_id", "wins", "knockouts", "losses", "draws", "title", "fighter_weight_limit")}
             for row in snapshot
         ])
         self.status_label.config(
             text=f"Loaded existing rankings for {month} (saving will overwrite).")
 
     def _on_load_next_month(self):
+        """One-click version of "figure out the next month, then load last
+        month's roster as a starting point" -- the two steps you'd
+        otherwise do by hand (type the new month, click Load Last Month)
+        every time a new month rolls over in-game."""
         ranking_type, weight_limit = self._current_division()
         if ranking_type is None:
             messagebox.showerror("No Division", "Pick a division first.")
@@ -161,7 +185,8 @@ class DivisionRankingsSection(ttk.Frame):
         if next_month is None:
             messagebox.showinfo(
                 "No Existing Rankings",
-                "There's no previous snapshot for this division to advance from -- enter a starting month manually.",
+                "There's no previous snapshot for this division to advance from -- "
+                "enter a starting month manually.",
             )
             return
 
@@ -179,6 +204,7 @@ class DivisionRankingsSection(ttk.Frame):
         self.status_label.config(text=message)
 
     # ---------- Saving ----------
+
     def _on_save(self):
         ranking_type, weight_limit = self._current_division()
         if ranking_type is None:

@@ -44,6 +44,7 @@ class PrizefighterAPI:
         self.events = Events(arena_api=self.arenas, fights_api=self.fights)
 
     # ---- Weight class passthroughs ----
+
     def get_weight_classes(self):
         return self.weight_classes.get_all()
 
@@ -60,6 +61,7 @@ class PrizefighterAPI:
         return self.weight_classes.get_min_weigh_in(weight_limit)
 
     # ---- Country passthroughs (read-only in the UI today, full CRUD available) ----
+
     def get_countries(self):
         return self.countries.get_all()
 
@@ -73,6 +75,7 @@ class PrizefighterAPI:
         self.countries.delete(a2)
 
     # ---- Country flags (read-only in the UI today, full CRUD available) ----
+
     def get_flag_path(self, a2: str):
         return self.flags.get_path(a2)
 
@@ -89,6 +92,7 @@ class PrizefighterAPI:
         self.flags.delete(a2)
 
     # ---- Fighters ----
+
     def get_fighters(self):
         return self.fighters.get_all()
 
@@ -121,6 +125,7 @@ class PrizefighterAPI:
             pass  # record may already be missing; fighter deletion still succeeds
 
     # ---- Records ----
+
     def get_record(self, fighter_id: int):
         return self.records.get_by_fighter_id(fighter_id)
 
@@ -128,6 +133,7 @@ class PrizefighterAPI:
         self.records.update(fighter_id, wins, knockouts, losses, draws)
 
     # ---- Rankings (divisional + P4P) ----
+
     def get_ranking_snapshot(self, month: str, ranking_type: str, weight_limit=None):
         return self.rankings.get_snapshot(month, ranking_type, weight_limit)
 
@@ -147,6 +153,7 @@ class PrizefighterAPI:
         return self.rankings.carry_forward(ranking_type, weight_limit, from_month)
 
     # ---- Fan rankings ----
+
     def get_fan_snapshot(self, month: str):
         return self.rankings.get_fan_snapshot(month)
 
@@ -183,14 +190,12 @@ class PrizefighterAPI:
         self.arenas.delete(arena_id)
 
     # ---- Fights ----
+
     def get_fights(self):
         return self.fights.get_all()
 
     def get_fight(self, fight_id: str):
         return self.fights.get_by_id(fight_id)
-
-    def get_fight_rounds(self, fight_id: str):
-        return self.fights.get_scheduled_rounds(fight_id)
 
     def get_fight_full(self, fight_id: str):
         return self.fights.get_full(fight_id)
@@ -222,6 +227,7 @@ class PrizefighterAPI:
         self.fights.delete(fight_id)
 
     # ---- Events ----
+
     def get_events(self):
         return self.events.get_all()
 
@@ -284,6 +290,7 @@ class PrizefighterAPI:
         self.events.delete(event_id)
 
     # ---- Pre-fight metadata ----
+
     CORNERS = ("red_corner", "blue_corner")
 
     def _corner_fighter_id(self, fight: dict, corner: str) -> int:
@@ -292,7 +299,23 @@ class PrizefighterAPI:
         return fight["red_corner_fighter_id"] if corner == "red_corner" else fight["blue_corner_fighter_id"]
 
     def get_default_meta_for_fighter(self, fight_id: str, corner: str) -> dict:
-        """ Build a starting point for the pre-fight meta form ("_load_default") """
+        """
+        Build a starting point for the pre-fight meta form ("_load_default").
+
+        attributes/skills/tendencies/career_stats/last_6 are carried
+        forward from the fighter's most recently recorded meta -- their
+        most recent OTHER fight (by date) that has meta saved for them,
+        regardless of which corner they were in that fight. If they have
+        no prior recorded meta at all (a debut fighter, or one whose
+        earlier fights predate this feature), a blank default is used
+        instead.
+
+        profile.record and profile.weigh_in are NOT carried forward --
+        record always reflects the live value in records.csv (the
+        source of truth), and weigh-in is fight-specific with no
+        meaningful previous value, so it defaults to this fight's own
+        weight_limit as a starting guess for the user to adjust down.
+        """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
             raise FightError(f"No fight found with FightID {fight_id}.")

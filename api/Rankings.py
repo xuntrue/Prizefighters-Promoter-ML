@@ -67,6 +67,7 @@ differently from the others.
 import csv
 import os
 import re
+from datetime import date
 
 from api.Fighter import Fighter
 from api.Records import Records
@@ -213,6 +214,39 @@ class Rankings:
         advance from, since there's nothing to compute "next" from."""
         latest = self.get_latest_month(ranking_type, weight_limit)
         return next_month_str(latest) if latest else None
+
+    def get_available_months(self, ranking_type: str, weight_limit=None) -> list:
+        """
+        Values for the month combobox: every month that actually has a
+        saved snapshot for this division/P4P, from earliest to latest,
+        plus exactly one extra month after the latest -- so selecting it
+        is how the user starts entering a new month's rankings (see
+        carry_forward()). If nothing has ever been saved for this
+        division/type, returns just today's real calendar month, same
+        "game calendar may not match reality" caveat as the age preview
+        elsewhere in this app.
+        """
+        months = self.get_months(ranking_type, weight_limit)
+        if not months:
+            today = date.today()
+            return [f"{today.year:04d}-{today.month:02d}"]
+        return months + [next_month_str(months[-1])]
+
+    def get_previous_month(self, ranking_type: str, weight_limit, month: str):
+        """
+        The most recent EXISTING snapshot month strictly before `month`
+        for this division (or P4P) -- skips gaps rather than requiring
+        exact calendar adjacency, since divisions can drift out of sync
+        with each other (see rankings.py). Returns None if there's no
+        earlier snapshot at all, which the caller should treat as "no
+        comparison available" rather than "everyone is new."
+
+        String comparison is safe here (month < month) since "YYYY-MM"
+        sorts correctly as plain text, unlike this app's "dd-mm-yyyy"
+        dates elsewhere.
+        """
+        earlier = [m for m in self.get_months(ranking_type, weight_limit) if m < month]
+        return max(earlier) if earlier else None
 
     def _save_all(self, rows: list):
         with open(self.rankings_file, "w", newline="", encoding="utf-8") as f:
@@ -361,6 +395,24 @@ class Rankings:
     def get_next_fan_month(self):
         latest = self.get_latest_fan_month()
         return next_month_str(latest) if latest else None
+
+    def get_available_fan_months(self) -> list:
+        """Same idea as get_available_months(), for fan rankings: every
+        month with a saved snapshot, plus one extra month after the
+        latest for starting a new one. Just today's real calendar month
+        if nothing has ever been saved yet."""
+        months = self.get_fan_months()
+        if not months:
+            today = date.today()
+            return [f"{today.year:04d}-{today.month:02d}"]
+        return months + [next_month_str(months[-1])]
+
+    def get_previous_fan_month(self, month: str):
+        """The most recent EXISTING fan-rankings month strictly before
+        `month` -- see get_previous_month()'s docstring for why this
+        skips gaps rather than requiring exact calendar adjacency."""
+        earlier = [m for m in self.get_fan_months() if m < month]
+        return max(earlier) if earlier else None
 
     def _save_all_fan_rankings(self, rows: list):
         with open(self.fan_file, "w", newline="", encoding="utf-8") as f:
@@ -516,3 +568,64 @@ class Rankings:
             })
 
         return {"source_month": source_month, "entries": entries, "dropped": dropped}
+
+    # ================= Rank deltas =================
+
+    @staticmethod
+    def _rank_deltas_from_snapshot(previous_snapshot: list, current_entries: list) -> dict:
+        """
+        Shared by compute_rank_deltas() and compute_fan_rank_deltas():
+        given a previous month's saved snapshot and the CURRENTLY
+        DISPLAYED list of entries in rank order (index 0 = rank #1 --
+        this may not be saved yet, e.g. a freshly carried-forward month
+        still being edited), works out each fighter's rank change.
+
+        Returns {fighter_id: int delta | "NR"}. A positive delta means
+        the fighter moved UP (a better, lower rank number -- #5 -> #2 is
+        +3); negative means they dropped. "NR" means the fighter wasn't
+        in the previous snapshot at all. A fighter from the previous
+        snapshot who's absent from current_entries simply gets no key
+        here -- there's no row in the current table to attach a delta
+        to, and per the UI spec, a fighter falling out of the rankings
+        isn't indicated at all.
+        """
+        previous_rank_by_fighter = {row["fighter_id"]: row["rank"] for row in previous_snapshot}
+
+        deltas = {}
+        for index, entry in enumerate(current_entries or []):
+            fighter_id = entry["fighter_id"]
+            current_rank = index + 1
+            previous_rank = previous_rank_by_fighter.get(fighter_id)
+            deltas[fighter_id] = "NR" if previous_rank is None else previous_rank - current_rank
+        return deltas
+
+    def compute_rank_deltas(self, ranking_type: str, weight_limit, current_month: str,
+                            current_entries: list = None) -> dict:
+        """
+        Rank deltas for a division (or P4P) snapshot, comparing
+        current_entries against the most recent EXISTING month strictly
+        before current_month -- which may skip over gaps, since one
+        division can drift a month or two ahead of another. Returns {}
+        if there's no earlier snapshot to compare against at all (e.g.
+        this is the very first month ever recorded for this division),
+        which the caller should render as "nothing to show", not as
+        every fighter being new.
+        """
+        if ranking_type == TYPE_P4P:
+            weight_limit = None
+
+        previous_month = self.get_previous_month(ranking_type, weight_limit, current_month)
+        if previous_month is None:
+            return {}
+
+        previous_snapshot = self.get_snapshot(previous_month, ranking_type, weight_limit)
+        return self._rank_deltas_from_snapshot(previous_snapshot, current_entries)
+
+    def compute_fan_rank_deltas(self, current_month: str, current_entries: list = None) -> dict:
+        """Same idea as compute_rank_deltas(), for fan rankings."""
+        previous_month = self.get_previous_fan_month(current_month)
+        if previous_month is None:
+            return {}
+
+        previous_snapshot = self.get_fan_snapshot(previous_month)
+        return self._rank_deltas_from_snapshot(previous_snapshot, current_entries)
