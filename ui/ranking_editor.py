@@ -1,17 +1,3 @@
-"""
-ranking_editor.py
-
-Shared editor widget for building a ranking snapshot. Used by both
-rankings.py (divisional + P4P, which have a Title checkbox) and
-record_fans.py (fan favourites, which have a Total Fans count instead).
-
-The two modes differ only in one column, so the widget is parameterised
-with `mode` rather than duplicated. It holds the working snapshot in a
-plain Python list (self.entries) -- index 0 is rank #1 -- and re-renders
-the table from that list. Nothing is written to disk until the owning
-screen calls the API on Save.
-"""
-
 import tkinter as tk
 from tkinter import ttk, messagebox
 
@@ -20,7 +6,6 @@ from api.Fighter import format_full_name
 
 MODE_RANKING = "ranking"   # divisional / P4P: has a Title flag
 MODE_FANS = "fans"         # fan favourites: has a Total Fans count
-
 
 class RankingEditorFrame(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI, mode: str = MODE_RANKING, max_entries=None):
@@ -37,28 +22,18 @@ class RankingEditorFrame(ttk.Frame):
         self._build_entry_controls()
 
     # ---------- Construction ----------
-
     def _build_table(self):
         frame = ttk.Frame(self)
         frame.pack(fill="both", expand=True, padx=5, pady=5)
 
         if self.mode == MODE_RANKING:
-            # "division" shows each fighter's own registered weight class --
-            # redundant for a DIVISION snapshot (it's always the selected
-            # division) but the whole point for P4P, where fighters span
-            # every division: seeing it while building the list is what
-            # lets which-divisions-are-strongest analysis start at
-            # data-entry time, not just after the fact.
             columns = ("rank", "delta", "fighter", "division", "record", "title")
             headings = ("#", "Chg", "Fighter", "Division", "Record", "Title")
-            widths = (40, 55, 175, 150, 110, 60)
-        else:
-            # Fan favourites aren't restricted to one division either, so
-            # the same "which divisions draw the most interest" analysis
-            # applies here.
+            widths = (30, 45, 150, 120, 100, 40)
+        else: # Fan favourites aren't restricted to one division either
             columns = ("rank", "delta", "fighter", "division", "record", "fans")
             headings = ("#", "Chg", "Fighter", "Division", "Record", "Total Fans")
-            widths = (40, 55, 175, 150, 110, 100)
+            widths = (30, 45, 150, 120, 100, 100)
 
         self.tree = ttk.Treeview(frame, columns=columns, show="headings", height=12)
         for col, heading, width in zip(columns, headings, widths):
@@ -86,58 +61,56 @@ class RankingEditorFrame(ttk.Frame):
 
         ttk.Label(box, text="Fighter:").grid(row=0, column=0, sticky="w", padx=5, pady=4)
         self.fighter_var = tk.StringVar()
-        self.fighter_combo = ttk.Combobox(box, textvariable=self.fighter_var, state="readonly", width=34)
-        self.fighter_combo.grid(row=0, column=1, columnspan=3, sticky="w", padx=5, pady=4)
+        self.fighter_combo = ttk.Combobox(box, textvariable=self.fighter_var,
+                                            state="readonly", width=34)
+        self.fighter_combo.grid(row=0, column=1, sticky="w", padx=5, pady=4)
 
-        ttk.Label(box, text="W:").grid(row=1, column=0, sticky="e", padx=(5, 0), pady=4)
+        record_row = ttk.Frame(box)
+        record_row.grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=4)
+
         self.wins_var = tk.IntVar(value=0)
-        ttk.Spinbox(box, from_=0, to=999, textvariable=self.wins_var, width=5).grid(
-            row=1, column=1, sticky="w", padx=5, pady=4)
-
-        ttk.Label(box, text="KO:").grid(row=1, column=2, sticky="e", padx=(5, 0), pady=4)
         self.knockouts_var = tk.IntVar(value=0)
-        ttk.Spinbox(box, from_=0, to=999, textvariable=self.knockouts_var, width=5).grid(
-            row=1, column=3, sticky="w", padx=5, pady=4)
-
-        ttk.Label(box, text="L:").grid(row=2, column=0, sticky="e", padx=(5, 0), pady=4)
         self.losses_var = tk.IntVar(value=0)
-        ttk.Spinbox(box, from_=0, to=999, textvariable=self.losses_var, width=5).grid(
-            row=2, column=1, sticky="w", padx=5, pady=4)
-
-        ttk.Label(box, text="D:").grid(row=2, column=2, sticky="e", padx=(5, 0), pady=4)
         self.draws_var = tk.IntVar(value=0)
-        ttk.Spinbox(box, from_=0, to=999, textvariable=self.draws_var, width=5).grid(
-            row=2, column=3, sticky="w", padx=5, pady=4)
+
+        for label, var in (("W:", self.wins_var), ("KO:", self.knockouts_var),
+                            ("L:", self.losses_var), ("D:", self.draws_var)):
+            ttk.Label(record_row, text=label).pack(side="left", padx=(10, 2))
+            ttk.Spinbox(record_row, from_=0, to=999, textvariable=var,
+                        width=5).pack(side="left")
 
         if self.mode == MODE_RANKING:
             self.title_var = tk.BooleanVar(value=False)
-            ttk.Checkbutton(box, text="Holds a title in this division", variable=self.title_var).grid(
-                row=3, column=0, columnspan=4, sticky="w", padx=5, pady=4)
+            ttk.Checkbutton(box, text="Holds a title in this division",
+                            variable=self.title_var).grid(
+                row=2, column=0, columnspan=2, sticky="w", padx=5, pady=4)
         else:
-            ttk.Label(box, text="Total Fans:").grid(row=3, column=0, sticky="e", padx=(5, 0), pady=4)
+            fans_row = ttk.Frame(box)
+            fans_row.grid(row=2, column=0, columnspan=2, sticky="w", padx=5, pady=4)
+            ttk.Label(fans_row, text="Total Fans:").pack(side="left", padx=(0, 5))
             self.total_fans_var = tk.IntVar(value=0)
-            ttk.Spinbox(box, from_=0, to=100_000_000, textvariable=self.total_fans_var, width=12).grid(
-                row=3, column=1, columnspan=3, sticky="w", padx=5, pady=4)
+            ttk.Spinbox(fans_row, from_=0, to=100_000_000,
+                        textvariable=self.total_fans_var, width=12).pack(side="left")
 
         button_row = ttk.Frame(box)
-        button_row.grid(row=4, column=0, columnspan=4, sticky="w", padx=5, pady=(8, 5))
+        button_row.grid(row=3, column=0, columnspan=2, sticky="w", padx=5, pady=(8, 5))
         ttk.Button(button_row, text="Add to Bottom", command=self._add_entry).pack(side="left", padx=(0, 5))
         ttk.Button(button_row, text="Update Selected", command=self._update_selected).pack(side="left", padx=5)
-        ttk.Button(button_row, text="Fill Record From File",
-                   command=self._fill_record_from_file).pack(side="left", padx=5)
+        ttk.Button(button_row, text="Fill Record From File", command=self._fill_record_from_file).pack(side="left", padx=5)
 
     # ---------- Eligible fighters ----------
     def set_eligible_fighters(self, fighters: list):
-        """Restrict the fighter dropdown to a given list of fighter dicts.
-        Divisional rankings pass only fighters registered to that weight
-        class; P4P and fan rankings pass everyone."""
-        self._fighter_options = [
+        """ Divisional rankings pass only fighters registered to that weight class; P4P and fan rankings pass everyone """
+        self._fighter_options = sorted(
             (
-                f["fighter_id"],
-                f'#{f["fighter_id"]} {format_full_name(f["first_name"], f["last_name"], f["nickname"], f["placement"])}',
-            )
-            for f in fighters
-        ]
+                (
+                    f["fighter_id"],
+                    f'{f["first_name"]} {f["last_name"]}'
+                )
+                for f in fighters
+            ),
+            key=lambda option: option[1].lower()
+        )
         self.fighter_combo["values"] = [label for _fid, label in self._fighter_options]
         self.fighter_var.set("")
 
@@ -155,18 +128,10 @@ class RankingEditorFrame(ttk.Frame):
         fighter = self.api.get_fighter(fighter_id)
         if fighter is None:
             return f"#{fighter_id} (unknown fighter)"
-        return (f'#{fighter_id} '
-                f'{format_full_name(fighter["first_name"], fighter["last_name"], fighter["nickname"], fighter["placement"])}')
+        return (f'{fighter["first_name"]} {fighter["last_name"]}')
 
     def _division_label_for_entry(self, entry: dict) -> str:
-        """Division label for one row. Prefers the entry's OWN stored
-        fighter_weight_limit -- the fighter's actual division AT THE TIME
-        of a historical snapshot, read straight from rankings.csv -- over
-        a live lookup, since a fighter's current registration can have
-        changed since that snapshot was recorded. Falls back to a live
-        lookup only for an entry that has no fighter_weight_limit at all
-        yet (freshly added, or carried forward into a month that hasn't
-        been saved yet), where a live value is the best guess available."""
+        """Division label for one row """
         weight_limit = entry.get("fighter_weight_limit")
 
         if weight_limit is None:
@@ -181,36 +146,28 @@ class RankingEditorFrame(ttk.Frame):
         return str(weight_limit)
 
     # ---------- Rank-change column ----------
+    def get_rank(self, fighter_id: int, previous_ranks: list) -> int:
+        """ Return the rank of a fighter_id in the given {fighter_id: rank} lookup, or None if not ranked """
+        for r in previous_ranks:
+            if r["fighter_id"] == fighter_id:
+                return r["rank"]
+        return None
 
     def set_previous_ranks(self, previous_ranks):
-        """Set the {fighter_id: rank} lookup from the most recent existing
-        PRIOR month, used to render the "Chg" column. Pass None when no
-        prior snapshot exists at all for this division/type (e.g. the
-        very first month ever recorded) -- in that case the column stays
-        blank for every row, rather than treating everyone as new (NR).
-        Call this, then load_entries()/refresh_table(), whenever the
-        displayed month or division changes."""
+        """ Set the {fighter_id: rank} lookup from the most recent existing PRIOR month, used to render the "Chg" column """
         self.previous_ranks = previous_ranks
 
     def _delta_label(self, fighter_id: int, current_rank: int) -> str:
         """
-        '\u25b2{delta}' -- moved up (a better, lower rank number) since
-                            the last existing snapshot
+        '\u25b2{delta}' -- moved up since last existing snapshot
         '\u25bc{delta}' -- dropped since the last existing snapshot
         'NR'            -- wasn't ranked at all last time (new entrant)
-        ''              -- either no prior snapshot exists to compare
-                            against, or the rank is unchanged
-
-        Deliberately says nothing about a fighter who WAS ranked last
-        month but is absent this month -- that's not this column's job,
-        and there's no row to attach the label to anyway since this is
-        only ever called for a fighter present in the CURRENT list.
+        ''              -- either no prior snapshot exists to compare against, or the rank is unchanged
         """
-        print(f"For #{fighter_id}, self.previous_ranks = {self.previous_ranks}")
         if self.previous_ranks is None:
             return ""
 
-        previous_rank = self.previous_ranks.get(fighter_id)
+        previous_rank = self.get_rank(fighter_id, self.previous_ranks)
         if previous_rank is None:
             return "NR"
         if previous_rank == current_rank:
@@ -265,7 +222,6 @@ class RankingEditorFrame(ttk.Frame):
             self.total_fans_var.set(entry.get("total_fans", 0))
 
     # ---------- Editing ----------
-
     def _read_form(self):
         """Read the entry controls into a dict, or None after showing an error."""
         fighter_id = self._selected_fighter_id()
@@ -345,8 +301,7 @@ class RankingEditorFrame(ttk.Frame):
         self.refresh_table()
 
     def _fill_record_from_file(self):
-        """Pull the fighter's current record out of records.csv into the
-        record spinboxes, so the user doesn't retype what we already know."""
+        """ Pull the fighter's current record out of records.csv into the record spinboxes, so the user doesn't retype what we already know """
         fighter_id = self._selected_fighter_id()
         if fighter_id is None:
             messagebox.showerror("No Fighter", "Pick a fighter from the dropdown first.")
@@ -386,9 +341,7 @@ class RankingEditorFrame(ttk.Frame):
         self.refresh_table()
 
     # ---------- Bulk load ----------
-
     def load_entries(self, entries: list):
-        """Replace the working snapshot wholesale (used by carry-forward
-        and when viewing an existing month)."""
+        """ Replace the working snapshot wholesale (used by carry-forward and when viewing an existing month)."""
         self.entries = [dict(e) for e in entries]
         self.refresh_table()

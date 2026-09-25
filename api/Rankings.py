@@ -1,69 +1,3 @@
-"""
-Rankings.py
-
-Monthly ranking snapshots, stored in data/rankings/.
-
-Two files, both in long format (one row per ranked fighter) so they can
-be loaded straight into pandas with a single read_csv() -- no globbing
-or concatenating per-month files:
-
-    rankings.csv      -- divisional and pound-for-pound rankings
-        SnapshotMonth  -> str, "YYYY-MM"
-        RankingType    -> "DIVISION" or "P4P"
-        WeightLimit    -> int (blank for P4P), FK -> weights.csv. This is
-                          the division being ranked -- part of the
-                          snapshot's identity, constant across every row
-                          of a given DIVISION snapshot, always blank for
-                          P4P.
-        Rank           -> int, 1..N, contiguous within a snapshot
-        FighterID      -> int, FK -> fighters.csv
-        FighterWeightLimit -> int, FK -> weights.csv. The fighter's own
-                          registered division AT THE TIME of this
-                          snapshot -- a per-entry fact, not part of the
-                          snapshot's identity. For DIVISION rows this
-                          always equals WeightLimit (fighters can only be
-                          ranked in their own division). For P4P rows,
-                          where WeightLimit is blank, this is what lets
-                          later analysis ask "which divisions are
-                          strongest in the P4P list" or "does divisional
-                          rank correlate with P4P rank". Computed and
-                          stored automatically at save time from
-                          fighters.csv -- nothing in the UI sets this
-                          directly. Blank for rows saved before this
-                          column existed (old data is read back with
-                          this as None rather than raising).
-        Wins/Knockouts/Losses/Draws -> int, the fighter's record AS OF
-                          this snapshot (records.csv only holds current
-                          values, so these are stored for historical
-                          analysis)
-        Title          -> int 0/1, does this fighter hold a belt in this
-                          division. Deliberately independent of Rank --
-                          a champion can be ranked below a #1 contender,
-                          and a division can have multiple title holders
-                          (e.g. a champion moving up and bringing a belt).
-
-    fan_rankings.csv  -- top 9 fan favourites by Total Fans
-        SnapshotMonth  -> str, "YYYY-MM"
-        Rank           -> int, 1..9
-        FighterID      -> int, FK -> fighters.csv
-        FighterWeightLimit -> int, FK -> weights.csv. The fighter's own
-                          registered division AT THE TIME of this
-                          snapshot -- same idea as rankings.csv's column
-                          of the same name: fan favourites aren't
-                          restricted to one division, so this is what
-                          lets later analysis ask which divisions draw
-                          the most fan interest. Computed automatically
-                          at save time; blank for rows saved before this
-                          column existed.
-        TotalFans      -> int
-        Wins/Knockouts/Losses/Draws -> int, record as of this snapshot
-
-Kept in a separate file because fan rankings carry TotalFans, have no
-Title concept, and are capped at 9 -- folding them into rankings.csv
-would mean a mostly-empty column and a RankingType that behaves
-differently from the others.
-"""
-
 import csv
 import os
 import re
@@ -95,18 +29,15 @@ MONTH_PATTERN = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 
 MAX_FAN_RANKS = 9
 
-
 class RankingError(Exception):
-    """Raised when a ranking snapshot fails validation."""
+    """ Raised when a ranking snapshot fails validation """
     pass
-
 
 def validate_month(month: str) -> str:
     month = (month or "").strip()
     if not MONTH_PATTERN.match(month):
         raise RankingError('Snapshot month must be in "YYYY-MM" format (e.g. "2026-03").')
     return month
-
 
 def next_month_str(month: str) -> str:
     """'2026-03' -> '2026-04'; '2026-12' -> '2027-01'."""
@@ -118,32 +49,15 @@ def next_month_str(month: str) -> str:
         year += 1
     return f"{year:04d}-{mon:02d}"
 
-
-def next_month(month_str: str) -> str:
-    """'2026-03' -> '2026-04', '2026-12' -> '2027-01'. Used to auto-fill
-    the target month when carrying a snapshot forward, so the user isn't
-    doing the date arithmetic by hand every time they start a new month."""
-    month_str = validate_month(month_str)
-    year, month = (int(part) for part in month_str.split("-"))
-    if month == 12:
-        year, month = year + 1, 1
-    else:
-        month += 1
-    return f"{year:04d}-{month:02d}"
-
-
 def _validate_record(wins, knockouts, losses, draws):
     if min(wins, knockouts, losses, draws) < 0:
         raise RankingError("Record values cannot be negative.")
     if knockouts > wins:
         raise RankingError("Knockouts cannot exceed total wins.")
 
-
 class Rankings:
-    """Read/write monthly ranking snapshots."""
-
-    def __init__(self, rankings_file: str = RANKINGS_FILE, fan_file: str = FAN_RANKINGS_FILE,
-                 fighter_api: Fighter = None, records_api: Records = None):
+    """ Read/write monthly ranking snapshots"""
+    def __init__(self, rankings_file: str = RANKINGS_FILE, fan_file: str = FAN_RANKINGS_FILE, fighter_api: Fighter = None, records_api: Records = None):
         self.rankings_file = rankings_file
         self.fan_file = fan_file
         self.fighter_api = fighter_api or Fighter()
@@ -152,22 +66,17 @@ class Rankings:
 
     def _ensure_files_exist(self):
         os.makedirs(os.path.dirname(self.rankings_file), exist_ok=True)
-        for path, fieldnames in ((self.rankings_file, RANKING_FIELDNAMES),
-                                 (self.fan_file, FAN_FIELDNAMES)):
+        for path, fieldnames in ((self.rankings_file, RANKING_FIELDNAMES), (self.fan_file, FAN_FIELDNAMES)):
             if not os.path.exists(path):
                 with open(path, "w", newline="", encoding="utf-8") as f:
                     csv.DictWriter(f, fieldnames=fieldnames).writeheader()
 
     # ================= Division / P4P rankings =================
-
     def get_all(self) -> list:
         self._ensure_files_exist()
         with open(self.rankings_file, newline="", encoding="utf-8") as f:
             rows = []
             for row in csv.DictReader(f):
-                # .get() rather than [] -- rankings.csv written before this
-                # column existed won't have it in its header at all, and a
-                # missing/blank value both mean "not recorded".
                 raw_fighter_weight = row.get("FighterWeightLimit")
                 rows.append({
                     "month": row["SnapshotMonth"],
@@ -185,7 +94,7 @@ class Rankings:
             return rows
 
     def get_snapshot(self, month: str, ranking_type: str, weight_limit=None) -> list:
-        """Return the ranked entries for one division (or P4P) in one month."""
+        """ Return the ranked entries for one division (or P4P) in one month """
         return sorted(
             [
                 r for r in self.get_all()
@@ -197,7 +106,7 @@ class Rankings:
         )
 
     def get_months(self, ranking_type: str = None, weight_limit=None) -> list:
-        """All snapshot months present, newest last."""
+        """ All snapshot months present, newest last """
         rows = self.get_all()
         if ranking_type is not None:
             rows = [r for r in rows if r["ranking_type"] == ranking_type
@@ -209,9 +118,7 @@ class Rankings:
         return months[-1] if months else None
 
     def get_next_month(self, ranking_type: str, weight_limit=None):
-        """The month after the most recent existing snapshot for this
-        division (or P4P) -- or None if there's no snapshot yet to
-        advance from, since there's nothing to compute "next" from."""
+        """ The month after the most recent existing snapshot """
         latest = self.get_latest_month(ranking_type, weight_limit)
         return next_month_str(latest) if latest else None
 

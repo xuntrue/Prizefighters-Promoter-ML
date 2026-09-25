@@ -1,34 +1,13 @@
-"""
-rankings.py
-
-Rankings tab. Like settings.py, this hosts an inner notebook so related
-screens live under one top-level tab:
-    Divisions / P4P -- DivisionRankingsSection (below)
-    Fan Favourites  -- RecordFansSection (record_fans.py)
-
-Divisional and P4P rankings share a shape (ranked list + Title flag), so
-one section handles both; picking "Pound-for-Pound" from the division
-dropdown just switches the ranking type and lifts the weight-class
-restriction on who can be ranked.
-
-Note that Title is recorded per-entry and is deliberately independent of
-Rank: a champion isn't necessarily #1, and a division can hold more than
-one title holder at once (e.g. a champion moving up a weight class and
-bringing a belt with them). Tracking a clean championship lineage is a
-separate future concern -- these monthly snapshots aren't trying to
-solve it.
-"""
-
 import tkinter as tk
 from tkinter import ttk, messagebox
 
 from api.PrizefighterAPI import PrizefighterAPI
 from api.Rankings import RankingError, TYPE_DIVISION, TYPE_P4P
+
 from ui.ranking_editor import RankingEditorFrame, MODE_RANKING
 from ui.record_fans import RecordFansSection
 
 P4P_LABEL = "Pound-for-Pound (P4P)"
-
 
 class DivisionRankingsSection(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
@@ -50,40 +29,31 @@ class DivisionRankingsSection(ttk.Frame):
         box = ttk.LabelFrame(self, text="Snapshot")
         box.pack(fill="x", padx=10, pady=10)
 
-        ttk.Label(box, text="Month (YYYY-MM):").grid(row=0, column=0, sticky="w", padx=5, pady=5)
-        self.month_var = tk.StringVar()
-        ttk.Entry(box, textvariable=self.month_var, width=12).grid(
-            row=0, column=1, sticky="w", padx=5, pady=5)
-
-        ttk.Label(box, text="Division:").grid(row=0, column=2, sticky="w", padx=(15, 5), pady=5)
+        # Division selector
+        ttk.Label(box, text="Division:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
         self.division_var = tk.StringVar()
-        self.division_combo = ttk.Combobox(box, textvariable=self.division_var,
-                                           state="readonly", width=28)
-        self.division_combo.grid(row=0, column=3, sticky="w", padx=5, pady=5)
-        self.division_combo.bind("<<ComboboxSelected>>", lambda _e: self._on_division_changed())
+        self.division_combo = ttk.Combobox(box, textvariable=self.division_var, state="readonly", width=28,)
+        self.division_combo.grid(row=0, column=1, sticky="w", padx=5, pady=5)
+        self.division_combo.bind("<<ComboboxSelected>>", self._on_division_changed)
 
-        button_row = ttk.Frame(box)
-        button_row.grid(row=1, column=0, columnspan=4, sticky="w", padx=5, pady=(0, 5))
-        ttk.Button(button_row, text="Load Last Month", command=self._on_carry_forward).pack(
-            side="left", padx=(0, 5))
-        ttk.Button(button_row, text="Load This Month", command=self._on_load_month).pack(
-            side="left", padx=5)
-        ttk.Button(button_row, text="Load Next Month", command=self._on_load_next_month).pack(
-            side="left", padx=5)
+        # Month selector
+        ttk.Label(box, text="Month (YYYY-MM):").grid(row=0, column=2, sticky="w", padx=(15, 5), pady=5)
+        self.month_var = tk.StringVar()
+        self.month_combo = ttk.Combobox(box, textvariable=self.month_var, state="readonly", width=18)
+        self.month_combo.grid(row=0, column=3, sticky="w", padx=5, pady=5)
+        self.month_combo.bind("<<ComboboxSelected>>", self._on_month_changed)
 
-        self.status_label = ttk.Label(box, text="", foreground="gray",
-                                      wraplength=600, justify="left")
-        self.status_label.grid(row=2, column=0, columnspan=4, sticky="w", padx=5, pady=(0, 5))
+        # Status label
+        self.status_label = ttk.Label(box, text="", foreground="gray", wraplength=1000, justify="left")
+        self.status_label.grid(row=1, column=0, columnspan=4, sticky="w", padx=5, pady=(0, 5))
 
     # ---------- Reference data ----------
-
     def refresh_reference_data(self):
-        """Rebuild the division dropdown from weights.csv (it can change
-        in Settings) and re-filter who's eligible to be ranked."""
+        """ Rebuild the division dropdown from weights.csv and re-filter who's eligible to be ranked """
         previous = self.division_var.get()
 
         self._division_options = [
-            (wc["weight_limit"], f'{wc["weight_limit"]} - {wc["weight_class"]}')
+            (wc["weight_limit"], f'{wc["weight_class"]}')
             for wc in self.api.get_weight_classes()
         ]
         self._division_options.append((None, P4P_LABEL))
@@ -93,12 +63,18 @@ class DivisionRankingsSection(ttk.Frame):
         if previous in self.division_combo["values"]:
             self.division_var.set(previous)
         elif self.division_combo["values"]:
-            self.division_var.set(self.division_combo["values"][0])
+            self.division_var.set(self.division_combo["values"][-1])
 
         self._refresh_eligible_fighters()
+        self._refresh_month_options()
+
+        if self.month_var.get():
+            self._on_month_changed()
+        else:
+            self.editor.clear()
 
     def _current_division(self):
-        """Return (ranking_type, weight_limit) for the selected dropdown item."""
+        """ Return (ranking_type, weight_limit) for the selected dropdown item """
         label = self.division_var.get()
         for weight_limit, option_label in self._division_options:
             if option_label == label:
@@ -108,8 +84,7 @@ class DivisionRankingsSection(ttk.Frame):
         return None, None
 
     def _refresh_eligible_fighters(self):
-        """P4P is open to everyone; a division is restricted to fighters
-        registered at that weight class in fighters.csv."""
+        """ P4P is open to everyone; a division is restricted to fighters registered at that weight class in fighters.csv """
         ranking_type, weight_limit = self._current_division()
         fighters = self.api.get_fighters()
 
@@ -118,93 +93,72 @@ class DivisionRankingsSection(ttk.Frame):
 
         self.editor.set_eligible_fighters(fighters)
 
-    def _on_division_changed(self):
+    def _on_division_changed(self, _event=None):
         self._refresh_eligible_fighters()
-        self.editor.clear()
-        self.status_label.config(text="Division changed -- load a snapshot or start adding fighters.")
+        self._refresh_month_options()
+        self.editor.clear()   
+        self.status_label.config(text="Select a month to view its rankings")
+
+    def _refresh_month_options(self):
+        """ Refresh available snapshot months for the selected division """
+        ranking_type, weight_limit = self._current_division()
+        if ranking_type is None:
+            self.month_combo["values"] = []
+            self.month_var.set("")
+            return
+
+        months = self.api.get_ranking_months(ranking_type, weight_limit)
+        if months[-1][5:] == '12':
+            months.append(f'{int(months[-1][:4]) + 1}-01')
+        else:
+            months.append(f'{months[-1][:5]}{int(months[-1][5:]) + 1:02d}')
+
+        self.month_combo["values"] = months
+        if months:
+            self.month_var.set(months[-2]) # Get 2nd last
+        else:
+            self.month_var.set("")
+        self._on_month_changed()
 
     # ---------- Loading ----------
-
-    def _on_carry_forward(self):
+    def _on_month_changed(self, _event=None):
         ranking_type, weight_limit = self._current_division()
         if ranking_type is None:
-            messagebox.showerror("No Division", "Pick a division first.")
             return
 
-        result = self.api.carry_forward_rankings(ranking_type, weight_limit)
+        months = self.api.get_ranking_months(ranking_type, weight_limit)
 
-        if result["source_month"] is None:
-            self.editor.clear()
-            self.status_label.config(
-                text="No previous snapshot for this division -- starting from scratch.")
-            return
-
-        self.editor.load_entries(result["entries"])
-
-        message = f'Loaded {result["source_month"]} as a starting point.'
-        if result["dropped"]:
-            parts = []
-            for d in result["dropped"]:
-                who = d.get("name") or f'FighterID {d["fighter_id"]}'
-                parts.append(f'#{d["previous_rank"]} {who} ({d["reason"]})')
-            message += " Dropped and everyone below moved up: " + "; ".join(parts) + "."
-        self.status_label.config(text=message)
-
-    def _on_load_month(self):
-        ranking_type, weight_limit = self._current_division()
-        if ranking_type is None:
-            messagebox.showerror("No Division", "Pick a division first.")
-            return
-
+        # Fetch month selected
         month = self.month_var.get().strip()
-        snapshot = self.api.get_ranking_snapshot(month, ranking_type, weight_limit)
-
-        if not snapshot:
-            self.status_label.config(text=f"No rankings saved for {month} in this division.")
+        if not month:
+            self.editor.clear()
             return
+
+        # Fetch 'current' snapshot
+        if month not in months:
+            snapshot = self.api.get_ranking_snapshot(months[-1], ranking_type, weight_limit)
+            self.status_label.config(text=f"No rankings saved for {month} in this division.")
+            i = len(months)
+        else:
+            snapshot = self.api.get_ranking_snapshot(month, ranking_type, weight_limit)
+            i = months.index(month)
+
+        # Fetch previous month's snapshot
+        if i > 0:
+            prev_month = months[i-1]
+            prev_snapshot = self.api.get_ranking_snapshot(prev_month, ranking_type, weight_limit)
+            self.editor.set_previous_ranks(prev_snapshot)
 
         self.editor.load_entries([
-            {k: row[k] for k in
-             ("fighter_id", "wins", "knockouts", "losses", "draws", "title", "fighter_weight_limit")}
+            {
+                k: row[k]
+                for k in ("fighter_id", "wins", "knockouts", "losses", "draws", "title", "fighter_weight_limit")
+            }
             for row in snapshot
         ])
-        self.status_label.config(
-            text=f"Loaded existing rankings for {month} (saving will overwrite).")
-
-    def _on_load_next_month(self):
-        """One-click version of "figure out the next month, then load last
-        month's roster as a starting point" -- the two steps you'd
-        otherwise do by hand (type the new month, click Load Last Month)
-        every time a new month rolls over in-game."""
-        ranking_type, weight_limit = self._current_division()
-        if ranking_type is None:
-            messagebox.showerror("No Division", "Pick a division first.")
-            return
-
-        next_month = self.api.get_next_ranking_month(ranking_type, weight_limit)
-        if next_month is None:
-            messagebox.showinfo(
-                "No Existing Rankings",
-                "There's no previous snapshot for this division to advance from -- "
-                "enter a starting month manually.",
-            )
-            return
-
-        result = self.api.carry_forward_rankings(ranking_type, weight_limit)
-        self.month_var.set(next_month)
-        self.editor.load_entries(result["entries"])
-
-        message = f'Advanced to {next_month}, starting from {result["source_month"]}\'s roster.'
-        if result["dropped"]:
-            parts = []
-            for d in result["dropped"]:
-                who = d.get("name") or f'FighterID {d["fighter_id"]}'
-                parts.append(f'#{d["previous_rank"]} {who} ({d["reason"]})')
-            message += " Dropped and everyone below moved up: " + "; ".join(parts) + "."
-        self.status_label.config(text=message)
+        self.status_label.config(text=f"Loaded {weight_limit}lb rankings for {month}.")
 
     # ---------- Saving ----------
-
     def _on_save(self):
         ranking_type, weight_limit = self._current_division()
         if ranking_type is None:
@@ -227,10 +181,8 @@ class DivisionRankingsSection(ttk.Frame):
         self.status_label.config(
             text=f"Saved {len(self.editor.entries)} ranked fighters for {month}.")
 
-
 class RankingsTab(ttk.Frame):
-    """Top-level Rankings tab: divisions/P4P and fan favourites."""
-
+    """ Top-level Rankings tab: divisions/P4P and fan favourites """
     def __init__(self, parent, api: PrizefighterAPI):
         super().__init__(parent)
 

@@ -1,22 +1,9 @@
-"""
-record_fans.py
-
-Fan favourites section of the Rankings tab. Prizefighters 2 only exposes
-the top 9 fighters by Total Fans, so this records rank #1-#9 along with
-each fighter's Total Fans count and their record at the time.
-
-Unlike divisional rankings there's no weight class restriction (any
-fighter can be a fan favourite) and no Title concept -- see
-ranking_editor.py, which handles both shapes.
-"""
-
 import tkinter as tk
 from tkinter import ttk, messagebox
 
 from api.PrizefighterAPI import PrizefighterAPI
 from api.Rankings import RankingError, MAX_FAN_RANKS
 from ui.ranking_editor import RankingEditorFrame, MODE_FANS
-
 
 class RecordFansSection(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
@@ -37,55 +24,74 @@ class RecordFansSection(ttk.Frame):
         box = ttk.LabelFrame(self, text="Snapshot")
         box.pack(fill="x", padx=10, pady=10)
 
-        ttk.Label(box, text="Month (YYYY-MM):").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        # Month selector
+        ttk.Label(box, text="Month (YYYY-MM):").grid(row=0, column=2, sticky="w", padx=(15, 5), pady=5)
         self.month_var = tk.StringVar()
-        ttk.Entry(box, textvariable=self.month_var, width=12).grid(
-            row=0, column=1, sticky="w", padx=5, pady=5)
+        self.month_combo = ttk.Combobox(box, textvariable=self.month_var, state="readonly", width=18)
+        self.month_combo.grid(row=0, column=3, sticky="w", padx=5, pady=5)
+        self.month_combo.bind("<<ComboboxSelected>>", self._on_month_changed)
 
-        ttk.Button(box, text="Load Last Month", command=self._on_carry_forward).grid(
-            row=0, column=2, sticky="w", padx=5, pady=5)
-        ttk.Button(box, text="Load This Month", command=self._on_load_month).grid(
-            row=0, column=3, sticky="w", padx=5, pady=5)
-        ttk.Button(box, text="Load Next Month", command=self._on_load_next_month).grid(
-            row=0, column=4, sticky="w", padx=5, pady=5)
-
-        self.status_label = ttk.Label(box, text="", foreground="gray", wraplength=600, justify="left")
-        self.status_label.grid(row=1, column=0, columnspan=5, sticky="w", padx=5, pady=(0, 5))
+        # Status label
+        self.status_label = ttk.Label(box, text="", foreground="gray", wraplength=1000, justify="left")
+        self.status_label.grid(row=1, column=0, columnspan=4, sticky="w", padx=5, pady=(0, 5))
 
     # ---------- Lifecycle ----------
-
     def refresh_reference_data(self):
         """Any fighter can be a fan favourite, so the dropdown is everyone."""
         self.editor.set_eligible_fighters(self.api.get_fighters())
         self.editor.refresh_table()
 
-    # ---------- Loading ----------
+        self.editor.set_eligible_fighters(self.api.get_fighters())
 
-    def _on_carry_forward(self):
-        result = self.api.carry_forward_fan_rankings()
+        self._refresh_month_options()
 
-        if result["source_month"] is None:
+        if self.month_var.get():
+            self._on_month_changed()
+        else:
             self.editor.clear()
-            self.status_label.config(text="No previous fan rankings on file -- starting from scratch.")
+
+    def _refresh_month_options(self):
+        """ Refresh available snapshot months for the selected division """
+        months = self.api.get_fan_months()
+        if months[-1][5:] == '12':
+            months.append(f'{int(months[-1][:4]) + 1}-01')
+        else:
+            months.append(f'{months[-1][:5]}{int(months[-1][5:]) + 1:02d}')
+
+        self.month_combo["values"] = months
+        if months:
+            self.month_var.set(months[-2]) # Get 2nd last
+        else:
+            self.month_var.set("")
+        self._on_month_changed()
+
+    # ---------- Loading ----------
+    def _on_month_changed(self, _event=None):
+        months = self.api.get_fan_months()
+
+        # Fetch month selected
+        month = self.month_var.get().strip()
+        if not month:
+            self.editor.clear()
             return
 
-        self.editor.load_entries(result["entries"])
+        # Fetch 'current' snapshot
+        if month not in months:
+            snapshot = self.api.get_fan_snapshot(months[-1])
+            self.status_label.config(text=f"No fan rankings saved for {month} ")
+            i = len(months)
+        else:
+            snapshot = self.api.get_fan_snapshot(month)
+            i = months.index(month)
 
-        message = f'Loaded {result["source_month"]} as a starting point.'
-        if result["dropped"]:
-            dropped_text = "; ".join(
-                f'#{d["previous_rank"]} FighterID {d["fighter_id"]} ({d["reason"]})'
-                for d in result["dropped"]
-            )
-            message += f' Dropped: {dropped_text}.'
-        self.status_label.config(text=message)
-
-    def _on_load_month(self):
-        month = self.month_var.get().strip()
-        snapshot = self.api.get_fan_snapshot(month)
+        # Fetch previous month's snapshot
+        if i > 0:
+            prev_month = months[i-1]
+            prev_snapshot = self.api.get_fan_snapshot(prev_month)
+            self.editor.set_previous_ranks(prev_snapshot)
 
         if not snapshot:
-            self.status_label.config(text=f"No fan rankings saved for {month}.")
+            self.status_label.config(text=f"No fan rankings saved for {month} ")
             return
 
         self.editor.load_entries([
@@ -93,34 +99,9 @@ class RecordFansSection(ttk.Frame):
                                  "fighter_weight_limit")}
             for row in snapshot
         ])
-        self.status_label.config(text=f"Loaded existing fan rankings for {month} (saving will overwrite).")
-
-    def _on_load_next_month(self):
-        """One-click "figure out next month, then load last month's roster"."""
-        next_month = self.api.get_next_fan_month()
-        if next_month is None:
-            messagebox.showinfo(
-                "No Existing Rankings",
-                "There's no previous fan rankings snapshot to advance from -- "
-                "enter a starting month manually.",
-            )
-            return
-
-        result = self.api.carry_forward_fan_rankings()
-        self.month_var.set(next_month)
-        self.editor.load_entries(result["entries"])
-
-        message = f'Advanced to {next_month}, starting from {result["source_month"]}\'s roster.'
-        if result["dropped"]:
-            parts = [
-                f'#{d["previous_rank"]} FighterID {d["fighter_id"]} ({d["reason"]})'
-                for d in result["dropped"]
-            ]
-            message += " Dropped: " + "; ".join(parts) + "."
-        self.status_label.config(text=message)
+        self.status_label.config(text=f"Loaded existing fan rankings for {month} (saving will overwrite).") 
 
     # ---------- Saving ----------
-
     def _on_save(self):
         month = self.month_var.get().strip()
 

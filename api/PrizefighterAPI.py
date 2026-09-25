@@ -1,36 +1,18 @@
-"""
-PrizefighterAPI.py
-
-Central facade for all data access in the Prizefighters Promoter ML app.
-UI code should never touch files under data/ directly -- it should only
-ever call through this class. This keeps storage details (CSV today,
-maybe SQLite later) hidden from the UI layer, and gives one place to
-coordinate logic that spans more than one table (e.g. creating a
-zeroed-out record whenever a new fighter is added).
-"""
-
 import copy
 from datetime import datetime
 
-from api.Weight_Classes import WeightClasses, WeightClassError  # noqa: F401
-from api.Country import Country, CountryError, CountryFlags, CountryFlagError  # noqa: F401
-from api.Fighter import Fighter, FighterError, blank_meta_section, validate_meta_section  # noqa: F401
-from api.Records import Records, RecordError  # noqa: F401
-from api.Rankings import (  # noqa: F401
-    Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS,
-)
-from api.Arenas import Arenas, ArenaError  # noqa: F401
-from api.Gyms import Gyms, GymError  # noqa: F401
-from api.Fights import (  # noqa: F401
-    Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, STATUS_COMPLETE,
-    DATE_FORMAT, CORNERS, validate_result,
-)
-from api.Events import Events, EventError  # noqa: F401
+from api.Weight_Classes import WeightClasses, WeightClassError
+from api.Country import Country, CountryError, CountryFlags, CountryFlagError
+from api.Fighter import Fighter, FighterError, blank_meta_section, validate_meta_section
+from api.Records import Records, RecordError
+from api.Rankings import Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS
+from api.Arenas import Arenas, ArenaError
+from api.Gyms import Gyms, GymError
+from api.Fights import Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, STATUS_COMPLETE, DATE_FORMAT, CORNERS, validate_result
+from api.Events import Events, EventError
 
 
 class PrizefighterAPI:
-    """Single entry point the UI layer talks to."""
-
     def __init__(self):
         self.weight_classes = WeightClasses()
         self.countries = Country()
@@ -44,7 +26,6 @@ class PrizefighterAPI:
         self.events = Events(arena_api=self.arenas, fights_api=self.fights)
 
     # ---- Weight class passthroughs ----
-
     def get_weight_classes(self):
         return self.weight_classes.get_all()
 
@@ -61,7 +42,6 @@ class PrizefighterAPI:
         return self.weight_classes.get_min_weigh_in(weight_limit)
 
     # ---- Country passthroughs (read-only in the UI today, full CRUD available) ----
-
     def get_countries(self):
         return self.countries.get_all()
 
@@ -75,7 +55,6 @@ class PrizefighterAPI:
         self.countries.delete(a2)
 
     # ---- Country flags (read-only in the UI today, full CRUD available) ----
-
     def get_flag_path(self, a2: str):
         return self.flags.get_path(a2)
 
@@ -92,7 +71,6 @@ class PrizefighterAPI:
         self.flags.delete(a2)
 
     # ---- Fighters ----
-
     def get_fighters(self):
         return self.fighters.get_all()
 
@@ -104,11 +82,7 @@ class PrizefighterAPI:
 
     def add_fighter(self, wins: int = 0, knockouts: int = 0, losses: int = 0, draws: int = 0,
                      **fighter_fields) -> dict:
-        """
-        Add a fighter, then create their record. Defaults to a zeroed-out
-        debut record; pass wins/knockouts/losses/draws for a veteran
-        fighter hired with a pre-existing record.
-        """
+        """ Add a fighter, then create their record """
         new_fighter = self.fighters.add(**fighter_fields)
         self.records.create(new_fighter["fighter_id"], wins, knockouts, losses, draws)
         return new_fighter
@@ -117,7 +91,7 @@ class PrizefighterAPI:
         self.fighters.update(fighter_id, **fighter_fields)
 
     def delete_fighter(self, fighter_id: int) -> None:
-        """Delete a fighter and their record together."""
+        """ Delete a fighter and their record together """
         self.fighters.delete(fighter_id)
         try:
             self.records.delete(fighter_id)
@@ -125,7 +99,6 @@ class PrizefighterAPI:
             pass  # record may already be missing; fighter deletion still succeeds
 
     # ---- Records ----
-
     def get_record(self, fighter_id: int):
         return self.records.get_by_fighter_id(fighter_id)
 
@@ -133,7 +106,6 @@ class PrizefighterAPI:
         self.records.update(fighter_id, wins, knockouts, losses, draws)
 
     # ---- Rankings (divisional + P4P) ----
-
     def get_ranking_snapshot(self, month: str, ranking_type: str, weight_limit=None):
         return self.rankings.get_snapshot(month, ranking_type, weight_limit)
 
@@ -153,7 +125,6 @@ class PrizefighterAPI:
         return self.rankings.carry_forward(ranking_type, weight_limit, from_month)
 
     # ---- Fan rankings ----
-
     def get_fan_snapshot(self, month: str):
         return self.rankings.get_fan_snapshot(month)
 
