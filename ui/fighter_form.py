@@ -1,5 +1,6 @@
+import calendar
+import random
 import tkinter as tk
-
 from tkinter import ttk
 
 from api.PrizefighterAPI import PrizefighterAPI
@@ -12,6 +13,12 @@ from api.Fighter import (
     MIN_REACH,
     MAX_REACH,
 )
+
+MONTHS = [
+    "JAN", "FEB", "MAR", "APR",
+    "MAY", "JUN", "JUL", "AUG",
+    "SEP", "OCT", "NOV", "DEC"
+]
 
 class FighterFormFrame(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
@@ -68,10 +75,37 @@ class FighterFormFrame(ttk.Frame):
         self.country_combo.grid(row=row, column=1, sticky="w", padx=5, pady=4)
         row += 1
 
-        # --- Row 4: Birthdate ---
+        # --- Row 4a: Birthdate ---
         ttk.Label(self, text="Birthdate (dd-mm-yyyy):").grid(row=row, column=0, sticky="w", padx=5, pady=4)
-        self.birthdate_var = tk.StringVar()
-        ttk.Entry(self, textvariable=self.birthdate_var, width=15).grid(
+        birthdate_frame = ttk.Frame(self)
+        birthdate_frame.grid(row=row, column=1, sticky="w", padx=5, pady=4)
+        
+        self.birth_day_var = tk.StringVar() # Day Entry
+        self.day_entry = ttk.Entry(birthdate_frame, textvariable=self.birth_day_var, width=5).grid(
+            row=0, column=0, padx=(0, 5)
+        )
+
+        self.birth_month_var = tk.StringVar() # Month Combobox
+        self.month_combo = ttk.Combobox(birthdate_frame, textvariable=self.birth_month_var, values=MONTHS, state="readonly", width=12).grid(
+            row=0, column=1, padx=5
+        )
+
+        self.birth_year_var = tk.StringVar() # Year Entry
+        self.year_entry = ttk.Entry(birthdate_frame, textvariable=self.birth_year_var, width=8).grid(
+            row=0, column=2, padx=(5, 0)
+        )
+
+        self.birthdate_var = tk.StringVar() # Unified birthdate variable (dd-mm-yyyy)
+
+        # Update the combined date whenever an input changes
+        self.birth_day_var.trace_add("write", self._update_birthdate)
+        self.birth_month_var.trace_add("write", self._update_birthdate)
+        self.birth_year_var.trace_add("write", self._update_birthdate)
+
+        row += 1
+
+        # --- Row 4b: Random Day ---
+        ttk.Button(self, text="Random Day", command=self._random_birth_day).grid(
             row=row, column=1, sticky="w", padx=5, pady=4
         )
         row += 1
@@ -115,8 +149,7 @@ class FighterFormFrame(ttk.Frame):
 
     # ---------- Live-update hook ----------
     def bind_change(self, callback):
-        """Call `callback()` (no arguments) whenever any field in this form
-        changes. Used by add_fighter.py to keep its preview pane in sync."""
+        """Call `callback()` (no arguments) whenever any field in this form changes """
         watched_vars = (
             self.first_name_var, self.last_name_var, self.nickname_var,
             self.placement_var, self.hometown_var, self.country_var,
@@ -126,8 +159,48 @@ class FighterFormFrame(ttk.Frame):
         for var in watched_vars:
             var.trace_add("write", lambda *_args: callback())
 
-    # ---------- Reference data (countries / weight classes) ----------
+    def _update_birthdate(self, *_):
+        """ Combine the day, month, and year into dd-mm-yyyy """
+        day = self.birth_day_var.get().strip()
+        month = self.birth_month_var.get()
+        year = self.birth_year_var.get().strip()
 
+        # Clear the combined date until all fields are populated
+        if not day or not month or not year:
+            self.birthdate_var.set("")
+            return
+
+        try:
+            day = int(day)
+            year = int(year)
+            month_number = MONTHS.index(month) + 1
+            # Validate the date
+            if not 1 <= day <= calendar.monthrange(year, month_number)[1]:
+                self.birthdate_var.set("")
+                return
+
+            self.birthdate_var.set(f"{day:02d}-{month_number:02d}-{year:04d}")
+
+        except (ValueError, IndexError):
+            self.birthdate_var.set("")
+
+    def _random_birth_day(self):
+        """Generate a random valid day for the selected month and year """
+        month = self.birth_month_var.get()
+        year = self.birth_year_var.get().strip()
+        
+        if not month or not year:
+            return
+        try:
+            year = int(year)
+            month_number = MONTHS.index(month) + 1    
+            days_in_month = calendar.monthrange(year, month_number)[1] # Get number of days in the selected month
+            random_day = random.randint(1, days_in_month) # Generate random day
+            self.birth_day_var.set(str(random_day))
+        except (ValueError, IndexError):
+            return
+
+    # ---------- Reference data (countries / weight classes) ----------
     def refresh_reference_data(self):
         """Reload country and weight-class options from API """
         self._country_options = [(c["country_name"], c["a2"]) for c in self.api.get_countries()]
@@ -141,7 +214,6 @@ class FighterFormFrame(ttk.Frame):
         ]
 
     # ---------- Reading / writing values ----------
-
     def get_raw_values(self) -> dict:
         """Return the form's values as the raw strings/ints Fighter.add()/update()
         expect. Does NOT validate -- that's api.Fighter's job."""

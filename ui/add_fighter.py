@@ -5,9 +5,9 @@ from tkinter import ttk, messagebox
 from api.PrizefighterAPI import PrizefighterAPI
 from api.Fighter import FighterError, INT_TO_STANCE, INT_TO_STYLE
 from api.Records import RecordError
+
 from ui.fighter_form import FighterFormFrame
 from ui.fighter_preview import FighterPreviewFrame
-
 
 class AddFighterTab(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
@@ -71,9 +71,6 @@ class AddFighterTab(ttk.Frame):
 
     # ---------- Preview ----------
     def _read_record_fields_loosely(self) -> dict:
-        """Tolerant parse for the preview -- returns None for any field
-        that isn't currently a valid non-negative integer, instead of
-        raising, since the preview should stay usable mid-typing."""
         result = {}
         for key, var in (
             ("wins", self.wins_var), ("knockouts", self.knockouts_var),
@@ -118,7 +115,6 @@ class AddFighterTab(ttk.Frame):
         self.preview.render(self._gather_preview_data())
 
     # ---------- Save / clear ----------
-
     def _get_record_values(self):
         """Strict parse + validation for saving. Returns a dict on
         success, or None after showing an error message."""
