@@ -1,18 +1,9 @@
 weight_limit,weight_class
-105,Minimumweight
-108,Light Flyweight
 112,Flyweight
-115,Super Flyweight
 118,Bantamweight
-122,Super Bantamweight
 126,Featherweight
-130,Super Featherweight
 135,Lightweight
-140,Super Lightweight
 147,Welterweight
-154,Super Welterweight
 160,Middleweight
-168,Super Middleweight
 175,Light Heavyweight
-200,Cruiserweight
 300,Heavyweight

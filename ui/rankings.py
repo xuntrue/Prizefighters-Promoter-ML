@@ -108,6 +108,12 @@ class DivisionRankingsSection(ttk.Frame):
             return
 
         months = self.api.get_ranking_months(ranking_type, weight_limit)
+        if len(months) < 1:
+            months.append(f'1990-01') # Default starting value
+            self.month_combo["values"] = months
+            self.month_var.set(months[0])
+            return
+
         if months[-1][5:] == '12':
             months.append(f'{int(months[-1][:4]) + 1}-01')
         else:
@@ -127,6 +133,8 @@ class DivisionRankingsSection(ttk.Frame):
             return
 
         months = self.api.get_ranking_months(ranking_type, weight_limit)
+        if len(months) < 1:
+            return
 
         # Fetch month selected
         month = self.month_var.get().strip()
