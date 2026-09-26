@@ -1,27 +1,3 @@
-"""
-Fighter.py
-
-CRUD + validation for fighters stored in data/fighters.csv.
-
-Columns:
-    FighterID    -> int, auto-assigned (sequential, starting at 1), primary key
-    FirstName    -> str
-    LastName     -> str
-    Nickname     -> str (may be empty)
-    Placement    -> one of "Prefix", "Middle", "Suffix", "None"
-    Hometown     -> str
-    Country      -> str, A-2 code, foreign key -> countries.csv
-    Birthdate    -> str, "dd-mm-yyyy"
-    Weightclass  -> int, weight_limit, foreign key -> weights.csv
-    Reach        -> int, 63-75 inclusive (inches)
-    Stance       -> int, 0 = Orthodox, 1 = Southpaw
-    Style        -> int, 1 = In Fighter, 2 = Out Boxer, 3 = Brawler, 4 = Boxer Puncher
-
-Win/loss record is intentionally NOT stored here -- see Records.py.
-This module validates the Country and Weightclass foreign keys against
-the Country and WeightClasses modules, but never touches records.csv.
-"""
-
 import csv
 import os
 import re
@@ -30,11 +6,9 @@ from datetime import datetime
 from api.Country import Country
 from api.Weight_Classes import WeightClasses
 
-DATA_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"
-)
-FIGHTERS_FILE = os.path.join(DATA_DIR, "fighters.csv")
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 
+FIGHTERS_FILE = os.path.join(DATA_DIR, "fighters.csv")
 FIELDNAMES = [
     "FighterID", "FirstName", "LastName", "Nickname", "Placement",
     "Hometown", "Country", "Birthdate", "Weightclass", "Reach", "Stance", "Style",
@@ -55,21 +29,17 @@ BIRTHDATE_FORMAT = "%d-%m-%Y"
 
 
 class FighterError(Exception):
-    """Raised when a fighter record fails validation."""
+    """ Raised when a fighter record fails validation """
     pass
 
 
 def format_full_name(first_name: str, last_name: str, nickname: str = "", placement: str = "None") -> str:
-    """
+    """ 
     Build a fighter's display name from their name fields, e.g.:
-        format_full_name("Andy", "Ruiz", "The Destroyer", "Middle")  -> "Andy 'The Destroyer' Ruiz"
-        format_full_name("Conor", "McGregor", "The Notorious", "Prefix") -> "'The Notorious' Conor McGregor"
-        format_full_name("Phillip", "Willems", "The Count", "Suffix") -> "Phillip Willems 'The Count'"
-        format_full_name("Logan", "Reed", "", "None") -> "Logan Reed"
-
-    Pure formatting logic (no validation) so it can be reused anywhere a
-    fighter's name needs to be displayed -- UI previews, printed cards,
-    rankings, exports -- without duplicating the placement rules.
+    format_full_name("Andy", "Ruiz", "The Destroyer", "Middle")  -> "Andy 'The Destroyer' Ruiz"
+    format_full_name("Conor", "McGregor", "The Notorious", "Prefix") -> "'The Notorious' Conor McGregor"
+    format_full_name("Phillip", "Willems", "The Count", "Suffix") -> "Phillip Willems 'The Count'"
+    format_full_name("Logan", "Reed", "", "None") -> "Logan Reed"
     """
     first_name = (first_name or "").strip()
     last_name = (last_name or "").strip()
@@ -96,8 +66,7 @@ def _ordinal(n: int) -> str:
 
 
 def format_birthdate_readable(birthdate: str):
-    """Convert 'dd-mm-yyyy' into e.g. 'August 23rd 1993'. Returns None if
-    `birthdate` isn't a valid date in that format."""
+    """ Convert 'dd-mm-yyyy' into e.g. 'August 23rd 1993' """
     try:
         parsed = datetime.strptime(birthdate, BIRTHDATE_FORMAT)
     except (ValueError, TypeError):
@@ -106,11 +75,7 @@ def format_birthdate_readable(birthdate: str):
 
 
 def compute_age(birthdate: str, as_of):
-    """
-    Return (years, months) between a fighter's birthdate ('dd-mm-yyyy')
-    and `as_of` (a datetime.date). Returns None if birthdate is invalid
-    or `as_of` falls before the birthdate.
-    """
+    """ Return (years, months) between a fighter's birthdate ('dd-mm-yyyy') and `as_of` (a datetime.date) """
     try:
         born = datetime.strptime(birthdate, BIRTHDATE_FORMAT).date()
     except (ValueError, TypeError):
@@ -133,8 +98,7 @@ def compute_age(birthdate: str, as_of):
 
 
 class Fighter:
-    """CRUD for fighters stored in fighters.csv."""
-
+    """ CRUD for fighters stored in fighters.csv """
     def __init__(self, filepath: str = FIGHTERS_FILE):
         self.filepath = filepath
         self.country_api = Country()
@@ -162,7 +126,7 @@ class Fighter:
         return None
 
     def search_by_name(self, first_name: str = "", last_name: str = "") -> list:
-        """Case-insensitive substring match on first and/or last name."""
+        """ Case-insensitive substring match on first and/or last name """
         first_name = first_name.strip().lower()
         last_name = last_name.strip().lower()
 
@@ -442,15 +406,11 @@ TENDENCY_FIELDS = [
 MIN_TENDENCY = 0
 MAX_TENDENCY = 100
 
-# "W-TKO(8)": win/loss/draw, dash, method, round in parentheses. Method is
-# restricted to a fixed set rather than free text so last_6 data stays
-# analysable -- a typo'd method code would silently become its own
-# category in any later groupby.
-LAST_6_METHODS = ("KO", "TKO", "UD", "SD", "MD")
-LAST_6_PATTERN = re.compile(r"^([WLD])-(" + "|".join(LAST_6_METHODS) + r")\((\d{1,2})\)$")
-MAX_LAST_6_ENTRIES = 6
-
-
+# "W-TKO(8)": win/loss/draw, dash, method, round in parentheses
+#LAST_6_METHODS = ("KO", "TKO", "UD", "SD", "MD")
+#LAST_6_PATTERN = re.compile(r"^([WLD])-(" + "|".join(LAST_6_METHODS) + r")\((\d{1,2})\)$")
+#MAX_LAST_6_ENTRIES = 6
+"""
 def validate_last_6_entry(entry: str) -> str:
     entry = (entry or "").strip()
     match = LAST_6_PATTERN.match(entry)
@@ -463,19 +423,14 @@ def validate_last_6_entry(entry: str) -> str:
     if not (1 <= round_number <= 12):
         raise FighterError(f'"{entry}": round must be between 1 and 12.')
     return entry
-
+"""
 
 def blank_meta_section(weight_limit: int = None) -> dict:
-    """A fresh, blank corner meta block -- used when a fighter has no
-    prior recorded meta to carry forward from. Attributes start at a
-    neutral mid-scale value (5.0) and tendencies at a neutral 50 rather
-    than the scale minimums, since 0.5-everywhere is a much less
-    reasonable "unknown fighter" guess than "roughly average"."""
+    "" "A fresh, blank corner meta block """
     return {
         "profile": {
             "weigh_in": weight_limit,
             "record": {"wins": 0, "knockouts": 0, "losses": 0, "draws": 0},
-            "last_6": [],
         },
         "career_stats": {key: 0 for key, _ in CAREER_STAT_FIELDS},
         "attributes": {key: 5.0 for key, _ in ATTRIBUTE_FIELDS},
@@ -488,13 +443,10 @@ def blank_meta_section(weight_limit: int = None) -> dict:
 
 
 def validate_meta_section(meta: dict, weight_limit: int, min_weigh_in: int) -> dict:
-    """Validate one corner's full meta block. Returns a cleaned copy (int/
-    float types normalised) or raises FighterError naming the first
-    problem found. weight_limit and min_weigh_in bound the fight's
-    division (see WeightClasses.get_min_weigh_in for how min_weigh_in is
-    derived) -- passed in rather than looked up, since this is a pure
-    data-shape check with no access to a specific fight or the weight
-    classes table."""
+    """
+    Validate one corner's full meta blockReturns a cleaned copy (int/float types normalised) 
+    or raises FighterError naming the first problem found
+    """
     cleaned = {}
 
     # --- profile ---
@@ -522,15 +474,15 @@ def validate_meta_section(meta: dict, weight_limit: int, min_weigh_in: int) -> d
     if knockouts > wins:
         raise FighterError("Knockouts cannot exceed total wins.")
 
-    last_6 = profile.get("last_6", [])
-    if len(last_6) > MAX_LAST_6_ENTRIES:
-        raise FighterError(f"last_6 holds at most {MAX_LAST_6_ENTRIES} entries.")
-    last_6 = [validate_last_6_entry(entry) for entry in last_6]
+    #last_6 = profile.get("last_6", [])
+    #if len(last_6) > MAX_LAST_6_ENTRIES:
+    #    raise FighterError(f"last_6 holds at most {MAX_LAST_6_ENTRIES} entries.")
+    #last_6 = [validate_last_6_entry(entry) for entry in last_6]
 
     cleaned["profile"] = {
         "weigh_in": weigh_in,
         "record": {"wins": wins, "knockouts": knockouts, "losses": losses, "draws": draws},
-        "last_6": last_6,
+        #"last_6": last_6,
     }
 
     # --- career_stats ---

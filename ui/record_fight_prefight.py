@@ -10,11 +10,9 @@ from api.Fighter import (
     TENDENCY_FIELDS, SIGNATURE_TRAIT_GROUPS,
     MIN_ATTRIBUTE, MAX_ATTRIBUTE, ATTRIBUTE_STEP,
     MIN_LEVEL, MAX_LEVEL, MIN_XP, MIN_TENDENCY, MAX_TENDENCY,
-    MIN_TRAIT_LEVEL, MAX_TRAIT_LEVEL, MIN_TRAIT_XP, MAX_TRAIT_XP,
-    max_xp_for_level, validate_last_6_entry, MAX_LAST_6_ENTRIES,
+    MIN_TRAIT_LEVEL, MAX_TRAIT_LEVEL, MIN_TRAIT_XP, MAX_TRAIT_XP, max_xp_for_level
 )
 from api.Fights import DATE_FORMAT, FightError
-
 
 def _fight_display_label(api: PrizefighterAPI, fight_id: str, role: str) -> str:
     fight = api.get_fight(fight_id)
@@ -22,8 +20,8 @@ def _fight_display_label(api: PrizefighterAPI, fight_id: str, role: str) -> str:
         return f"{fight_id} (missing)"
     red = api.get_fighter(fight["red_corner_fighter_id"])
     blue = api.get_fighter(fight["blue_corner_fighter_id"])
-    red_name = format_full_name(red["first_name"], red["last_name"], red["nickname"], red["placement"]) if red else "?"
-    blue_name = format_full_name(blue["first_name"], blue["last_name"], blue["nickname"], blue["placement"]) if blue else "?"
+    red_name = f'{red["first_name"]} {red["last_name"]}' if red else "?"
+    blue_name = f'{blue["first_name"]} {blue["last_name"]}' if blue else "?"
     return f'[{role}] {fight_id}: {red_name} vs {blue_name} ({fight["weight_limit"]} lbs) -- {fight["status"]}'
 
 class CornerMetaForm(ttk.Frame):
@@ -84,25 +82,6 @@ class CornerMetaForm(ttk.Frame):
                       "correction back to records.csv.",
             foreground="gray", wraplength=380, justify="left",
         ).grid(row=2, column=0, columnspan=3, sticky="w", padx=5, pady=(0, 8))
-
-        ttk.Label(tab, text=f"Last 6 (most recent first, max {MAX_LAST_6_ENTRIES}):").grid(
-            row=3, column=0, columnspan=3, sticky="w", padx=5, pady=(4, 0))
-        ttk.Label(
-            tab, text='One per line, e.g. "W-TKO(8)". Methods: KO, TKO, UD, SD, MD.',
-            foreground="gray",
-        ).grid(row=4, column=0, columnspan=3, sticky="w", padx=5)
-        self.last_6_text = tk.Text(tab, width=30, height=6)
-        self.last_6_text.grid(row=5, column=0, columnspan=3, sticky="w", padx=5, pady=(2, 5))
-
-    def _get_last_6(self) -> list:
-        raw = self.last_6_text.get("1.0", "end").strip()
-        if not raw:
-            return []
-        return [line.strip() for line in raw.splitlines() if line.strip()]
-
-    def _set_last_6(self, entries: list):
-        self.last_6_text.delete("1.0", "end")
-        self.last_6_text.insert("1.0", "\n".join(entries))
 
     # ---------- Career Stats ----------
     def _build_career_stats_tab(self, notebook):
@@ -237,7 +216,6 @@ class CornerMetaForm(ttk.Frame):
         self.knockouts_var.set(profile["record"]["knockouts"])
         self.losses_var.set(profile["record"]["losses"])
         self.draws_var.set(profile["record"]["draws"])
-        self._set_last_6(profile["last_6"])
 
         for key, var in self.career_stat_vars.items():
             var.set(meta["career_stats"][key])
@@ -277,8 +255,7 @@ class CornerMetaForm(ttk.Frame):
                     "knockouts": self.knockouts_var.get(),
                     "losses": self.losses_var.get(),
                     "draws": self.draws_var.get(),
-                },
-                "last_6": [validate_last_6_entry(e) for e in self._get_last_6()],
+                }
             },
             "career_stats": {key: var.get() for key, var in self.career_stat_vars.items()},
             "attributes": {key: round(float(var.get()), 1) for key, var in self.attribute_vars.items()},
@@ -459,8 +436,8 @@ class RecordFightPrefightTab(ttk.Frame):
 
         red = self.api.get_fighter(fight["red_corner_fighter_id"])
         blue = self.api.get_fighter(fight["blue_corner_fighter_id"])
-        red_label = format_full_name(red["first_name"], red["last_name"], red["nickname"], red["placement"]) if red else "?"
-        blue_label = format_full_name(blue["first_name"], blue["last_name"], blue["nickname"], blue["placement"]) if blue else "?"
+        red_label = f'{red["first_name"]} {red["last_name"]}' if red else "?"
+        blue_label = f'{blue["first_name"]} {blue["last_name"]}' if blue else "?"
 
         self.red_form.load_fight(fight_id, red_label, fight["weight_limit"])
         self.blue_form.load_fight(fight_id, blue_label, fight["weight_limit"])

@@ -11,7 +11,6 @@ from api.Gyms import Gyms, GymError
 from api.Fights import Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, STATUS_COMPLETE, DATE_FORMAT, CORNERS, validate_result
 from api.Events import Events, EventError
 
-
 class PrizefighterAPI:
     def __init__(self):
         self.weight_classes = WeightClasses()
@@ -161,7 +160,6 @@ class PrizefighterAPI:
         self.arenas.delete(arena_id)
 
     # ---- Fights ----
-
     def get_fights(self):
         return self.fights.get_all()
 
@@ -198,7 +196,6 @@ class PrizefighterAPI:
         self.fights.delete(fight_id)
 
     # ---- Events ----
-
     def get_events(self):
         return self.events.get_all()
 
@@ -208,14 +205,7 @@ class PrizefighterAPI:
     def create_event(self, headliner: str, date: str, arena_id: int, main_event_fight_id: str,
                      co_main_fight_ids: list = None, undercard_fight_ids: list = None,
                      slogan: str = "") -> dict:
-        """
-        Create an event card, then flip every included fight's status to
-        Evented. Events.add() already validated every fight exists, is
-        Scheduled, and shares the card's date -- so the status updates
-        below shouldn't fail, but if one somehow does, the event is
-        rolled back rather than left referencing a fight whose status
-        didn't actually change.
-        """
+        """ Create an event card, then flip every included fight's status to Evented """
         new_event = self.events.add(
             headliner, date, arena_id, main_event_fight_id,
             co_main_fight_ids, undercard_fight_ids, slogan,
@@ -243,8 +233,7 @@ class PrizefighterAPI:
         return new_event
 
     def delete_event(self, event_id: int) -> None:
-        """Delete an event card and revert its fights back to Scheduled,
-        so they can be re-assigned to a different card."""
+        """ Delete an event card and revert its fights back to Scheduled, so they can be re-assigned to a different card """
         event = self.events.get_by_id(event_id)
         if event is None:
             raise EventError(f"No event found with EventID {event_id}.")
@@ -270,22 +259,9 @@ class PrizefighterAPI:
         return fight["red_corner_fighter_id"] if corner == "red_corner" else fight["blue_corner_fighter_id"]
 
     def get_default_meta_for_fighter(self, fight_id: str, corner: str) -> dict:
-        """
-        Build a starting point for the pre-fight meta form ("_load_default").
-
-        attributes/skills/tendencies/career_stats/last_6 are carried
-        forward from the fighter's most recently recorded meta -- their
-        most recent OTHER fight (by date) that has meta saved for them,
-        regardless of which corner they were in that fight. If they have
-        no prior recorded meta at all (a debut fighter, or one whose
-        earlier fights predate this feature), a blank default is used
-        instead.
-
-        profile.record and profile.weigh_in are NOT carried forward --
-        record always reflects the live value in records.csv (the
-        source of truth), and weigh-in is fight-specific with no
-        meaningful previous value, so it defaults to this fight's own
-        weight_limit as a starting guess for the user to adjust down.
+        """ 
+        Build a starting point for the pre-fight meta form ("_load_default")
+        attributes/skills/tendencies/career_stats are carried forward from the fighter's most recently recorded meta
         """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
@@ -324,14 +300,7 @@ class PrizefighterAPI:
         return base
 
     def save_fight_meta(self, fight_id: str, corner: str, meta: dict) -> None:
-        """
-        Validate and save one corner's pre-fight meta into the fight's
-        JSON file, correct records.csv to match whatever record was
-        entered (the "adjustment" workflow), and flip the fight to Meta
-        status once BOTH corners have meta recorded -- not before, so a
-        half-completed fight can still be found by searching for
-        Evented fights that still need work.
-        """
+        """ Validate and save one corner's pre-fight meta into the fight's JSON file """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
             raise FightError(f"No fight found with FightID {fight_id}.")
@@ -358,7 +327,6 @@ class PrizefighterAPI:
             self.fights.update_status(fight_id, STATUS_META)
 
     # ---- Gyms ----
-
     def get_gyms(self):
         return self.gyms.get_all()
 
@@ -377,18 +345,11 @@ class PrizefighterAPI:
         self.gyms.delete(gym_id)
 
     # ---- Post-fight results ----
-
     def save_fight_result(self, fight_id: str, result: dict) -> None:
         """
-        Validate and save a fight's full post-fight result (gyms,
-        round-by-round punch stats, judges' scorecards, stoppage,
-        outcome, and each corner's post-fight changes), then correct
-        records.csv for both fighters and flip the fight to Complete.
-
-        Only callable once pre-fight meta has been recorded for both
-        corners (status Meta) -- recording a result for a fight nobody
-        weighed in for doesn't make sense, and Complete/Cancelled fights
-        shouldn't have their result silently overwritten by resaving.
+        Validate and save a fight's full post-fight result
+        (gyms, round-by-round punch stats, judges' scorecards, stoppage,
+        outcome, and each corner's post-fight changes) 
         """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
