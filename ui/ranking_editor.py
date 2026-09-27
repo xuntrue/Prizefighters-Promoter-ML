@@ -27,13 +27,13 @@ class RankingEditorFrame(ttk.Frame):
         frame.pack(fill="both", expand=True, padx=5, pady=5)
 
         if self.mode == MODE_RANKING:
-            columns = ("rank", "delta", "fighter", "division", "record", "title")
-            headings = ("#", "Chg", "Fighter", "Division", "Record", "Title")
-            widths = (30, 45, 150, 120, 100, 40)
+            columns = ("rank", "delta", "fighter", "weight", "record", "title")
+            headings = ("#", "Chg", "Fighter", "Weight", "Record", "Title")
+            widths = (30, 45, 150, 80, 100, 40)
         else: # Fan favourites aren't restricted to one division either
-            columns = ("rank", "delta", "fighter", "division", "record", "fans")
-            headings = ("#", "Chg", "Fighter", "Division", "Record", "Total Fans")
-            widths = (30, 45, 150, 120, 100, 100)
+            columns = ("rank", "delta", "fighter", "weight", "record", "fans")
+            headings = ("#", "Chg", "Fighter", "Weight", "Record", "Total Fans")
+            widths = (30, 45, 150, 80, 100, 100)
 
         self.tree = ttk.Treeview(frame, columns=columns, show="headings", height=12)
         for col, heading, width in zip(columns, headings, widths):
@@ -130,10 +130,20 @@ class RankingEditorFrame(ttk.Frame):
             return f"#{fighter_id} (unknown fighter)"
         return (f'{fighter["first_name"]} {fighter["last_name"]}')
 
-    def _division_label_for_entry(self, entry: dict) -> str:
-        """Division label for one row """
-        weight_limit = entry.get("fighter_weight_limit")
+    def _weight_label_for_entry(self, entry: dict) -> str:
+        """ Return the fighter's actual weight in pounds """
+        fighter = self.api.get_fighter(entry["fighter_id"])
+        if fighter is None:
+            return "???"
 
+        weight = fighter.get("weight")
+        if weight is None:
+            return "-"
+        return f"{weight} lbs"
+
+    def _division_label_for_entry(self, entry: dict) -> str:
+        """ Division label for one row """
+        weight_limit = entry.get("fighter_weight_limit")
         if weight_limit is None:
             fighter = self.api.get_fighter(entry["fighter_id"])
             if fighter is None:
@@ -186,7 +196,7 @@ class RankingEditorFrame(ttk.Frame):
             rank = index + 1
             record = f'{entry["wins"]}({entry["knockouts"]})-{entry["losses"]}-{entry["draws"]}'
             fighter_label = self._label_for_fighter(entry["fighter_id"])
-            division_label = self._division_label_for_entry(entry)
+            weight_label = self._weight_label_for_entry(entry)
             delta_label = self._delta_label(entry["fighter_id"], rank)
             #print(f"Entry: {entry['fighter_id']}, Rank: {rank}, Delta: {delta_label}")
 
@@ -194,8 +204,8 @@ class RankingEditorFrame(ttk.Frame):
                 last_col = "\u2605" if entry.get("title") else ""
             else:
                 last_col = f'{entry.get("total_fans", 0):,}'
-            values = (index + 1, fighter_label, division_label, record, last_col)
-            values = (rank, delta_label, fighter_label, division_label, record, last_col)
+            values = (index + 1, fighter_label, weight_label, record, last_col)
+            values = (rank, delta_label, fighter_label, weight_label, record, last_col)
 
             self.tree.insert("", "end", iid=str(index), values=values)
 

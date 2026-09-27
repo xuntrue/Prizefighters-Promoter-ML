@@ -1,1 +1,10 @@
-SnapshotMonth,Rank,FighterID,FighterWeightLimit,TotalFans,Wins,Knockouts,Losses,Draws
+SnapshotMonth,Rank,FighterID,FighterWeight,TotalFans,Wins,Knockouts,Losses,Draws
+1990-01,1,81,,6963,25,5,0,0
+1990-01,2,1,,5966,16,8,0,0
+1990-01,3,41,,5837,21,8,0,0
+1990-01,4,141,,5300,17,6,0,0
+1990-01,5,42,,5133,16,8,0,0
+1990-01,6,23,,4947,14,9,0,0
+1990-01,7,83,,4898,20,5,0,0
+1990-01,8,25,,4808,15,5,0,0
+1990-01,9,43,,4431,16,5,0,0

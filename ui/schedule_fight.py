@@ -150,8 +150,14 @@ class ScheduleFightTab(ttk.Frame):
     def _on_weight_class_changed(self):
         weight_limit = self._current_weight_limit()
         fighters = self.api.get_fighters()
+        weight_classes = self.api.get_weight_classes()
+
         if weight_limit is not None:
-            fighters = [f for f in fighters if f["weightclass"] == weight_limit]
+            fighters = [
+                f for f in fighters
+                if f["weight"] is not None # Find the smallest weight limit that accommodates the fighter
+                and (next((wc["weight_limit"] for wc in weight_classes if wc["weight_limit"] >= f["weight"]), None) == weight_limit)
+            ]
         fighters = sorted(fighters, key=lambda f: (f["first_name"].lower(), f["last_name"].lower()))
 
         self._fighter_options = [(f["fighter_id"], _fighter_label(f)) for f in fighters]

@@ -87,13 +87,14 @@ class AddFighterTab(ttk.Frame):
         country = self.api.countries.get_by_code(raw["country"]) if raw["country"] else None
 
         weight_class_label = None
-        if raw["weightclass"] is not None:
+        if raw["weight"] is not None:
             match = next(
-                (wc for wc in self.api.get_weight_classes() if wc["weight_limit"] == raw["weightclass"]),
+                (wc for wc in self.api.get_weight_classes() if raw["weight"] <= wc["weight_limit"]),
                 None,
             )
+
             if match:
-                weight_class_label = f'{match["weight_limit"]} - {match["weight_class"]}'
+                weight_class_label = (f'{match["weight_limit"]} - {match["weight_class"]}')
 
         return {
             "first_name": raw["first_name"],
@@ -139,7 +140,7 @@ class AddFighterTab(ttk.Frame):
     def _on_save(self):
         values = self.form.get_raw_values()
 
-        if values["weightclass"] is None:
+        if values["weight"] is None:
             messagebox.showerror("Invalid Input", "Please select a weight class.")
             return
         if values["reach"] is None:

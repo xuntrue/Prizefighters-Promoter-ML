@@ -104,7 +104,7 @@ class RecordFansSection(ttk.Frame):
 
         self.editor.load_entries([
             {k: row[k] for k in ("fighter_id", "total_fans", "wins", "knockouts", "losses", "draws",
-                                 "fighter_weight_limit")}
+                                 "fighter_weight")}
             for row in snapshot
         ])
         self.status_label.config(text=f"Loaded existing fan rankings for {month} (saving will overwrite).") 

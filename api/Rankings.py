@@ -5,6 +5,7 @@ from datetime import date
 
 from api.Fighter import Fighter
 from api.Records import Records
+from api.Weight_Classes import WeightClasses
 
 DATA_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"
@@ -15,10 +16,10 @@ FAN_RANKINGS_FILE = os.path.join(RANKINGS_DIR, "fan_rankings.csv")
 
 RANKING_FIELDNAMES = [
     "SnapshotMonth", "RankingType", "WeightLimit", "Rank", "FighterID",
-    "FighterWeightLimit", "Wins", "Knockouts", "Losses", "Draws", "Title",
+    "FighterWeight", "Wins", "Knockouts", "Losses", "Draws", "Title",
 ]
 FAN_FIELDNAMES = [
-    "SnapshotMonth", "Rank", "FighterID", "FighterWeightLimit", "TotalFans",
+    "SnapshotMonth", "Rank", "FighterID", "FighterWeight", "TotalFans",
     "Wins", "Knockouts", "Losses", "Draws",
 ]
 
@@ -84,7 +85,7 @@ class Rankings:
                     "weight_limit": int(row["WeightLimit"]) if row["WeightLimit"] else None,
                     "rank": int(row["Rank"]),
                     "fighter_id": int(row["FighterID"]),
-                    "fighter_weight_limit": int(raw_fighter_weight) if raw_fighter_weight else None,
+                    "fighter_weight": int(raw_fighter_weight) if raw_fighter_weight else None,
                     "wins": int(row["Wins"]),
                     "knockouts": int(row["Knockouts"]),
                     "losses": int(row["Losses"]),
@@ -170,7 +171,7 @@ class Rankings:
                     "WeightLimit": "" if row["weight_limit"] is None else row["weight_limit"],
                     "Rank": row["rank"],
                     "FighterID": row["fighter_id"],
-                    "FighterWeightLimit": (
+                    "FighterWeight": (
                         "" if row.get("fighter_weight_limit") is None else row["fighter_weight_limit"]
                     ),
                     "Wins": row["wins"],
@@ -213,8 +214,8 @@ class Rankings:
             if fighter is None:
                 raise RankingError(f"No fighter found with FighterID {fighter_id}.")
 
-            # Only fighters registered to this division may be ranked in it.
-            if ranking_type == TYPE_DIVISION and fighter["weightclass"] != weight_limit:
+            # Only fighters eligible to this division may be ranked in it
+            if (ranking_type == TYPE_DIVISION) and fighter["weight"] > weight_limit:
                 raise RankingError(
                     f'{fighter["first_name"]} {fighter["last_name"]} does not compete at '
                     f"{weight_limit} lbs and cannot be ranked in that division."
@@ -232,12 +233,11 @@ class Rankings:
                 "weight_limit": weight_limit,
                 "rank": index,
                 "fighter_id": fighter_id,
-                # The fighter's own registered division right now. For
-                # DIVISION rows this is always == weight_limit (enforced
-                # above); for P4P it's the whole point -- weight_limit is
-                # blank there, so this is the only place a P4P entry's
-                # division gets recorded.
-                "fighter_weight_limit": fighter["weightclass"],
+                # The fighter's own registered weight right now
+                # For DIVISION rows this is always == weight_limit (enforced above);
+                # for P4P it's the whole point -- weight_limit is blank there,
+                # so this is the only place a P4P entry's weight gets recorded.
+                "fighter_weight": fighter["weight"],
                 "wins": wins,
                 "knockouts": knockouts,
                 "losses": losses,
@@ -266,7 +266,6 @@ class Rankings:
         self._save_all(remaining)
 
     # ================= Fan rankings =================
-
     def get_all_fan_rankings(self) -> list:
         self._ensure_files_exist()
         with open(self.fan_file, newline="", encoding="utf-8") as f:
@@ -277,7 +276,7 @@ class Rankings:
                     "month": row["SnapshotMonth"],
                     "rank": int(row["Rank"]),
                     "fighter_id": int(row["FighterID"]),
-                    "fighter_weight_limit": int(raw_fighter_weight) if raw_fighter_weight else None,
+                    "fighter_weight": int(raw_fighter_weight) if raw_fighter_weight else None,
                     "total_fans": int(row["TotalFans"]),
                     "wins": int(row["Wins"]),
                     "knockouts": int(row["Knockouts"]),
@@ -330,8 +329,8 @@ class Rankings:
                     "SnapshotMonth": row["month"],
                     "Rank": row["rank"],
                     "FighterID": row["fighter_id"],
-                    "FighterWeightLimit": (
-                        "" if row.get("fighter_weight_limit") is None else row["fighter_weight_limit"]
+                    "FighterWeight": (
+                        "" if row.get("fighter_weight") is None else row["fighter_weight"]
                     ),
                     "TotalFans": row["total_fans"],
                     "Wins": row["wins"],
@@ -378,7 +377,7 @@ class Rankings:
 
             validated.append({
                 "month": month, "rank": index, "fighter_id": fighter_id,
-                "fighter_weight_limit": fighter["weightclass"],
+                "fighter_weight_limit": fighter["weight"],
                 "total_fans": total_fans, "wins": wins, "knockouts": knockouts,
                 "losses": losses, "draws": draws,
             })

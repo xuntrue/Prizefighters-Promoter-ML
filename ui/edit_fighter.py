@@ -122,7 +122,7 @@ class EditFighterTab(ttk.Frame):
 
         values = self.form.get_raw_values()
 
-        if values["weightclass"] is None:
+        if values["weight"] is None:
             messagebox.showerror("Invalid Input", "Please select a weight class.")
             return
         if values["reach"] is None:

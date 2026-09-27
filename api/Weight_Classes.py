@@ -17,7 +17,6 @@ class WeightClassError(Exception):
 
 class WeightClasses:
     """ CRUD + validation for weight classes stored in weights.csv """
-
     def __init__(self, filepath: str = WEIGHTS_FILE):
         self.filepath = filepath
         self._ensure_file_exists()

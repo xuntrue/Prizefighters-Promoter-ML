@@ -11,7 +11,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 FIGHTERS_FILE = os.path.join(DATA_DIR, "fighters.csv")
 FIELDNAMES = [
     "FighterID", "FirstName", "LastName", "Nickname", "Placement",
-    "Hometown", "Country", "Birthdate", "Weightclass", "Reach", "Stance", "Style",
+    "Hometown", "Country", "Birthdate", "Weight", "Reach", "Stance", "Style",
 ]
 
 PLACEMENTS = ["Prefix", "Middle", "Suffix", "None"]
@@ -56,14 +56,12 @@ def format_full_name(first_name: str, last_name: str, nickname: str = "", placem
         return f"{base} {quoted}".strip()
     return f"{first_name} {quoted} {last_name}".strip()  # Middle
 
-
 def _ordinal(n: int) -> str:
     if 11 <= (n % 100) <= 13:
         suffix = "th"
     else:
         suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
     return f"{n}{suffix}"
-
 
 def format_birthdate_readable(birthdate: str):
     """ Convert 'dd-mm-yyyy' into e.g. 'August 23rd 1993' """
@@ -72,7 +70,6 @@ def format_birthdate_readable(birthdate: str):
     except (ValueError, TypeError):
         return None
     return f"{parsed.strftime('%B')} {_ordinal(parsed.day)} {parsed.year}"
-
 
 def compute_age(birthdate: str, as_of):
     """ Return (years, months) between a fighter's birthdate ('dd-mm-yyyy') and `as_of` (a datetime.date) """
@@ -95,7 +92,6 @@ def compute_age(birthdate: str, as_of):
         months += 12
 
     return years, months
-
 
 class Fighter:
     """ CRUD for fighters stored in fighters.csv """
@@ -157,7 +153,7 @@ class Fighter:
             "hometown": row["Hometown"],
             "country": row["Country"],
             "birthdate": row["Birthdate"],
-            "weightclass": int(row["Weightclass"]),
+            "weight": int(row["Weight"]),
             "reach": int(row["Reach"]),
             "stance": int(row["Stance"]),
             "style": int(row["Style"]),
@@ -174,7 +170,7 @@ class Fighter:
             "Hometown": row["hometown"],
             "Country": row["country"],
             "Birthdate": row["birthdate"],
-            "Weightclass": row["weightclass"],
+            "Weight": row["weight"],
             "Reach": row["reach"],
             "Stance": row["stance"],
             "Style": row["style"],
@@ -216,9 +212,9 @@ class Fighter:
         except ValueError:
             raise FighterError('Birthdate must be a valid date in "dd-mm-yyyy" format.')
 
-        valid_weight_limits = [wc["weight_limit"] for wc in self.weight_class_api.get_all()]
-        if weightclass not in valid_weight_limits:
-            raise FighterError(f"Weightclass {weightclass} does not match any defined weight class.")
+        #valid_weight_limits = [wc["weight_limit"] for wc in self.weight_class_api.get_all()]
+        #if weightclass not in valid_weight_limits:
+        #    raise FighterError(f"Weightclass {weightclass} does not match any defined weight class.")
 
         if not (MIN_REACH <= reach <= MAX_REACH):
             raise FighterError(f"Reach must be between {MIN_REACH} and {MAX_REACH} inches (inclusive).")
@@ -232,10 +228,10 @@ class Fighter:
         return first_name, last_name, nickname, hometown, country
 
     def add(self, first_name, last_name, nickname, placement, hometown,
-            country, birthdate, weightclass, reach, stance, style) -> dict:
+            country, birthdate, weight, reach, stance, style) -> dict:
         first_name, last_name, nickname, hometown, country = self._validate(
             first_name, last_name, nickname, placement, hometown,
-            country, birthdate, weightclass, reach, stance, style,
+            country, birthdate, weight, reach, stance, style,
         )
 
         new_row = {
@@ -247,7 +243,7 @@ class Fighter:
             "hometown": hometown,
             "country": country,
             "birthdate": birthdate,
-            "weightclass": weightclass,
+            "weight": weight,
             "reach": reach,
             "stance": stance,
             "style": style,
@@ -259,10 +255,10 @@ class Fighter:
         return new_row
 
     def update(self, fighter_id, first_name, last_name, nickname, placement, hometown,
-               country, birthdate, weightclass, reach, stance, style) -> None:
+               country, birthdate, weight, reach, stance, style) -> None:
         first_name, last_name, nickname, hometown, country = self._validate(
             first_name, last_name, nickname, placement, hometown,
-            country, birthdate, weightclass, reach, stance, style,
+            country, birthdate, weight, reach, stance, style,
         )
 
         existing = self.get_all()
@@ -280,7 +276,7 @@ class Fighter:
                 "hometown": hometown,
                 "country": country,
                 "birthdate": birthdate,
-                "weightclass": weightclass,
+                "weight": weight,
                 "reach": reach,
                 "stance": stance,
                 "style": style,
@@ -296,7 +292,6 @@ class Fighter:
             raise FighterError(f"No fighter found with FighterID {fighter_id}.")
 
         self._save_all(remaining)
-
 
 # =====================================================================
 # Pre-fight metadata schema

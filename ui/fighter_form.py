@@ -110,13 +110,12 @@ class FighterFormFrame(ttk.Frame):
         )
         row += 1
 
-        # --- Row 5: Weight Class ---
-        ttk.Label(self, text="Weight Class:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
-        self.weight_class_var = tk.StringVar()
-        self.weight_class_combo = ttk.Combobox(
-            self, textvariable=self.weight_class_var, state="readonly", width=30
+        # --- Row 5: Weight ---
+        ttk.Label(self, text="Weight (100-300 lbs):").grid(row=row, column=0, sticky="w", padx=5, pady=4)
+        self.weight_var = tk.StringVar(value=100)
+        self.weight_entry = ttk.Entry(self, textvariable=self.weight_var, width=30).grid(
+            row=row, column=1, sticky="w", padx=5, pady=4
         )
-        self.weight_class_combo.grid(row=row, column=1, sticky="w", padx=5, pady=4)
         row += 1
 
         # --- Row 6: Reach ---
@@ -153,7 +152,7 @@ class FighterFormFrame(ttk.Frame):
         watched_vars = (
             self.first_name_var, self.last_name_var, self.nickname_var,
             self.placement_var, self.hometown_var, self.country_var,
-            self.birthdate_var, self.weight_class_var, self.reach_var,
+            self.birthdate_var, self.weight_var, self.reach_var,
             self.stance_var, self.style_var,
         )
         for var in watched_vars:
@@ -206,26 +205,15 @@ class FighterFormFrame(ttk.Frame):
         self._country_options = [(c["country_name"], c["a2"]) for c in self.api.get_countries()]
         self.country_combo["values"] = [f"[{a2}] {name}" for name, a2 in self._country_options]
 
-        self._weight_class_options = [
-            (wc["weight_limit"], wc["weight_class"]) for wc in self.api.get_weight_classes()
-        ]
-        self.weight_class_combo["values"] = [
-            f"{limit} - {name}" for limit, name in self._weight_class_options
-        ]
-
     # ---------- Reading / writing values ----------
     def get_raw_values(self) -> dict:
         """Return the form's values as the raw strings/ints Fighter.add()/update()
         expect. Does NOT validate -- that's api.Fighter's job."""
         country_a2 = self.country_var.get()[1:3] if self.country_var.get() else ""
-
-        weight_class_text = self.weight_class_var.get()
-        weightclass = None
-        if weight_class_text:
-            try:
-                weightclass = int(weight_class_text.split(" - ")[0].strip())
-            except ValueError:
-                weightclass = None
+        if self.weight_var.get() != "":
+            weight = int(self.weight_var.get())
+        else:
+            weight = 0
 
         return {
             "first_name": self.first_name_var.get(),
@@ -235,15 +223,17 @@ class FighterFormFrame(ttk.Frame):
             "hometown": self.hometown_var.get(),
             "country": country_a2,
             "birthdate": self.birthdate_var.get(),
-            "weightclass": weightclass,
+            "weight": weight,
             "reach": int(self.reach_var.get()) if str(self.reach_var.get()).isdigit() else None,
             "stance": STANCE_TO_INT.get(self.stance_var.get()),
             "style": STYLE_TO_INT.get(self.style_var.get()),
         }
 
     def set_values(self, fighter: dict):
-        """Populate the form from a fighter dict as returned by PrizefighterAPI
-        (i.e. using the internal snake_case / int-coded representation)."""
+        """
+        Populate the form from a fighter dict as returned by PrizefighterAPI
+        (i.e. using the internal snake_case / int-coded representation)
+        """
         self.first_name_var.set(fighter["first_name"])
         self.last_name_var.set(fighter["last_name"])
         self.nickname_var.set(fighter["nickname"])
@@ -254,14 +244,13 @@ class FighterFormFrame(ttk.Frame):
         if country:
             self.country_var.set(f"[{country['a2']}] {country['country_name']}")
 
-        self.birthdate_var.set(fighter["birthdate"])
+        # Break birthdate_var into birth_day_var, birth_month_var, and birth_year_var
+        day, month, year = fighter["birthdate"].split("-")
+        self.birth_day_var.set(day)
+        self.birth_month_var.set(MONTHS[int(month) - 1])
+        self.birth_year_var.set(year)
 
-        weight_match = next(
-            (wc for wc in self._weight_class_options if wc[0] == fighter["weightclass"]), None
-        )
-        if weight_match:
-            self.weight_class_var.set(f"{weight_match[0]} - {weight_match[1]}")
-
+        self.weight_var.set(fighter["weight"])
         self.reach_var.set(str(fighter["reach"]))
         self.stance_var.set(INT_TO_STANCE.get(fighter["stance"], "Orthodox"))
         self.style_var.set(INT_TO_STYLE.get(fighter["style"], "In Fighter"))
@@ -274,7 +263,7 @@ class FighterFormFrame(ttk.Frame):
         self.hometown_var.set("")
         self.country_var.set("")
         self.birthdate_var.set("")
-        self.weight_class_var.set("")
+        self.weight_var.set("")
         self.reach_var.set(str(MIN_REACH))
         self.stance_var.set("Orthodox")
         self.style_var.set("In Fighter")

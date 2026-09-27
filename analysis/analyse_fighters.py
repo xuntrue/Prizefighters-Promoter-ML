@@ -6,9 +6,9 @@ import sys
 from datetime import date
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, PROJECT_ROOT)  # so `from api...` works when run directly
+sys.path.insert(0, PROJECT_ROOT)
 
-from api.Fighter import INT_TO_STANCE, INT_TO_STYLE  # noqa: E402
+from api.Fighter import INT_TO_STANCE, INT_TO_STYLE
 
 FIGHTERS_CSV = os.path.join(PROJECT_ROOT, "data", "fighters.csv")
 COUNTRIES_CSV = os.path.join(PROJECT_ROOT, "data", "countries.csv")
@@ -24,7 +24,7 @@ def load_fighters(conn: sqlite3.Connection) -> None:
             FighterID INTEGER PRIMARY KEY,
             FirstName TEXT, LastName TEXT, Nickname TEXT, Placement TEXT,
             Hometown TEXT, Country TEXT, Birthdate TEXT,
-            Weightclass INTEGER, Reach INTEGER, Stance INTEGER, Style INTEGER
+            Weight INTEGER, Reach INTEGER, Stance INTEGER, Style INTEGER
         )
         """
     )
@@ -33,13 +33,12 @@ def load_fighters(conn: sqlite3.Connection) -> None:
             (
                 int(r["FighterID"]), r["FirstName"], r["LastName"], r["Nickname"], r["Placement"],
                 r["Hometown"], r["Country"], r["Birthdate"],
-                int(r["Weightclass"]), int(r["Reach"]), int(r["Stance"]), int(r["Style"]),
+                int(r["Weight"]), int(r["Reach"]), int(r["Stance"]), int(r["Style"]),
             )
             for r in csv.DictReader(f)
         ]
     conn.executemany("INSERT INTO fighters VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", rows)
     conn.commit()
-
 
 def load_countries(conn: sqlite3.Connection) -> None:
     conn.execute("CREATE TABLE countries (A2 TEXT PRIMARY KEY, CountryName TEXT)")
@@ -47,7 +46,6 @@ def load_countries(conn: sqlite3.Connection) -> None:
         rows = [(r["A-2"], r["CountryName"]) for r in csv.DictReader(f)]
     conn.executemany("INSERT INTO countries VALUES (?, ?)", rows)
     conn.commit()
-
 
 def load_records(conn: sqlite3.Connection) -> None:
     conn.execute(
@@ -62,14 +60,12 @@ def load_records(conn: sqlite3.Connection) -> None:
     conn.executemany("INSERT INTO records VALUES (?,?,?,?,?)", rows)
     conn.commit()
 
-
 def load_weight_classes(conn: sqlite3.Connection) -> None:
     conn.execute("CREATE TABLE weight_classes (WeightLimit INTEGER PRIMARY KEY, WeightClassName TEXT)")
     with open(WEIGHTS_CSV, newline="", encoding="utf-8") as f:
         rows = [(int(r["weight_limit"]), r["weight_class"]) for r in csv.DictReader(f)]
     conn.executemany("INSERT INTO weight_classes VALUES (?, ?)", rows)
     conn.commit()
-
 
 def build_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
@@ -79,12 +75,9 @@ def build_connection() -> sqlite3.Connection:
     load_weight_classes(conn)
     return conn
 
-
 # ============================= Queries =============================
-
 def count_total_fighters(conn: sqlite3.Connection) -> int:
     return conn.execute("SELECT COUNT(*) FROM fighters").fetchone()[0]
-
 
 def fighters_by_country(conn: sqlite3.Connection) -> list:
     """Roster size per country, busiest first.
@@ -108,6 +101,21 @@ def fighters_by_country(conn: sqlite3.Connection) -> list:
     )
     return cursor.fetchall()
 
+def weight_distribution(conn: sqlite3.Connection, bucket_size: int = 5) -> list:
+    """Weight distribution in 5 lb intervals, from lightest to heaviest."""
+    cursor = conn.execute(
+        f"""
+        SELECT
+            (CAST(f.Weight / {bucket_size} AS INTEGER) * {bucket_size}) AS WeightBin,
+            (CAST(f.Weight / {bucket_size} AS INTEGER) * {bucket_size} + {bucket_size}) AS BinUpper,
+            COUNT(*) AS FighterCount
+        FROM fighters AS f
+        WHERE f.Weight IS NOT NULL
+        GROUP BY WeightBin
+        ORDER BY WeightBin ASC
+        """
+    )
+    return cursor.fetchall()
 
 def fighters_by_weight_class(conn: sqlite3.Connection) -> list:
     """Roster size per division, lightest to heaviest."""
@@ -115,13 +123,17 @@ def fighters_by_weight_class(conn: sqlite3.Connection) -> list:
         """
         SELECT w.WeightLimit, w.WeightClassName, COUNT(*) AS FighterCount
         FROM fighters AS f
-        JOIN weight_classes AS w ON w.WeightLimit = f.Weightclass
-        GROUP BY w.WeightLimit
+        JOIN weight_classes AS w
+            ON w.WeightLimit = (
+                SELECT MIN(w2.WeightLimit)
+                FROM weight_classes AS w2
+                WHERE w2.WeightLimit >= f.Weight
+            )
+        GROUP BY w.WeightLimit, w.WeightClassName
         ORDER BY w.WeightLimit ASC
         """
     )
     return cursor.fetchall()
-
 
 def stance_distribution(conn: sqlite3.Connection) -> dict:
     """{stance_label: count}. Stance is an int in the data (0/1) -- the
@@ -135,19 +147,22 @@ def style_distribution(conn: sqlite3.Connection) -> dict:
     cursor = conn.execute("SELECT Style, COUNT(*) FROM fighters GROUP BY Style")
     return {INT_TO_STYLE.get(style, f"Unknown({style})"): count for style, count in cursor.fetchall()}
 
-
 def average_reach_by_weight_class(conn: sqlite3.Connection) -> list:
     cursor = conn.execute(
         f"""
-        SELECT w.WeightLimit, w.WeightClassName, ROUND(AVG(f.Reach), 1) AS AvgReach, COUNT(*) AS FighterCount
+        SELECT w.WeightLimit, w.WeightClassName, ROUND(AVG(f.Reach), 2) AS AvgReach, COUNT(*) AS FighterCount
         FROM fighters AS f
-        JOIN weight_classes AS w ON w.WeightLimit = f.Weightclass
-        GROUP BY w.WeightLimit
+        JOIN weight_classes AS w
+            ON w.WeightLimit = (
+                SELECT MIN(w2.WeightLimit)
+                FROM weight_classes AS w2
+                WHERE w2.WeightLimit >= f.Weight
+            )
+        GROUP BY w.WeightLimit, w.WeightClassName
         ORDER BY w.WeightLimit ASC
         """
     )
     return cursor.fetchall()
-
 
 def record_totals_by_country(conn: sqlite3.Connection, min_fighters: int = 1) -> list:
     cursor = conn.execute(
@@ -297,6 +312,11 @@ def main():
         print(f"  {country:<25}{count:>6}")
 
     print()
+    print("Weight distribution:")
+    for weight_bin, bin_upper, count in weight_distribution(conn, bucket_size=10):
+        print(f"  {weight_bin}-{bin_upper-1} lbs: {count}")
+
+    print()
     print("Fighters by weight class:")
     for _limit, name, count in fighters_by_weight_class(conn):
         print(f"  {name:<20}{count:>6}")
@@ -324,8 +344,8 @@ def main():
         print(f"  {country:<25}{n:>9}{wins:>7}{losses:>8}{ko_rate_str:>9}")
 
     print()
-    print("Top KO artists (min 5 wins):")
-    for name, wins, kos, ko_rate in top_ko_artists(conn):
+    print("Top 10 KO artists (min 10 wins):")
+    for name, wins, kos, ko_rate in top_ko_artists(conn, min_wins=10, limit=10):
         print(f"  {name:<25}{wins:>3}W  {kos:>3}KO  {ko_rate:>5}%")
 
     print()
@@ -336,7 +356,7 @@ def main():
 
     print()
     with_nick, total_fighters = nickname_coverage(conn)
-    print(f"Nickname coverage: {with_nick}/{total_fighters} ({with_nick / total_fighters:.1%})")
+    print(f"Nickname coverage: {with_nick}/{total_fighters} ({with_nick / total_fighters:.2%})")
 
     print()
     print("Age distribution")
@@ -346,7 +366,7 @@ def main():
             f"Invalid birthdate: "
             f"{fighter_id} - {first_name} {last_name}: {birthdate!r}"
         )
-    for bucket, count in age_bucket_histogram(conn, as_of='01-03-2000', bucket_size=3):
+    for bucket, count in age_bucket_histogram(conn, as_of='01-01-1990', bucket_size=2):
         print(f"  {bucket:<10}{count:>6}")
 
     conn.close()

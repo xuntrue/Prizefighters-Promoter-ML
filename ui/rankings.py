@@ -63,7 +63,7 @@ class DivisionRankingsSection(ttk.Frame):
         if previous in self.division_combo["values"]:
             self.division_var.set(previous)
         elif self.division_combo["values"]:
-            self.division_var.set(self.division_combo["values"][-1])
+            self.division_var.set(self.division_combo["values"][-1]) # Default: P4P
 
         self._refresh_eligible_fighters()
         self._refresh_month_options()
@@ -87,14 +87,20 @@ class DivisionRankingsSection(ttk.Frame):
         """ P4P is open to everyone; a division is restricted to fighters registered at that weight class in fighters.csv """
         ranking_type, weight_limit = self._current_division()
         fighters = self.api.get_fighters()
+        weight_classes = self.api.get_weight_classes()
 
-        if ranking_type == TYPE_DIVISION:
-            fighters = [f for f in fighters if f["weightclass"] == weight_limit]
+        if ranking_type == TYPE_DIVISION:       
+            fighters = [
+                f for f in fighters
+                if f["weight"] is not None # Find the smallest weight limit that accommodates the fighter
+                and (next((wc["weight_limit"] for wc in weight_classes if wc["weight_limit"] >= f["weight"]), None) == weight_limit)
+            ]
 
         self.editor.set_eligible_fighters(fighters)
 
     def _on_division_changed(self, _event=None):
         self._refresh_eligible_fighters()
+        self.editor.set_previous_ranks(None) # Reset prev_rankings in memory
         self._refresh_month_options()
         self.editor.clear()   
         self.status_label.config(text="Select a month to view its rankings")
@@ -160,7 +166,7 @@ class DivisionRankingsSection(ttk.Frame):
         self.editor.load_entries([
             {
                 k: row[k]
-                for k in ("fighter_id", "wins", "knockouts", "losses", "draws", "title", "fighter_weight_limit")
+                for k in ("fighter_id", "wins", "knockouts", "losses", "draws", "title", "fighter_weight")
             }
             for row in snapshot
         ])
