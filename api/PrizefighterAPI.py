@@ -8,6 +8,7 @@ from api.Records import Records, RecordError
 from api.Rankings import Rankings, RankingError, TYPE_DIVISION, TYPE_P4P, MAX_FAN_RANKS
 from api.Arenas import Arenas, ArenaError
 from api.Gyms import Gyms, GymError
+from api.Contracts import Contracts, ContractError
 from api.Fights import Fights, FightError, STATUS_SCHEDULED, STATUS_EVENTED, STATUS_META, STATUS_COMPLETE, DATE_FORMAT, CORNERS, validate_result
 from api.Events import Events, EventError
 
@@ -18,6 +19,7 @@ class PrizefighterAPI:
         self.flags = CountryFlags(country_api=self.countries)
         self.fighters = Fighter()
         self.records = Records()
+        self.contracts = Contracts()
         self.rankings = Rankings(fighter_api=self.fighters, records_api=self.records)
         self.arenas = Arenas(country_api=self.countries)
         self.gyms = Gyms(country_api=self.countries)
@@ -143,7 +145,6 @@ class PrizefighterAPI:
         return self.rankings.carry_forward_fans(from_month)
 
     # ---- Arenas ----
-
     def get_arenas(self):
         return self.arenas.get_all()
 
@@ -165,6 +166,9 @@ class PrizefighterAPI:
 
     def get_fight(self, fight_id: str):
         return self.fights.get_by_id(fight_id)
+
+    def get_fight_scheduled_rounds(self, fight_id: str):
+        return self.fights.get_scheduled_rounds(fight_id)
 
     def get_fight_full(self, fight_id: str):
         return self.fights.get_full(fight_id)
@@ -203,18 +207,19 @@ class PrizefighterAPI:
         return self.events.get_by_id(event_id)
 
     def create_event(self, headliner: str, date: str, arena_id: int, main_event_fight_id: str,
-                     co_main_fight_ids: list = None, undercard_fight_ids: list = None,
+                     co_main_fight_ids: list = None, undercard_fight_ids: list = None, preliminary_fight_ids: list = None,
                      slogan: str = "") -> dict:
         """ Create an event card, then flip every included fight's status to Evented """
         new_event = self.events.add(
             headliner, date, arena_id, main_event_fight_id,
-            co_main_fight_ids, undercard_fight_ids, slogan,
+            co_main_fight_ids, undercard_fight_ids, preliminary_fight_ids, slogan
         )
 
         all_fight_ids = (
             [main_event_fight_id]
             + list(co_main_fight_ids or [])
             + list(undercard_fight_ids or [])
+            + list (preliminary_fight_ids or [])
         )
 
         updated = []
@@ -237,16 +242,15 @@ class PrizefighterAPI:
         event = self.events.get_by_id(event_id)
         if event is None:
             raise EventError(f"No event found with EventID {event_id}.")
-
         all_fight_ids = (
             [event["main_event_fight_id"]]
             + event["co_main_fight_ids"]
             + event["undercard_fight_ids"]
+            + event["preliminary_fight_ids"]
         )
         for fight_id in all_fight_ids:
             self.fights.update_status(fight_id, STATUS_SCHEDULED)
             self.fights.set_event_id(fight_id, None)
-
         self.events.delete(event_id)
 
     # ---- Pre-fight metadata ----
@@ -261,7 +265,8 @@ class PrizefighterAPI:
     def get_default_meta_for_fighter(self, fight_id: str, corner: str) -> dict:
         """ 
         Build a starting point for the pre-fight meta form ("_load_default")
-        attributes/skills/tendencies/career_stats are carried forward from the fighter's most recently recorded meta
+        attributes/skills/tendencies/career_stats
+        are carried forward from the fighter's most recently recorded meta
         """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
@@ -295,7 +300,7 @@ class PrizefighterAPI:
             {k: current_record[k] for k in ("wins", "knockouts", "losses", "draws")}
             if current_record else {"wins": 0, "knockouts": 0, "losses": 0, "draws": 0}
         )
-        base["profile"]["weigh_in"] = fight["weight_limit"]
+        base["profile"]["weigh_in"] = self.get_fighter(fighter_id)["weight"]
 
         return base
 
@@ -343,6 +348,23 @@ class PrizefighterAPI:
 
     def delete_gym(self, gym_id: int) -> None:
         self.gyms.delete(gym_id)
+
+    # ---- Contracts ----
+    def get_contracts(self):
+        return self.contracts.get_all()
+
+    def get_contract(self, contract_id: int):
+        return self.contracts.get_by_id(contract_id)
+
+    def get_active_contract(self, fighter_id: int, date: str):
+        return self.contracts.get_active_contract(fighter_id, date)
+
+    def save_contract(self, gym_id: int, fighter_id: int, start_date: str, end_date: str) -> dict:
+        """ Validate and save a new contract """
+        return self.contracts.save_contract(gym_id, fighter_id, start_date, end_date)
+
+    def delete_contract(self, contract_id: int) -> None:
+        self.contracts.delete(contract_id)
 
     # ---- Post-fight results ----
     def save_fight_result(self, fight_id: str, result: dict) -> None:

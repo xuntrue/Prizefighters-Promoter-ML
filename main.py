@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from api.PrizefighterAPI import PrizefighterAPI
-from ui.settings import SettingsTab
+
 from ui.add_fighter import AddFighterTab
 from ui.edit_fighter import EditFighterTab
 from ui.rankings import RankingsTab
@@ -11,6 +11,8 @@ from ui.schedule_fight import ScheduleFightTab
 from ui.create_event import CreateEventTab
 from ui.record_fight_prefight import RecordFightPrefightTab
 from ui.record_fight_result import RecordFightResultTab
+from ui.gym_contracts import GymContractsTab
+from ui.settings import SettingsTab
 
 def main():
     root = tk.Tk()
@@ -29,6 +31,7 @@ def main():
     create_event_tab = CreateEventTab(notebook, api)
     record_prefight_tab = RecordFightPrefightTab(notebook, api)
     record_result_tab = RecordFightResultTab(notebook, api)
+    gym_contracts_tab = GymContractsTab(notebook, api)
     settings_tab = SettingsTab(notebook, api)
 
     notebook.add(add_fighter_tab, text="Add Fighter")
@@ -38,6 +41,7 @@ def main():
     notebook.add(create_event_tab, text="Create Event")
     notebook.add(record_prefight_tab, text="Pre-Fight Meta")
     notebook.add(record_result_tab, text="Record Result")
+    notebook.add(gym_contracts_tab, text="Gym Contracts")
     notebook.add(settings_tab, text="Settings")
 
     def on_tab_changed(event):

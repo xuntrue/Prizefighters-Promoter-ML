@@ -1,1 +1,35 @@
-[]
+[
+  {
+    "event_id": 1,
+    "headliner": "Johnston vs Sanchez",
+    "slogan": "Bring the Heat",
+    "arena_id": 10,
+    "date": "06-01-1990",
+    "main_event_fight_id": "000001",
+    "co_main_fight_ids": [
+      "000002"
+    ],
+    "undercard_fight_ids": [
+      "000003",
+      "000004",
+      "000005",
+      "000006",
+      "000007",
+      "000008",
+      "000009",
+      "00000A"
+    ],
+    "preliminary_fight_ids": [
+      "00000B",
+      "00000C",
+      "00000D",
+      "00000E",
+      "00000F",
+      "000010",
+      "000011",
+      "000012",
+      "000013",
+      "000014"
+    ]
+  }
+]

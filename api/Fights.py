@@ -169,11 +169,11 @@ class Fights:
         if blue is None:
             raise FightError(f"No fighter found with FighterID {blue_corner_fighter_id} (blue corner).")
 
-        if red["weightclass"] != weight_limit:
+        if red["weight"] > weight_limit:
             raise FightError(
                 f'{red["first_name"]} {red["last_name"]} is not registered at {weight_limit} lbs.'
             )
-        if blue["weightclass"] != weight_limit:
+        if blue["weight"] > weight_limit:
             raise FightError(
                 f'{blue["first_name"]} {blue["last_name"]} is not registered at {weight_limit} lbs.'
             )

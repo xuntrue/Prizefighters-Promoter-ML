@@ -1,44 +1,18 @@
-"""
-Gyms.py
-
-CRUD + validation for gyms stored in data/gyms.csv.
-
-Columns:
-    id                 -> int, auto-assigned (sequential, starting at 1), primary key
-    name               -> str
-    location           -> str, A-2 code, foreign key -> countries.csv
-    trainingCoach      -> int, 0-10 inclusive
-    conditioningCoach  -> int, 0-10 inclusive
-    fightPromoter      -> int, 0-10 inclusive
-
-The three coach/promoter ratings only matter for later data analysis --
-nothing in the UI surfaces them directly (see record_fight_result.py,
-which only needs a gym's name for the cornering-gym dropdown).
-
-Like Arenas, no dedicated "add gym" screen was requested -- gyms get
-added from the Gyms section in ui/settings.py.
-"""
-
 import csv
 import os
 
 from api.Country import Country
 
-DATA_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"
-)
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 GYMS_FILE = os.path.join(DATA_DIR, "gyms.csv")
-
 FIELDNAMES = ["id", "name", "location", "trainingCoach", "conditioningCoach", "fightPromoter"]
 
 MIN_GYM_RATING = 0
 MAX_GYM_RATING = 10
 
-
 class GymError(Exception):
     """Raised when a gym entry fails validation."""
     pass
-
 
 class Gyms:
     """CRUD for gyms stored in gyms.csv."""
@@ -55,8 +29,7 @@ class Gyms:
                 csv.DictWriter(f, fieldnames=FIELDNAMES).writeheader()
 
     def get_all(self) -> list:
-        """Return all gyms as a list of dicts, sorted by name (matches the
-        alphabetical ordering the cornering-gym dropdown wants)."""
+        """ Return all gyms as a list of dicts, sorted by name """
         self._ensure_file_exists()
         with open(self.filepath, newline="", encoding="utf-8") as f:
             rows = [

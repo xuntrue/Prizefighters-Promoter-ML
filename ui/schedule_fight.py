@@ -26,7 +26,6 @@ class ScheduleFightTab(ttk.Frame):
         self.refresh_reference_data()
 
     # ---------- Construction ----------
-
     def _build_reference_date(self):
         date_frame = ttk.LabelFrame(self, text="Game's Current Date (defines \"upcoming\")")
         date_frame.pack(fill="x", padx=10, pady=(10, 5))
@@ -113,13 +112,13 @@ class ScheduleFightTab(ttk.Frame):
         ttk.Button(top_bar, text="Cancel Selected Fight", command=self._on_cancel).pack(
             side="left", padx=15)
 
-        columns = ("fight_id", "date", "weight_class", "red", "blue", "championship", "status")
+        columns = ("fight_id", "date", "weight_class", "rounds", "red", "blue", "championship", "status")
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=12)
         headings = {
-            "fight_id": "FightID", "date": "Date", "weight_class": "Division",
+            "fight_id": "FightID", "date": "Date", "weight_class": "Division", "rounds": "Rounds",
             "red": "Red Corner", "blue": "Blue Corner", "championship": "Title Bout", "status": "Status",
         }
-        widths = {"fight_id": 80, "date": 90, "weight_class": 130, "red": 150,
+        widths = {"fight_id": 80, "date": 90, "weight_class": 130, "rounds": 60, "red": 150,
                  "blue": 150, "championship": 80, "status": 90}
         for col in columns:
             self.tree.heading(col, text=headings[col])
@@ -127,7 +126,6 @@ class ScheduleFightTab(ttk.Frame):
         self.tree.pack(fill="both", expand=True, padx=5, pady=(0, 5))
 
     # ---------- Reference data ----------
-
     def on_tab_shown(self):
         self.refresh_reference_data()
 
@@ -175,7 +173,6 @@ class ScheduleFightTab(ttk.Frame):
         return None
 
     # ---------- Table ----------
-
     def _refresh_table(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -184,8 +181,7 @@ class ScheduleFightTab(ttk.Frame):
 
         if self.filter_var.get() == STATUS_FILTER_UPCOMING:
             try:
-                ref_date = date(int(self.ref_year_var.get()), int(self.ref_month_var.get()),
-                                int(self.ref_day_var.get()))
+                ref_date = date(int(self.ref_year_var.get()), int(self.ref_month_var.get()), int(self.ref_day_var.get()))
             except (ValueError, tk.TclError):
                 ref_date = date.today()
 
@@ -195,17 +191,9 @@ class ScheduleFightTab(ttk.Frame):
                 except ValueError:
                     return False
                 return fight_date >= ref_date
-
             fights = [f for f in fights if is_upcoming(f)]
 
-        # Sort by date, then FightID. Date is stored as "dd-mm-yyyy" text,
-        # which sorts wrong as a plain string (e.g. "05-02-2026" would
-        # come before "12-01-2026" even though January is earlier) -- so
-        # this parses it into a real date first. FightID itself is safe
-        # to compare as a plain string: it's always a fixed-width 6-digit
-        # hex value (see api/Fights.py), so string order already matches
-        # numeric order with no parsing needed.
-        def sort_key(fight):
+        def sort_key(fight):  # Sort by date, then FightID
             try:
                 fight_date = datetime.strptime(fight["date"], DATE_FORMAT).date()
             except ValueError:
@@ -223,6 +211,7 @@ class ScheduleFightTab(ttk.Frame):
                     fight["fight_id"],
                     fight["date"],
                     fight["weight_limit"],
+                    self.api.get_fight_scheduled_rounds(fight["fight_id"]),
                     _fighter_label(red) if red else f'FighterID {fight["red_corner_fighter_id"]}',
                     _fighter_label(blue) if blue else f'FighterID {fight["blue_corner_fighter_id"]}',
                     "Yes" if fight["championship"] else "",
@@ -231,7 +220,6 @@ class ScheduleFightTab(ttk.Frame):
             )
 
     # ---------- Actions ----------
-
     def _on_schedule(self):
         red_id = self._selected_fighter_id(self.red_var)
         blue_id = self._selected_fighter_id(self.blue_var)

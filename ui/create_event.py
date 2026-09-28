@@ -9,6 +9,7 @@ from api.Events import EventError
 ROLE_MAIN = "Main Event"
 ROLE_CO_MAIN = "Co-Main"
 ROLE_UNDERCARD = "Undercard"
+ROLE_PRELIMINARY = "Preliminary"
 
 def _fight_label(api: PrizefighterAPI, fight: dict) -> str:
     red = api.get_fighter(fight["red_corner_fighter_id"])
@@ -69,6 +70,8 @@ class CreateEventTab(ttk.Frame):
                   command=lambda: self._assign_role(ROLE_CO_MAIN)).pack(fill="x", pady=4)
         ttk.Button(button_col, text="Add as Undercard  ->",
                   command=lambda: self._assign_role(ROLE_UNDERCARD)).pack(fill="x", pady=4)
+        ttk.Button(button_col, text="Add as Preliminary  ->",
+                  command=lambda: self._assign_role(ROLE_PRELIMINARY)).pack(fill="x", pady=4)
         ttk.Button(button_col, text="<-  Remove From Card",
                   command=self._remove_from_card).pack(fill="x", pady=(20, 4))
 
@@ -109,7 +112,6 @@ class CreateEventTab(ttk.Frame):
         self.refresh_reference_data()
 
     # ---------- Lifecycle ----------
-
     def on_tab_shown(self):
         self.refresh_reference_data()
 
@@ -127,7 +129,6 @@ class CreateEventTab(ttk.Frame):
         return None
 
     # ---------- Loading fights for a date ----------
-
     def _on_load_date(self):
         date_str = self.date_var.get().strip()
         self.date_fights = self.api.get_scheduled_fights_on_date(date_str)
@@ -142,7 +143,6 @@ class CreateEventTab(ttk.Frame):
         self._refresh_lists()
 
     # ---------- List rendering ----------
-
     def _refresh_lists(self):
         self.available_list.delete(0, tk.END)
         for fight in self.date_fights:
@@ -162,7 +162,6 @@ class CreateEventTab(ttk.Frame):
         return [f for f in self.date_fights if f["fight_id"] not in self.assignments]
 
     # ---------- Role assignment ----------
-
     def _assign_role(self, role: str):
         selection = self.available_list.curselection()
         if not selection:
@@ -192,7 +191,6 @@ class CreateEventTab(ttk.Frame):
         self._refresh_lists()
 
     # ---------- Save ----------
-
     def _on_create_event(self):
         date_str = self.date_var.get().strip()
         headliner = self.headliner_var.get().strip()
@@ -201,7 +199,8 @@ class CreateEventTab(ttk.Frame):
         main_fight_ids = [fid for fid, role in self.assignments.items() if role == ROLE_MAIN]
         co_main_fight_ids = [fid for fid, role in self.assignments.items() if role == ROLE_CO_MAIN]
         undercard_fight_ids = [fid for fid, role in self.assignments.items() if role == ROLE_UNDERCARD]
-
+        preliminary_fight_ids = [fid for fid, role in self.assignments.items() if role == ROLE_PRELIMINARY]
+        print(f'create_event.py: preliminary_fight_ids={preliminary_fight_ids}')
         if not main_fight_ids:
             messagebox.showerror("Missing Main Event", "Assign a main event fight before saving.")
             return
@@ -217,6 +216,7 @@ class CreateEventTab(ttk.Frame):
                 main_event_fight_id=main_fight_ids[0],
                 co_main_fight_ids=co_main_fight_ids,
                 undercard_fight_ids=undercard_fight_ids,
+                preliminary_fight_ids=preliminary_fight_ids,
                 slogan=self.slogan_var.get().strip(),
             )
         except EventError as e:

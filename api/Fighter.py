@@ -27,7 +27,6 @@ MAX_REACH = 75
 
 BIRTHDATE_FORMAT = "%d-%m-%Y"
 
-
 class FighterError(Exception):
     """ Raised when a fighter record fails validation """
     pass

@@ -1,44 +1,20 @@
-"""
-Events.py
-
-CRUD for event cards, stored as a single JSON array in data/events.json.
-Unlike fights (potentially tens of thousands of rows, hence the CSV
-index + one-file-per-fight split), events are few -- one per month or
-so of play -- so there's no need to split them up or keep a separate
-compressed index. A single JSON file holding a list of event objects is
-the simplest thing that works.
-
-An event has exactly one main event fight, zero or more co-main fights,
-and zero or more undercard fights. All bouts on a card must share the
-same Date -- a card happens on one night -- and must currently be in
-Scheduled status (not already on another card, and not already fought).
-
-This module validates fights exist, are Scheduled, and share a date,
-but it does NOT flip their status to Evented itself -- that's an
-orchestration step spanning two modules, so it belongs in
-PrizefighterAPI.create_event(), same pattern as add_fighter() creating
-a Records row.
-"""
-
 import json
 import os
 
 from api.Arenas import Arenas
 from api.Fights import Fights, STATUS_SCHEDULED
 
-DATA_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"
-)
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 EVENTS_FILE = os.path.join(DATA_DIR, "events.json")
 
 
 class EventError(Exception):
-    """Raised when an event card fails validation."""
+    """ Raised when an event card fails validation """
     pass
 
 
 class Events:
-    """CRUD for event cards stored in events.json."""
+    """ CRUD for event cards stored in events.json """
 
     def __init__(self, filepath: str = EVENTS_FILE, arena_api: Arenas = None, fights_api: Fights = None):
         self.filepath = filepath
@@ -74,7 +50,7 @@ class Events:
         return max(e["event_id"] for e in existing) + 1
 
     def _validate(self, headliner, arena_id, date, main_event_fight_id,
-                  co_main_fight_ids, undercard_fight_ids):
+                  co_main_fight_ids, undercard_fight_ids, preliminary_fight_ids):
         headliner = headliner.strip()
         if not headliner:
             raise EventError("Headliner cannot be empty.")
@@ -85,7 +61,7 @@ class Events:
         if not main_event_fight_id:
             raise EventError("An event needs a main event fight.")
 
-        all_fight_ids = [main_event_fight_id] + list(co_main_fight_ids) + list(undercard_fight_ids)
+        all_fight_ids = [main_event_fight_id] + list(co_main_fight_ids) + list(undercard_fight_ids) + list(preliminary_fight_ids)
 
         if len(all_fight_ids) != len(set(all_fight_ids)):
             raise EventError("The same fight cannot appear twice on one card.")
@@ -108,13 +84,13 @@ class Events:
         return headliner
 
     def add(self, headliner: str, date: str, arena_id: int, main_event_fight_id: str,
-            co_main_fight_ids: list = None, undercard_fight_ids: list = None,
+            co_main_fight_ids: list = None, undercard_fight_ids: list = None, preliminary_fight_ids: list = None,
             slogan: str = "") -> dict:
         co_main_fight_ids = list(co_main_fight_ids or [])
         undercard_fight_ids = list(undercard_fight_ids or [])
-
+        preliminary_fight_ids = list(preliminary_fight_ids or [])
         headliner = self._validate(
-            headliner, arena_id, date, main_event_fight_id, co_main_fight_ids, undercard_fight_ids
+            headliner, arena_id, date, main_event_fight_id, co_main_fight_ids, undercard_fight_ids, preliminary_fight_ids
         )
 
         new_event = {
@@ -126,8 +102,8 @@ class Events:
             "main_event_fight_id": main_event_fight_id,
             "co_main_fight_ids": co_main_fight_ids,
             "undercard_fight_ids": undercard_fight_ids,
+            "preliminary_fight_ids": preliminary_fight_ids
         }
-
         existing = self.get_all()
         existing.append(new_event)
         self._save_all(existing)

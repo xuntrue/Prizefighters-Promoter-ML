@@ -377,7 +377,7 @@ class RecordFightPrefightTab(ttk.Frame):
         events.sort(key=lambda e: e["event_id"]) # Sort by eventID
 
         self._event_options = [
-            (e["event_id"], f'{e["date"]} -- {e["headliner"]}') #(Event #{e["event_id"]})')
+            (e["event_id"], f'{e["date"]} -- {e["headliner"]} (Event #{e["event_id"]})')
             for e in events
         ]
         self.event_combo["values"] = [label for _eid, label in self._event_options]
@@ -411,6 +411,7 @@ class RecordFightPrefightTab(ttk.Frame):
             [(event["main_event_fight_id"], "Main Event")]
             + [(fid, "Co-Main") for fid in event["co_main_fight_ids"]]
             + [(fid, "Undercard") for fid in event["undercard_fight_ids"]]
+            + [(fid, "Preliminary") for fid in event["preliminary_fight_ids"]]
         )
         self._bout_options = [
             (fight_id, _fight_display_label(self.api, fight_id, role)) for fight_id, role in bouts

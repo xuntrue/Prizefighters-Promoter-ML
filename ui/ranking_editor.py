@@ -65,8 +65,7 @@ class RankingEditorFrame(ttk.Frame):
                                             state="readonly", width=34)
         self.fighter_combo.grid(row=0, column=1, sticky="w", padx=5, pady=4)
 
-        record_row = ttk.Frame(box)
-        record_row.grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=4)
+        record_row = ttk.Frame(box).grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=4)
 
         self.wins_var = tk.IntVar(value=0)
         self.knockouts_var = tk.IntVar(value=0)
