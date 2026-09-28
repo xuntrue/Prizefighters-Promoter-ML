@@ -392,7 +392,7 @@ class RecordFightResultTab(ttk.Frame):
             return
 
         all_fight_ids = (
-            [event["main_event_fight_id"]] + event["co_main_fight_ids"] + event["undercard_fight_ids"]
+            [event["main_event_fight_id"]] + event["co_main_fight_ids"] + event["undercard_fight_ids"] + event["preliminary_fight_ids"]
         )
         meta_ready = [fid for fid in all_fight_ids if self.api.get_fight(fid)["status"] == STATUS_META]
 
@@ -409,7 +409,7 @@ class RecordFightResultTab(ttk.Frame):
         # format_full_name(red["first_name"], red["last_name"], red["nickname"], red["placement"])
         red_name = f'{red["first_name"]} {red["last_name"]}'
         blue_name = f'{blue["first_name"]} {blue["last_name"]}'
-        rounds = self.api.get_fight_rounds(fight_id)
+        rounds = self.api.get_fight_scheduled_rounds(fight_id)
         return f'{fight_id}: {red_name} vs {blue_name} ({fight["weight_limit"]} lbs, {rounds} rounds)'
 
     def _selected_fight_id(self):
@@ -426,7 +426,7 @@ class RecordFightResultTab(ttk.Frame):
 
         self.current_fight_id = fight_id
         self.current_fight = self.api.get_fight(fight_id)
-        rounds = self.api.get_fight_rounds(fight_id)
+        rounds = self.api.get_fight_scheduled_rounds(fight_id)
 
         self.stoppage_round_spin.config(to=rounds)
         if int(self.stoppage_round_var.get()) > rounds:
@@ -448,7 +448,7 @@ class RecordFightResultTab(ttk.Frame):
             messagebox.showerror("No Bout Selected", "Select a bout first.")
             return
 
-        sanctioned_rounds = self.api.get_fight_rounds(self.current_fight_id )
+        sanctioned_rounds = self.api.get_fight_scheduled_rounds(self.current_fight_id )
 
         if self.end_type_var.get() == STOPPED:
             try:

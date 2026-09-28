@@ -7,8 +7,147 @@
   "championship": false,
   "rounds": 6,
   "round_minutes": 1,
-  "status": "Evented",
+  "status": "Meta",
   "event_id": 1,
-  "meta": {},
+  "meta": {
+    "red_corner": {
+      "profile": {
+        "weigh_in": 135,
+        "record": {
+          "wins": 25,
+          "knockouts": 5,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 6963
+      },
+      "attributes": {
+        "strength": 2.0,
+        "speed": 3.5,
+        "stamina": 3.5,
+        "endurance": 2.0,
+        "chin": 3.0,
+        "jab": 3.5,
+        "cross": 3.0,
+        "lead_hook": 3.0,
+        "rear_hook": 2.0,
+        "lead_uppercut": 2.0,
+        "rear_uppercut": 2.0
+      },
+      "skills": {
+        "experience": {
+          "level": 7,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Thick Skin",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Body Blows",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Iron Fists",
+            "level": 1,
+            "xp": 0
+          },
+          "group_4": {
+            "name": "Rapid Jabs",
+            "level": 1,
+            "xp": 0
+          }
+        }
+      },
+      "tendencies": {
+        "body_head": 58,
+        "single_punches_combinations": 83,
+        "speed_power": 69,
+        "inside_outside": 74,
+        "block_dodge": 17,
+        "counter_aggressive_first_half": 53,
+        "cautious_reckless_first_half": 47,
+        "counter_aggressive_second_half": 79,
+        "cautious_reckless_second_half": 14
+      }
+    },
+    "blue_corner": {
+      "profile": {
+        "weigh_in": 134,
+        "record": {
+          "wins": 7,
+          "knockouts": 2,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 1871
+      },
+      "attributes": {
+        "strength": 3.0,
+        "speed": 5.5,
+        "stamina": 4.0,
+        "endurance": 4.0,
+        "chin": 4.5,
+        "jab": 2.0,
+        "cross": 2.0,
+        "lead_hook": 7.0,
+        "rear_hook": 5.0,
+        "lead_uppercut": 7.5,
+        "rear_uppercut": 4.0
+      },
+      "skills": {
+        "experience": {
+          "level": 2,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Heart",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Body Blows",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": null,
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 40,
+        "single_punches_combinations": 71,
+        "speed_power": 73,
+        "inside_outside": 81,
+        "block_dodge": 38,
+        "counter_aggressive_first_half": 66,
+        "cautious_reckless_first_half": 59,
+        "counter_aggressive_second_half": 59,
+        "cautious_reckless_second_half": 40
+      }
+    }
+  },
   "result": {}
 }

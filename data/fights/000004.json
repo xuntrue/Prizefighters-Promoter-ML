@@ -7,8 +7,147 @@
   "championship": false,
   "rounds": 6,
   "round_minutes": 1,
-  "status": "Evented",
+  "status": "Meta",
   "event_id": 1,
-  "meta": {},
+  "meta": {
+    "red_corner": {
+      "profile": {
+        "weigh_in": 259,
+        "record": {
+          "wins": 16,
+          "knockouts": 8,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 5966
+      },
+      "attributes": {
+        "strength": 5.0,
+        "speed": 4.5,
+        "stamina": 5.5,
+        "endurance": 4.0,
+        "chin": 3.0,
+        "jab": 4.0,
+        "cross": 3.0,
+        "lead_hook": 6.5,
+        "rear_hook": 6.0,
+        "lead_uppercut": 7.5,
+        "rear_uppercut": 6.0
+      },
+      "skills": {
+        "experience": {
+          "level": 4,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Recovery",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Body Blows",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Show Stopper",
+            "level": 1,
+            "xp": 0
+          },
+          "group_4": {
+            "name": "Rapid Jabs",
+            "level": 1,
+            "xp": 0
+          }
+        }
+      },
+      "tendencies": {
+        "body_head": 62,
+        "single_punches_combinations": 73,
+        "speed_power": 32,
+        "inside_outside": 29,
+        "block_dodge": 44,
+        "counter_aggressive_first_half": 46,
+        "cautious_reckless_first_half": 36,
+        "counter_aggressive_second_half": 75,
+        "cautious_reckless_second_half": 45
+      }
+    },
+    "blue_corner": {
+      "profile": {
+        "weigh_in": 289,
+        "record": {
+          "wins": 10,
+          "knockouts": 4,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 2764
+      },
+      "attributes": {
+        "strength": 4.5,
+        "speed": 4.0,
+        "stamina": 3.0,
+        "endurance": 5.0,
+        "chin": 5.0,
+        "jab": 5.5,
+        "cross": 3.5,
+        "lead_hook": 7.5,
+        "rear_hook": 7.5,
+        "lead_uppercut": 5.0,
+        "rear_uppercut": 4.0
+      },
+      "skills": {
+        "experience": {
+          "level": 2,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Recovery",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Body Blows",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": null,
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 35,
+        "single_punches_combinations": 31,
+        "speed_power": 83,
+        "inside_outside": 36,
+        "block_dodge": 18,
+        "counter_aggressive_first_half": 63,
+        "cautious_reckless_first_half": 35,
+        "counter_aggressive_second_half": 74,
+        "cautious_reckless_second_half": 7
+      }
+    }
+  },
   "result": {}
 }

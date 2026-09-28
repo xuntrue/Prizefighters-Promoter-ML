@@ -7,8 +7,151 @@
   "championship": false,
   "rounds": 6,
   "round_minutes": 1,
-  "status": "Evented",
+  "status": "Meta",
   "event_id": 1,
-  "meta": {},
+  "meta": {
+    "red_corner": {
+      "profile": {
+        "weigh_in": 132,
+        "record": {
+          "wins": 11,
+          "knockouts": 2,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 2495
+      },
+      "attributes": {
+        "strength": 3.0,
+        "speed": 3.5,
+        "stamina": 4.5,
+        "endurance": 4.0,
+        "chin": 4.0,
+        "jab": 2.5,
+        "cross": 2.5,
+        "lead_hook": 4.0,
+        "rear_hook": 4.5,
+        "lead_uppercut": 6.0,
+        "rear_uppercut": 6.5
+      },
+      "skills": {
+        "experience": {
+          "level": 3,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Rage",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Hard Core",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Breathing",
+            "level": 1,
+            "xp": 0
+          },
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 23,
+        "single_punches_combinations": 85,
+        "speed_power": 84,
+        "inside_outside": 84,
+        "block_dodge": 38,
+        "counter_aggressive_first_half": 31,
+        "cautious_reckless_first_half": 59,
+        "counter_aggressive_second_half": 56,
+        "cautious_reckless_second_half": 45
+      }
+    },
+    "blue_corner": {
+      "profile": {
+        "weigh_in": 132,
+        "record": {
+          "wins": 14,
+          "knockouts": 4,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 3506
+      },
+      "attributes": {
+        "strength": 3.0,
+        "speed": 2.0,
+        "stamina": 2.5,
+        "endurance": 4.0,
+        "chin": 3.5,
+        "jab": 3.5,
+        "cross": 2.5,
+        "lead_hook": 5.0,
+        "rear_hook": 3.0,
+        "lead_uppercut": 3.5,
+        "rear_uppercut": 3.0
+      },
+      "skills": {
+        "experience": {
+          "level": 4,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Rage",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Iron Jaw",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Fan Favourite",
+            "level": 1,
+            "xp": 0
+          },
+          "group_4": {
+            "name": "Liver Shot",
+            "level": 1,
+            "xp": 0
+          }
+        }
+      },
+      "tendencies": {
+        "body_head": 50,
+        "single_punches_combinations": 19,
+        "speed_power": 74,
+        "inside_outside": 36,
+        "block_dodge": 13,
+        "counter_aggressive_first_half": 50,
+        "cautious_reckless_first_half": 29,
+        "counter_aggressive_second_half": 69,
+        "cautious_reckless_second_half": 3
+      }
+    }
+  },
   "result": {}
 }

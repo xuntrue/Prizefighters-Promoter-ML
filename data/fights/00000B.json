@@ -7,8 +7,151 @@
   "championship": false,
   "rounds": 6,
   "round_minutes": 1,
-  "status": "Evented",
+  "status": "Meta",
   "event_id": 1,
-  "meta": {},
+  "meta": {
+    "red_corner": {
+      "profile": {
+        "weigh_in": 111,
+        "record": {
+          "wins": 11,
+          "knockouts": 2,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 2704
+      },
+      "attributes": {
+        "strength": 2.5,
+        "speed": 7.0,
+        "stamina": 4.5,
+        "endurance": 3.0,
+        "chin": 5.5,
+        "jab": 4.0,
+        "cross": 6.0,
+        "lead_hook": 4.0,
+        "rear_hook": 3.0,
+        "lead_uppercut": 4.5,
+        "rear_uppercut": 3.5
+      },
+      "skills": {
+        "experience": {
+          "level": 3,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Invigorate",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Hard Core",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Fan Favourite",
+            "level": 1,
+            "xp": 0
+          },
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 16,
+        "single_punches_combinations": 86,
+        "speed_power": 81,
+        "inside_outside": 78,
+        "block_dodge": 39,
+        "counter_aggressive_first_half": 57,
+        "cautious_reckless_first_half": 71,
+        "counter_aggressive_second_half": 58,
+        "cautious_reckless_second_half": 46
+      }
+    },
+    "blue_corner": {
+      "profile": {
+        "weigh_in": 109,
+        "record": {
+          "wins": 11,
+          "knockouts": 4,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 2263
+      },
+      "attributes": {
+        "strength": 4.0,
+        "speed": 3.0,
+        "stamina": 2.0,
+        "endurance": 5.0,
+        "chin": 3.0,
+        "jab": 3.0,
+        "cross": 3.0,
+        "lead_hook": 4.5,
+        "rear_hook": 3.5,
+        "lead_uppercut": 4.0,
+        "rear_uppercut": 3.5
+      },
+      "skills": {
+        "experience": {
+          "level": 4,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Heart",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Hard Core",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": {
+            "name": "Show Stopper",
+            "level": 1,
+            "xp": 0
+          },
+          "group_4": {
+            "name": "Weaving Uppercut",
+            "level": 1,
+            "xp": 0
+          }
+        }
+      },
+      "tendencies": {
+        "body_head": 70,
+        "single_punches_combinations": 32,
+        "speed_power": 87,
+        "inside_outside": 14,
+        "block_dodge": 1,
+        "counter_aggressive_first_half": 48,
+        "cautious_reckless_first_half": 39,
+        "counter_aggressive_second_half": 70,
+        "cautious_reckless_second_half": 30
+      }
+    }
+  },
   "result": {}
 }

@@ -7,8 +7,135 @@
   "championship": false,
   "rounds": 4,
   "round_minutes": 1,
-  "status": "Evented",
+  "status": "Meta",
   "event_id": 1,
-  "meta": {},
+  "meta": {
+    "red_corner": {
+      "profile": {
+        "weigh_in": 161,
+        "record": {
+          "wins": 3,
+          "knockouts": 0,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 686
+      },
+      "attributes": {
+        "strength": 3.0,
+        "speed": 4.0,
+        "stamina": 3.5,
+        "endurance": 3.5,
+        "chin": 2.0,
+        "jab": 3.0,
+        "cross": 2.0,
+        "lead_hook": 2.0,
+        "rear_hook": 3.5,
+        "lead_uppercut": 3.0,
+        "rear_uppercut": 2.5
+      },
+      "skills": {
+        "experience": {
+          "level": 1,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Rage",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": null,
+          "group_3": null,
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 62,
+        "single_punches_combinations": 58,
+        "speed_power": 33,
+        "inside_outside": 24,
+        "block_dodge": 34,
+        "counter_aggressive_first_half": 50,
+        "cautious_reckless_first_half": 34,
+        "counter_aggressive_second_half": 60,
+        "cautious_reckless_second_half": 27
+      }
+    },
+    "blue_corner": {
+      "profile": {
+        "weigh_in": 174,
+        "record": {
+          "wins": 5,
+          "knockouts": 1,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 1123
+      },
+      "attributes": {
+        "strength": 2.5,
+        "speed": 4.5,
+        "stamina": 3.0,
+        "endurance": 3.0,
+        "chin": 2.0,
+        "jab": 2.0,
+        "cross": 2.0,
+        "lead_hook": 2.5,
+        "rear_hook": 3.0,
+        "lead_uppercut": 3.5,
+        "rear_uppercut": 5.0
+      },
+      "skills": {
+        "experience": {
+          "level": 2,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": {
+            "name": "Thick Skin",
+            "level": 1,
+            "xp": 0
+          },
+          "group_2": {
+            "name": "Counter Puncher",
+            "level": 1,
+            "xp": 0
+          },
+          "group_3": null,
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 34,
+        "single_punches_combinations": 13,
+        "speed_power": 74,
+        "inside_outside": 11,
+        "block_dodge": 7,
+        "counter_aggressive_first_half": 58,
+        "cautious_reckless_first_half": 38,
+        "counter_aggressive_second_half": 69,
+        "cautious_reckless_second_half": 17
+      }
+    }
+  },
   "result": {}
 }
