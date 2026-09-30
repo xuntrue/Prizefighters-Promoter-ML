@@ -200,7 +200,7 @@ class CreateEventTab(ttk.Frame):
         co_main_fight_ids = [fid for fid, role in self.assignments.items() if role == ROLE_CO_MAIN]
         undercard_fight_ids = [fid for fid, role in self.assignments.items() if role == ROLE_UNDERCARD]
         preliminary_fight_ids = [fid for fid, role in self.assignments.items() if role == ROLE_PRELIMINARY]
-        print(f'create_event.py: preliminary_fight_ids={preliminary_fight_ids}')
+
         if not main_fight_ids:
             messagebox.showerror("Missing Main Event", "Assign a main event fight before saving.")
             return

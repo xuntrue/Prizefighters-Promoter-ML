@@ -322,8 +322,6 @@ def _all_matchup_keys(canonical_order: list) -> list:
 
 STANCE_ORDER = [INT_TO_STANCE[0], INT_TO_STANCE[1]]  # ["Orthodox", "Southpaw"]
 STYLE_ORDER = [INT_TO_STYLE[i] for i in range(1, len(STYLE_TO_INT) + 1)]  # canonical 1..4 order
-GYM_ORDER = ["Gym", "Free Agent"]
-
 
 def stance_matchup_distribution(conn: sqlite3.Connection) -> dict:
     """Every completed fight's stance pairing (Orthodox/Southpaw, a
@@ -369,25 +367,6 @@ def style_matchup_distribution(conn: sqlite3.Connection) -> dict:
         key = _matchup_key(red_label, blue_label, STYLE_ORDER)
         counts[key] = counts.get(key, 0) + 1
     return counts
-
-
-def gym_matchup_distribution(conn: sqlite3.Connection) -> dict:
-    """Whether each corner had a cornering gym at all, not whether it
-    was literally the SAME gym for both fighters. This is fight-specific
-    (a fighter can be a free agent for one fight and gym-affiliated for
-    the next), so unlike stance/style it has to come from each fight's
-    own JSON (result.gyms), not a fixed fighters.csv column."""
-    counts = {key: 0 for key in _all_matchup_keys(GYM_ORDER)}
-    for fight_id in get_completed_fight_ids(conn):
-        gyms = load_fight_result(fight_id).get("gyms")
-        if not gyms:
-            continue
-        red_label = "Gym" if gyms.get("red_corner") is not None else "Free Agent"
-        blue_label = "Gym" if gyms.get("blue_corner") is not None else "Free Agent"
-        key = _matchup_key(red_label, blue_label, GYM_ORDER)
-        counts[key] = counts.get(key, 0) + 1
-    return counts
-
 
 def corner_win_distribution(conn: sqlite3.Connection) -> dict:
     """Red corner wins vs. Blue corner wins vs. Draws. Needs each
@@ -519,9 +498,9 @@ def main():
 
     print()
     print("Last recorded fight per fighter (any status, sort='asc'):")
-    print(f"  {'FighterID':<10}{'Name':<22}{'FightID':<10}{'Date':<12}")
+    print(f"  {'FighterID':<10}{'Name':<25}{'FightID':<10}{'Date':<12}")
     for fighter_id, name, fight_id, fight_date in last_fight_per_fighter(conn, sort="asc"):
-        print(f"  {fighter_id:<10}{name:<22}{fight_id or '--':<10}{fight_date or 'No last fight':<12}")
+        print(f"  {fighter_id:<10}{name:<25}{fight_id or '--':<10}{fight_date or 'No last fight':<12}")
 
     print()
     print("Stance matchups (pure SQL, no JSON needed):")
@@ -532,11 +511,6 @@ def main():
     print("Style matchups (pure SQL, no JSON needed):")
     for label, count in style_matchup_distribution(conn).items():
         print(f"  {label:<32}{count:>6}")
-
-    print()
-    print("Gym matchups (from each fight's JSON):")
-    for label, count in gym_matchup_distribution(conn).items():
-        print(f"  {label:<28}{count:>6}")
 
     print()
     print("Corner win distribution (from each fight's JSON):")

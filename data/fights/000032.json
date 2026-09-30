@@ -1,0 +1,14 @@
+{
+  "fight_id": "000032",
+  "red_corner_fighter_id": 160,
+  "blue_corner_fighter_id": 158,
+  "weight_limit": 112,
+  "date": "03-02-1990",
+  "championship": false,
+  "rounds": 4,
+  "round_minutes": 1,
+  "status": "Evented",
+  "event_id": 3,
+  "meta": {},
+  "result": {}
+}

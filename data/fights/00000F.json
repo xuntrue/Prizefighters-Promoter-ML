@@ -7,7 +7,7 @@
   "championship": false,
   "rounds": 4,
   "round_minutes": 1,
-  "status": "Meta",
+  "status": "Complete",
   "event_id": 1,
   "meta": {
     "red_corner": {
@@ -133,5 +133,463 @@
       }
     }
   },
-  "result": {}
+  "result": {
+    "gyms": {
+      "red_corner": null,
+      "blue_corner": null
+    },
+    "rounds": {
+      "red_corner": [
+        {
+          "punches": {
+            "jab": {
+              "landed": 8,
+              "thrown": 15
+            },
+            "cross": {
+              "landed": 6,
+              "thrown": 16
+            },
+            "lead_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "rear_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "lead_uppercut": {
+              "landed": 1,
+              "thrown": 1
+            },
+            "rear_uppercut": {
+              "landed": 1,
+              "thrown": 1
+            },
+            "head": {
+              "landed": 15,
+              "thrown": 30
+            },
+            "body": {
+              "landed": 1,
+              "thrown": 3
+            },
+            "counter": {
+              "landed": 3,
+              "thrown": 4
+            },
+            "power": {
+              "landed": 2,
+              "thrown": 2
+            }
+          },
+          "knocked_down": 0
+        },
+        {
+          "punches": {
+            "jab": {
+              "landed": 10,
+              "thrown": 18
+            },
+            "cross": {
+              "landed": 6,
+              "thrown": 14
+            },
+            "lead_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "rear_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "lead_uppercut": {
+              "landed": 2,
+              "thrown": 3
+            },
+            "rear_uppercut": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "head": {
+              "landed": 15,
+              "thrown": 31
+            },
+            "body": {
+              "landed": 3,
+              "thrown": 4
+            },
+            "counter": {
+              "landed": 3,
+              "thrown": 6
+            },
+            "power": {
+              "landed": 2,
+              "thrown": 3
+            }
+          },
+          "knocked_down": 0
+        },
+        {
+          "punches": {
+            "jab": {
+              "landed": 12,
+              "thrown": 15
+            },
+            "cross": {
+              "landed": 6,
+              "thrown": 15
+            },
+            "lead_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "rear_hook": {
+              "landed": 1,
+              "thrown": 1
+            },
+            "lead_uppercut": {
+              "landed": 0,
+              "thrown": 2
+            },
+            "rear_uppercut": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "head": {
+              "landed": 16,
+              "thrown": 28
+            },
+            "body": {
+              "landed": 3,
+              "thrown": 5
+            },
+            "counter": {
+              "landed": 3,
+              "thrown": 4
+            },
+            "power": {
+              "landed": 1,
+              "thrown": 3
+            }
+          },
+          "knocked_down": 0
+        },
+        {
+          "punches": {
+            "jab": {
+              "landed": 15,
+              "thrown": 23
+            },
+            "cross": {
+              "landed": 8,
+              "thrown": 16
+            },
+            "lead_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "rear_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "lead_uppercut": {
+              "landed": 2,
+              "thrown": 2
+            },
+            "rear_uppercut": {
+              "landed": 1,
+              "thrown": 2
+            },
+            "head": {
+              "landed": 23,
+              "thrown": 39
+            },
+            "body": {
+              "landed": 3,
+              "thrown": 4
+            },
+            "counter": {
+              "landed": 4,
+              "thrown": 9
+            },
+            "power": {
+              "landed": 3,
+              "thrown": 4
+            }
+          },
+          "knocked_down": 0
+        }
+      ],
+      "blue_corner": [
+        {
+          "punches": {
+            "jab": {
+              "landed": 6,
+              "thrown": 23
+            },
+            "cross": {
+              "landed": 3,
+              "thrown": 8
+            },
+            "lead_hook": {
+              "landed": 1,
+              "thrown": 1
+            },
+            "rear_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "lead_uppercut": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "rear_uppercut": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "head": {
+              "landed": 8,
+              "thrown": 27
+            },
+            "body": {
+              "landed": 2,
+              "thrown": 5
+            },
+            "counter": {
+              "landed": 2,
+              "thrown": 8
+            },
+            "power": {
+              "landed": 1,
+              "thrown": 1
+            }
+          },
+          "knocked_down": 0
+        },
+        {
+          "punches": {
+            "jab": {
+              "landed": 6,
+              "thrown": 15
+            },
+            "cross": {
+              "landed": 5,
+              "thrown": 12
+            },
+            "lead_hook": {
+              "landed": 1,
+              "thrown": 1
+            },
+            "rear_hook": {
+              "landed": 0,
+              "thrown": 1
+            },
+            "lead_uppercut": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "rear_uppercut": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "head": {
+              "landed": 11,
+              "thrown": 26
+            },
+            "body": {
+              "landed": 1,
+              "thrown": 3
+            },
+            "counter": {
+              "landed": 5,
+              "thrown": 10
+            },
+            "power": {
+              "landed": 1,
+              "thrown": 2
+            }
+          },
+          "knocked_down": 0
+        },
+        {
+          "punches": {
+            "jab": {
+              "landed": 6,
+              "thrown": 16
+            },
+            "cross": {
+              "landed": 1,
+              "thrown": 3
+            },
+            "lead_hook": {
+              "landed": 0,
+              "thrown": 1
+            },
+            "rear_hook": {
+              "landed": 0,
+              "thrown": 1
+            },
+            "lead_uppercut": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "rear_uppercut": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "head": {
+              "landed": 7,
+              "thrown": 20
+            },
+            "body": {
+              "landed": 0,
+              "thrown": 1
+            },
+            "counter": {
+              "landed": 1,
+              "thrown": 6
+            },
+            "power": {
+              "landed": 0,
+              "thrown": 2
+            }
+          },
+          "knocked_down": 0
+        },
+        {
+          "punches": {
+            "jab": {
+              "landed": 8,
+              "thrown": 18
+            },
+            "cross": {
+              "landed": 4,
+              "thrown": 14
+            },
+            "lead_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "rear_hook": {
+              "landed": 0,
+              "thrown": 0
+            },
+            "lead_uppercut": {
+              "landed": 1,
+              "thrown": 1
+            },
+            "rear_uppercut": {
+              "landed": 0,
+              "thrown": 1
+            },
+            "head": {
+              "landed": 11,
+              "thrown": 31
+            },
+            "body": {
+              "landed": 2,
+              "thrown": 3
+            },
+            "counter": {
+              "landed": 1,
+              "thrown": 10
+            },
+            "power": {
+              "landed": 1,
+              "thrown": 2
+            }
+          },
+          "knocked_down": 0
+        }
+      ]
+    },
+    "scorecards": {
+      "judge_1": {
+        "red_corner": [
+          10,
+          10,
+          10,
+          10
+        ],
+        "blue_corner": [
+          9,
+          9,
+          9,
+          9
+        ]
+      },
+      "judge_2": {
+        "red_corner": [
+          10,
+          10,
+          10,
+          10
+        ],
+        "blue_corner": [
+          9,
+          9,
+          9,
+          9
+        ]
+      },
+      "judge_3": {
+        "red_corner": [
+          10,
+          10,
+          10,
+          10
+        ],
+        "blue_corner": [
+          9,
+          9,
+          9,
+          9
+        ]
+      }
+    },
+    "stoppage": null,
+    "outcome": {
+      "winner_id": 69,
+      "method": "UD"
+    },
+    "post_fight": {
+      "red_corner": {
+        "new_record": {
+          "wins": 5,
+          "knockouts": 1,
+          "losses": 0,
+          "draws": 0
+        },
+        "prize_money": 90,
+        "total_fans": 865,
+        "xp_gained": 40,
+        "tendency_changes": {
+          "body_head": 0,
+          "single_punches_combinations": 3,
+          "speed_power": -1,
+          "inside_outside": 0,
+          "block_dodge": -1
+        }
+      },
+      "blue_corner": {
+        "new_record": {
+          "wins": 7,
+          "knockouts": 4,
+          "losses": 1,
+          "draws": 0
+        },
+        "prize_money": 110,
+        "total_fans": 482,
+        "xp_gained": 15,
+        "tendency_changes": {
+          "body_head": 1,
+          "single_punches_combinations": 2,
+          "speed_power": 1,
+          "inside_outside": 0,
+          "block_dodge": -1
+        }
+      }
+    }
+  }
 }

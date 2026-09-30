@@ -25,7 +25,6 @@ DECISION = "Decision"
 STOPPED = "Stopped (KO/TKO)"
 DRAW_LABEL = "Draw"
 
-
 class VScrollFrame(ttk.Frame):
     """A frame with a vertical scrollbar -- wraps this whole tab's content.
     Without it, everything past the punch-stats section (which is tall
@@ -68,8 +67,7 @@ class VScrollFrame(ttk.Frame):
 
 
 class HScrollFrame(ttk.Frame):
-    """A frame with a horizontal scrollbar -- used for the scorecard and
-    punch-stat grids, which get wide fast once rounds are added."""
+    """ A frame with a horizontal scrollbar -- used for the scorecard and punch-stat grids, which get wide fast once rounds are added """
 
     def __init__(self, parent, height=180):
         super().__init__(parent)
@@ -86,12 +84,10 @@ class HScrollFrame(ttk.Frame):
         canvas.pack(side="top", fill="both", expand=True)
         hbar.pack(side="bottom", fill="x")
 
-
 def _int_entry(parent, width=4, default="0"):
     var = tk.StringVar(value=default)
     entry = ttk.Entry(parent, textvariable=var, width=width)
     return entry, var
-
 
 class RecordFightResultTab(ttk.Frame):
     def __init__(self, parent, api: PrizefighterAPI):
@@ -119,10 +115,9 @@ class RecordFightResultTab(ttk.Frame):
         self._build_punch_stats_area()
         self._build_outcome_and_post_fight()
 
-        self.refresh_reference_data()
+        #self.refresh_reference_data()
 
     # ---------- Top: reference date + bout selection ----------
-
     def _build_reference_date(self):
         date_frame = ttk.LabelFrame(self.scroll.inner, text="Game's Current Date")
         date_frame.pack(fill="x", padx=10, pady=(10, 5))
@@ -165,26 +160,18 @@ class RecordFightResultTab(ttk.Frame):
     def _build_gyms_and_ending(self):
         box = ttk.LabelFrame(self.scroll.inner, text="Corners & How It Ended")
         box.pack(fill="x", padx=10, pady=5)
+        row = 0
 
-        ttk.Label(box, text="Red Corner Gym:").grid(row=0, column=0, sticky="w", padx=5, pady=4)
-        self.red_gym_var = tk.StringVar()
-        self.red_gym_combo = ttk.Combobox(box, textvariable=self.red_gym_var, state="readonly", width=25)
-        self.red_gym_combo.grid(row=0, column=1, sticky="w", padx=5, pady=4)
-
-        ttk.Label(box, text="Blue Corner Gym:").grid(row=0, column=2, sticky="w", padx=(15, 5), pady=4)
-        self.blue_gym_var = tk.StringVar()
-        self.blue_gym_combo = ttk.Combobox(box, textvariable=self.blue_gym_var, state="readonly", width=25)
-        self.blue_gym_combo.grid(row=0, column=3, sticky="w", padx=5, pady=4)
-
-        ttk.Label(box, text="Fight ended by:").grid(row=1, column=0, sticky="w", padx=5, pady=(10, 4))
+        ttk.Label(box, text="Fight ended by:").grid(row=row, column=0, sticky="w", padx=5, pady=(10, 4))
         self.end_type_var = tk.StringVar(value=DECISION)
         end_type_combo = ttk.Combobox(box, textvariable=self.end_type_var, state="readonly",
                                       values=[DECISION, STOPPED], width=20)
-        end_type_combo.grid(row=1, column=1, sticky="w", padx=5, pady=(10, 4))
+        end_type_combo.grid(row=row, column=1, sticky="w", padx=5, pady=(10, 4))
         end_type_combo.bind("<<ComboboxSelected>>", lambda _e: self._on_end_type_changed())
+        row += 1
 
         self.stoppage_frame = ttk.Frame(box)
-        self.stoppage_frame.grid(row=2, column=0, columnspan=4, sticky="w", padx=5, pady=4)
+        self.stoppage_frame.grid(row=row, column=0, columnspan=4, sticky="w", padx=5, pady=4)
 
         ttk.Label(self.stoppage_frame, text="Round:").pack(side="left", padx=(0, 2))
         self.stoppage_round_var = tk.StringVar(value="1")
@@ -213,12 +200,14 @@ class RecordFightResultTab(ttk.Frame):
         ttk.Entry(self.stoppage_frame, textvariable=self.time_centisec_var, width=3).pack(side="left")
 
         self._on_end_type_changed()  # hide stoppage fields initially (Decision is the default)
+        row += 1
 
         ttk.Button(box, text="Build Rounds & Scorecards", command=self._build_rounds_and_scorecards).grid(
-            row=3, column=0, columnspan=4, sticky="w", padx=5, pady=(10, 5))
+            row=row, column=0, columnspan=4, sticky="w", padx=5, pady=(10, 5))
+        row += 1
 
         self.build_status_label = ttk.Label(box, text="", foreground="gray")
-        self.build_status_label.grid(row=4, column=0, columnspan=4, sticky="w", padx=5, pady=(0, 5))
+        self.build_status_label.grid(row=row, column=0, columnspan=4, sticky="w", padx=5, pady=(0, 5))
 
     def _on_end_type_changed(self):
         state = "normal" if self.end_type_var.get() == STOPPED else "disabled"
@@ -229,7 +218,6 @@ class RecordFightResultTab(ttk.Frame):
                 pass  # plain Labels don't have a state option
 
     # ---------- Scorecards ----------
-
     def _build_scorecards_area(self):
         frame = ttk.LabelFrame(self.scroll.inner, text="Judges' Scorecards")
         frame.pack(fill="x", padx=10, pady=5)
@@ -237,7 +225,6 @@ class RecordFightResultTab(ttk.Frame):
         self.scorecards_scroll.pack(fill="x", padx=5, pady=5)
 
     # ---------- Punch stats ----------
-
     def _build_punch_stats_area(self):
         frame = ttk.LabelFrame(self.scroll.inner, text="Round-by-Round Punch Stats (Thrown / Landed)")
         frame.pack(fill="both", expand=True, padx=10, pady=5)
@@ -252,7 +239,6 @@ class RecordFightResultTab(ttk.Frame):
             self.punch_scrolls[corner] = scroll
 
     # ---------- Outcome + post-fight ----------
-
     def _build_outcome_and_post_fight(self):
         frame = ttk.LabelFrame(self.scroll.inner, text="Outcome & Post-Fight")
         frame.pack(fill="x", padx=10, pady=(5, 10))
@@ -263,7 +249,7 @@ class RecordFightResultTab(ttk.Frame):
         ttk.Label(outcome_row, text="Winner:").pack(side="left", padx=(0, 2))
         self.winner_var = tk.StringVar()
         self.winner_combo = ttk.Combobox(outcome_row, textvariable=self.winner_var,
-                                         state="readonly", width=25)
+                                         state="readonly", width=40)
         self.winner_combo.pack(side="left", padx=(0, 15))
 
         ttk.Label(outcome_row, text="Method:").pack(side="left", padx=(0, 2))
@@ -321,11 +307,11 @@ class RecordFightResultTab(ttk.Frame):
 
         return vars_out
 
+    """
     # ---------- Lifecycle ----------
-
     def on_tab_shown(self):
         self.refresh_reference_data()
-
+    
     def refresh_reference_data(self):
         self._gym_options = [(None, "FREE AGENT")] + [(g["id"], g["name"]) for g in self.api.get_gyms()]
         labels = [label for _gid, label in self._gym_options]
@@ -335,7 +321,6 @@ class RecordFightResultTab(ttk.Frame):
             self.red_gym_var.set("FREE AGENT")
         if not self.blue_gym_var.get():
             self.blue_gym_var.set("FREE AGENT")
-
         self._refresh_event_list()
 
     def _selected_gym_id(self, string_var: tk.StringVar):
@@ -344,9 +329,9 @@ class RecordFightResultTab(ttk.Frame):
             if option_label == label:
                 return gym_id
         return None
+    """
 
     # ---------- Event / bout selection ----------
-
     def _refresh_event_list(self):
         try:
             ref_date = date(int(self.ref_year_var.get()), int(self.ref_month_var.get()),
@@ -504,41 +489,42 @@ class RecordFightResultTab(ttk.Frame):
         self.punch_vars = {corner: {} for corner in CORNERS}
         self.knocked_down_vars = {corner: {} for corner in CORNERS}
 
+        kd_col = len(PUNCH_STAT_ROWS) + 1  # one column after the last punch field
+
         for corner in CORNERS:
             scroll = self.punch_scrolls[corner]
             for child in scroll.inner.winfo_children():
                 child.destroy()
             inner = scroll.inner
 
-            ttk.Label(inner, text="Field", width=14).grid(row=0, column=0, padx=2, pady=2)
-            for r in range(1, rounds_fought + 1):
-                ttk.Label(inner, text=f"Round {r}", width=13, anchor="center").grid(
-                    row=0, column=r, padx=2, pady=2)
+            # Header row: "Round" label, then one column per field, then Knocked Down.
+            ttk.Label(inner, text="Round", width=10).grid(row=0, column=0, padx=2, pady=2)
+            for col_index, (field_key, field_label) in enumerate(PUNCH_STAT_ROWS, start=1):
+                ttk.Label(inner, text=field_label, width=13, anchor="center").grid(
+                    row=0, column=col_index, padx=2, pady=2)
+            ttk.Label(inner, text="Knocked Down", width=13, anchor="center").grid(
+                row=0, column=kd_col, padx=2, pady=2)
 
-            for row_index, (field_key, field_label) in enumerate(PUNCH_STAT_ROWS, start=1):
-                ttk.Label(inner, text=field_label, width=14, anchor="w").grid(
-                    row=row_index, column=0, padx=2, pady=2, sticky="w")
-                for r in range(1, rounds_fought + 1):
+            for r in range(1, rounds_fought + 1):
+                ttk.Label(inner, text=f"Round {r}", width=10, anchor="w").grid(
+                    row=r, column=0, padx=2, pady=2, sticky="w")
+
+                for col_index, (field_key, field_label) in enumerate(PUNCH_STAT_ROWS, start=1):
                     cell = ttk.Frame(inner)
-                    cell.grid(row=row_index, column=r, padx=2, pady=2)
-                    ttk.Label(cell, text="T:").pack(side="left")
-                    t_entry, t_var = _int_entry(cell, width=4)
-                    t_entry.pack(side="left")
+                    cell.grid(row=r, column=col_index, padx=2, pady=2)   
                     ttk.Label(cell, text="L:").pack(side="left", padx=(4, 0))
                     l_entry, l_var = _int_entry(cell, width=4)
                     l_entry.pack(side="left")
-                    self.punch_vars[corner].setdefault(r, {})[field_key] = {"thrown": t_var, "landed": l_var}
+                    ttk.Label(cell, text="T:").pack(side="left")
+                    t_entry, t_var = _int_entry(cell, width=4)
+                    t_entry.pack(side="left")
+                    self.punch_vars[corner].setdefault(r, {})[field_key] = {"landed": l_var, "thrown": t_var}
 
-            kd_row = len(PUNCH_STAT_ROWS) + 1
-            ttk.Label(inner, text="Knocked Down", width=14, anchor="w").grid(
-                row=kd_row, column=0, padx=2, pady=2, sticky="w")
-            for r in range(1, rounds_fought + 1):
                 entry, var = _int_entry(inner, width=4)
-                entry.grid(row=kd_row, column=r, padx=2, pady=2)
+                entry.grid(row=r, column=kd_col, padx=2, pady=2)
                 self.knocked_down_vars[corner][r] = var
 
     # ---------- Gathering ----------
-
     def _gather_stoppage(self):
         if self.end_type_var.get() != STOPPED:
             return None
@@ -602,7 +588,6 @@ class RecordFightResultTab(ttk.Frame):
         return post_fight
 
     # ---------- Save ----------
-
     def _on_save(self):
         if self.current_fight_id is None:
             messagebox.showerror("No Bout Selected", "Select a bout first.")
@@ -612,16 +597,12 @@ class RecordFightResultTab(ttk.Frame):
             return
 
         stoppage = self._gather_stoppage()
-        rounds_fought = stoppage["round"] if stoppage else self.api.get_fight_rounds(self.current_fight_id)
+        rounds_fought = stoppage["round"] if stoppage else self.api.get_fight_scheduled_rounds(self.current_fight_id)
 
         red_id = self.current_fight["red_corner_fighter_id"]
         blue_id = self.current_fight["blue_corner_fighter_id"]
 
-        result = {
-            "gyms": {
-                "red_corner": self._selected_gym_id(self.red_gym_var),
-                "blue_corner": self._selected_gym_id(self.blue_gym_var),
-            },
+        result = { 
             "rounds": self._gather_rounds(rounds_fought),
             "scorecards": self._gather_scorecards(),
             "stoppage": stoppage,

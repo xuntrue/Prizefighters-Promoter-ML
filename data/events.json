@@ -31,5 +31,71 @@
       "000013",
       "000014"
     ]
+  },
+  {
+    "event_id": 2,
+    "headliner": "Ndlovu vs Sullivan",
+    "slogan": "Battle for Supremacy",
+    "arena_id": 7,
+    "date": "20-01-1990",
+    "main_event_fight_id": "000015",
+    "co_main_fight_ids": [
+      "000016"
+    ],
+    "undercard_fight_ids": [
+      "000017",
+      "000018",
+      "000019",
+      "00001A",
+      "00001B",
+      "00001C",
+      "00001D",
+      "00001E",
+      "00001F"
+    ],
+    "preliminary_fight_ids": [
+      "000020",
+      "000021",
+      "000022",
+      "000023",
+      "000024",
+      "000025",
+      "000026",
+      "000027",
+      "000028"
+    ]
+  },
+  {
+    "event_id": 3,
+    "headliner": "Anderson vs Rodriguez",
+    "slogan": "Rise of the Warriors",
+    "arena_id": 8,
+    "date": "03-02-1990",
+    "main_event_fight_id": "000029",
+    "co_main_fight_ids": [
+      "00002A"
+    ],
+    "undercard_fight_ids": [
+      "00002B",
+      "00002C",
+      "00002D",
+      "00002E",
+      "00002F",
+      "000030",
+      "000031",
+      "000032",
+      "000033"
+    ],
+    "preliminary_fight_ids": [
+      "000034",
+      "000035",
+      "000036",
+      "000037",
+      "000038",
+      "000039",
+      "00003A",
+      "00003B",
+      "00003C"
+    ]
   }
 ]

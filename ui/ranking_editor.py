@@ -35,7 +35,7 @@ class RankingEditorFrame(ttk.Frame):
             headings = ("#", "Chg", "Fighter", "Weight", "Record", "Total Fans")
             widths = (30, 45, 150, 80, 100, 100)
 
-        self.tree = ttk.Treeview(frame, columns=columns, show="headings", height=12)
+        self.tree = ttk.Treeview(frame, columns=columns, show="headings", height=10)
         for col, heading, width in zip(columns, headings, widths):
             self.tree.heading(col, text=heading)
             anchor = "w" if col == "fighter" else "center"
@@ -58,41 +58,41 @@ class RankingEditorFrame(ttk.Frame):
     def _build_entry_controls(self):
         box = ttk.LabelFrame(self, text="Add / Update Entry")
         box.pack(fill="x", padx=5, pady=(0, 5))
+        row = 0
 
-        ttk.Label(box, text="Fighter:").grid(row=0, column=0, sticky="w", padx=5, pady=4)
+        ttk.Label(box, text="Fighter:").grid(row=row, column=0, sticky="w", padx=5, pady=4)
         self.fighter_var = tk.StringVar()
         self.fighter_combo = ttk.Combobox(box, textvariable=self.fighter_var,
                                             state="readonly", width=34)
-        self.fighter_combo.grid(row=0, column=1, sticky="w", padx=5, pady=4)
+        self.fighter_combo.grid(row=row, column=1, sticky="w", padx=5, pady=4)
+        row += 1
 
-        record_row = ttk.Frame(box).grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=4)
-
+        record_row = ttk.Frame(box)
+        record_row.grid(row=row, column=0, columnspan=2, sticky="w", padx=5, pady=4)
         self.wins_var = tk.IntVar(value=0)
         self.knockouts_var = tk.IntVar(value=0)
         self.losses_var = tk.IntVar(value=0)
         self.draws_var = tk.IntVar(value=0)
-
-        for label, var in (("W:", self.wins_var), ("KO:", self.knockouts_var),
-                            ("L:", self.losses_var), ("D:", self.draws_var)):
+        for label, var in (("W:", self.wins_var), ("KO:", self.knockouts_var), ("L:", self.losses_var), ("D:", self.draws_var)):
             ttk.Label(record_row, text=label).pack(side="left", padx=(10, 2))
-            ttk.Spinbox(record_row, from_=0, to=999, textvariable=var,
-                        width=5).pack(side="left")
+            ttk.Spinbox(record_row, from_=0, to=999, textvariable=var, width=5).pack(side="left")
+        row += 1
 
         if self.mode == MODE_RANKING:
             self.title_var = tk.BooleanVar(value=False)
-            ttk.Checkbutton(box, text="Holds a title in this division",
-                            variable=self.title_var).grid(
-                row=2, column=0, columnspan=2, sticky="w", padx=5, pady=4)
+            ttk.Checkbutton(box, text="Holds a title in this division", variable=self.title_var).grid(
+                row=row, column=0, columnspan=2, sticky="w", padx=5, pady=4
+            )
         else:
             fans_row = ttk.Frame(box)
-            fans_row.grid(row=2, column=0, columnspan=2, sticky="w", padx=5, pady=4)
+            fans_row.grid(row=row, column=0, columnspan=2, sticky="w", padx=5, pady=4)
             ttk.Label(fans_row, text="Total Fans:").pack(side="left", padx=(0, 5))
             self.total_fans_var = tk.IntVar(value=0)
-            ttk.Spinbox(fans_row, from_=0, to=100_000_000,
-                        textvariable=self.total_fans_var, width=12).pack(side="left")
+            ttk.Spinbox(fans_row, from_=0, to=100_000_000, textvariable=self.total_fans_var, width=12).pack(side="left")
+        row += 1
 
         button_row = ttk.Frame(box)
-        button_row.grid(row=3, column=0, columnspan=2, sticky="w", padx=5, pady=(8, 5))
+        button_row.grid(row=row, column=0, columnspan=2, sticky="w", padx=5, pady=(8, 5))
         ttk.Button(button_row, text="Add to Bottom", command=self._add_entry).pack(side="left", padx=(0, 5))
         ttk.Button(button_row, text="Update Selected", command=self._update_selected).pack(side="left", padx=5)
         ttk.Button(button_row, text="Fill Record From File", command=self._fill_record_from_file).pack(side="left", padx=5)
@@ -193,7 +193,7 @@ class RankingEditorFrame(ttk.Frame):
 
         for index, entry in enumerate(self.entries):
             rank = index + 1
-            record = f'{entry["wins"]}({entry["knockouts"]})-{entry["losses"]}-{entry["draws"]}'
+            record = f'{entry["wins"]}-{entry["losses"]}-{entry["draws"]} ({entry["knockouts"]} KO)'
             fighter_label = self._label_for_fighter(entry["fighter_id"])
             weight_label = self._weight_label_for_entry(entry)
             delta_label = self._delta_label(entry["fighter_id"], rank)

@@ -211,16 +211,16 @@ def top_ko_artists(conn: sqlite3.Connection, min_wins: int = 5, limit: int = 10)
 
 
 def undefeated_fighters(conn: sqlite3.Connection) -> list:
-    """Fighters with at least one win and never a loss or a draw."""
+    """Fighters with at least one win and never a loss"""
     cursor = conn.execute(
         """
         SELECT f.FirstName || ' ' || f.LastName AS FighterName,
                COALESCE(c.CountryName, 'Unknown (' || f.Country || ')') AS CountryLabel,
-               r.Wins, r.Knockouts
+               r.Wins, r.Draws, r.Knockouts
         FROM fighters AS f
         JOIN records AS r ON r.FighterID = f.FighterID
         LEFT JOIN countries AS c ON c.A2 = f.Country
-        WHERE r.Wins > 0 AND r.Losses = 0 AND r.Draws = 0
+        WHERE r.Wins > 0 AND r.Losses = 0
         ORDER BY r.Wins DESC
         """
     )
@@ -351,8 +351,8 @@ def main():
     print()
     undefeated = undefeated_fighters(conn)
     print(f"Undefeated fighters: {len(undefeated)}")
-    for name, country, wins, kos in undefeated:
-        print(f"  {name:<25}{country:<25}{wins}-0-0 ({kos} KO)")
+    for name, country, wins, draws, kos in undefeated:
+        print(f"  {name:<25}{country:<25}{wins}-0-{draws} ({kos} KO)")
 
     print()
     with_nick, total_fighters = nickname_coverage(conn)
