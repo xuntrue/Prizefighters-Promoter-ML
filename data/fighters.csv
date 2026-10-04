@@ -46,7 +46,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 45,Robert,Hayes,The Bulldog,Middle,Boston,US,06-03-1953,154,64,1,4
 46,Zachary,Sanders,,None,Brooklyn,US,27-02-1955,155,65,0,1
 47,Malcolm,Anderson,,None,Washington,US,19-07-1961,150,66,0,1
-48,Dominic,Matei,,None,Brasov,RO,30-03-1958,148,69,0,2
+48,Dominic,Matei,,None,Brasov,RO,30-03-1958,147,69,0,2
 49,Patrick,Monga,,None,Kinshasa,CG,03-02-1959,148,66,0,1
 50,Masao,Ito,Yoshi,Suffix,Sapporo,JP,10-06-1964,148,69,0,2
 51,Viktor,Pavlov,,None,Chelyabinsk,RU,09-06-1966,154,69,0,4
@@ -83,7 +83,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 82,Alisher,Ibraimov,,None,Namangan,UZ,13-11-1950,135,68,0,1
 83,Dragan,Tomic,,None,Belgrade,RS,22-01-1950,128,63,0,1
 84,Kevin Alejandro,Jiménez,,None,Guadalajara,MX,18-04-1967,131,72,0,4
-85,Leonardo,Navarro,,None,Puebla,MX,09-09-1951,127,73,0,2
+85,Leonardo,Navarro,,None,Puebla,MX,09-09-1951,126,73,0,2
 86,Ramon,Gonzalez,,None,Guantanamo,CU,09-12-1953,132,66,0,3
 87,Simon,Dupont,,None,Liege,BE,10-06-1951,134,67,0,3
 88,Jorge,Álvarez,,None,Cienfuegos,CU,03-04-1961,127,63,0,4
@@ -134,7 +134,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 133,Julius,Kinnunen,,None,Turku,FI,20-09-1969,115,67,0,3
 134,Max,Jones,,None,Tauranga,NZ,13-03-1971,117,72,0,4
 135,Miguel,Villanueva,,None,Cebu City,PH,13-12-1971,117,70,1,4
-136,Sebastian,Reyes,,None,Baguio City,PH,21-01-1972,113,71,1,2
+136,Sebastian,Reyes,,None,Baguio City,PH,21-01-1972,112,71,1,2
 137,Ramon,Dela Cruz,,None,Iloilo City,PH,12-11-1967,118,68,0,4
 138,San,Ahn,,None,Gwangju,KR,29-03-1969,115,68,0,1
 139,Miguel,Vazquez,,None,San Juan,PR,04-03-1971,114,68,0,3

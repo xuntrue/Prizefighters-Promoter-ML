@@ -97,5 +97,38 @@
       "00003B",
       "00003C"
     ]
+  },
+  {
+    "event_id": 4,
+    "headliner": "Parker vs Weber",
+    "slogan": "Honour and Glory",
+    "arena_id": 4,
+    "date": "10-02-1990",
+    "main_event_fight_id": "00003E",
+    "co_main_fight_ids": [
+      "00003F"
+    ],
+    "undercard_fight_ids": [
+      "000040",
+      "000041",
+      "000042",
+      "000043",
+      "000044",
+      "000045",
+      "000046",
+      "000047",
+      "000048"
+    ],
+    "preliminary_fight_ids": [
+      "000049",
+      "00004A",
+      "00004B",
+      "00004C",
+      "00004D",
+      "00004E",
+      "00004F",
+      "000050",
+      "00003D"
+    ]
   }
 ]
