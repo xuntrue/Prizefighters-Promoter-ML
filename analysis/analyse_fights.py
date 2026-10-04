@@ -1,27 +1,49 @@
+"""
+analyse_fights.py
+
+Prints several counts and distributions drawn from fights.csv, plus the
+outcome-method distribution (UD, MD, SD, KO, TKO) pulled from each
+Complete fight's own JSON file.
+
+Everything here is done with real SQL against an in-memory SQLite
+database rather than pandas or plain Python loops over the CSV --
+the point of this script is SQL practice, not just getting the numbers
+out. Each count/distribution is its own function, taking an open
+connection and returning data (not printing it) -- main() is the only
+thing that prints, so these are easy to reuse or unit test later.
+
+Run from anywhere:
+    python analysis/analyse_fights.py
+"""
+
 import csv
 import json
 import os
 import sqlite3
 import sys
-
 from collections import Counter
 from itertools import combinations_with_replacement
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, PROJECT_ROOT)
+sys.path.insert(0, PROJECT_ROOT)  # so `from api...` works when run directly
 
-from api.Fights import STATUS_COMPLETE
-from api.Fighter import INT_TO_STANCE, INT_TO_STYLE, STYLE_TO_INT
+from api.Fights import STATUS_COMPLETE  # noqa: E402
+from api.Fighter import INT_TO_STANCE, INT_TO_STYLE, STYLE_TO_INT  # noqa: E402
 
 FIGHTS_CSV = os.path.join(PROJECT_ROOT, "data", "fights.csv")
 FIGHTS_DIR = os.path.join(PROJECT_ROOT, "data", "fights")
 WEIGHTS_CSV = os.path.join(PROJECT_ROOT, "data", "weights.csv")
 FIGHTERS_CSV = os.path.join(PROJECT_ROOT, "data", "fighters.csv")
 
+# The order the outcome-method report is printed in, regardless of how
+# many of each method actually occurred.
 METHOD_ORDER = ["UD", "MD", "SD", "KO", "TKO"]
 
+
+# ============================= Loading =============================
+
 def load_fights_into_sqlite(conn: sqlite3.Connection) -> None:
-    """ CREATE TABLE + INSERT fights.csv into an in-memory SQL table """
+    """CREATE TABLE + INSERT fights.csv into an in-memory SQL table."""
     conn.execute(
         """
         CREATE TABLE fights (
@@ -53,7 +75,10 @@ def load_fights_into_sqlite(conn: sqlite3.Connection) -> None:
     conn.executemany("INSERT INTO fights VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
     conn.commit()
 
+
 def load_weight_classes_into_sqlite(conn: sqlite3.Connection) -> None:
+    """A second table, loaded so the weight-class histogram can JOIN
+    against it and print division names instead of bare weight limits."""
     conn.execute(
         """
         CREATE TABLE weight_classes (
@@ -62,13 +87,21 @@ def load_weight_classes_into_sqlite(conn: sqlite3.Connection) -> None:
         )
         """
     )
+
     with open(WEIGHTS_CSV, newline="", encoding="utf-8") as f:
         rows = [(int(row["weight_limit"]), row["weight_class"]) for row in csv.DictReader(f)]
+
     conn.executemany("INSERT INTO weight_classes VALUES (?, ?)", rows)
     conn.commit()
 
 
 def load_fighters_into_sqlite(conn: sqlite3.Connection) -> None:
+    """A third table. Started out ID + name only for last_fight_per_fighter();
+    now also carries Reach/Stance/Style, since the matchup distributions
+    below need to compare each corner's fighter attributes directly. It
+    has to start from EVERY fighter in fighters.csv, not just the ones
+    who show up in fights.csv, so a fighter who's never been scheduled
+    for anything still gets a row."""
     conn.execute(
         """
         CREATE TABLE fighters (
@@ -77,6 +110,7 @@ def load_fighters_into_sqlite(conn: sqlite3.Connection) -> None:
         )
         """
     )
+
     with open(FIGHTERS_CSV, newline="", encoding="utf-8") as f:
         rows = [
             (
@@ -85,8 +119,10 @@ def load_fighters_into_sqlite(conn: sqlite3.Connection) -> None:
             )
             for row in csv.DictReader(f)
         ]
+
     conn.executemany("INSERT INTO fighters VALUES (?, ?, ?, ?, ?, ?)", rows)
     conn.commit()
+
 
 def build_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
@@ -95,9 +131,13 @@ def build_connection() -> sqlite3.Connection:
     load_fighters_into_sqlite(conn)
     return conn
 
+
+# ======================= Queries: one per count =======================
+
 def count_completed_fights(conn: sqlite3.Connection) -> int:
     cursor = conn.execute("SELECT COUNT(*) FROM fights WHERE Status = ?", (STATUS_COMPLETE,))
     return cursor.fetchone()[0]
+
 
 def count_completed_title_fights(conn: sqlite3.Connection) -> int:
     cursor = conn.execute(
@@ -322,6 +362,8 @@ def _all_matchup_keys(canonical_order: list) -> list:
 
 STANCE_ORDER = [INT_TO_STANCE[0], INT_TO_STANCE[1]]  # ["Orthodox", "Southpaw"]
 STYLE_ORDER = [INT_TO_STYLE[i] for i in range(1, len(STYLE_TO_INT) + 1)]  # canonical 1..4 order
+GYM_ORDER = ["Gym", "Free Agent"]
+
 
 def stance_matchup_distribution(conn: sqlite3.Connection) -> dict:
     """Every completed fight's stance pairing (Orthodox/Southpaw, a
@@ -369,11 +411,7 @@ def style_matchup_distribution(conn: sqlite3.Connection) -> dict:
     return counts
 
 def corner_win_distribution(conn: sqlite3.Connection) -> dict:
-    """Red corner wins vs. Blue corner wins vs. Draws. Needs each
-    fight's JSON for outcome.winner_id (not in fights.csv), compared
-    against fights.csv's own corner assignments to know which corner
-    that winner was actually sitting in -- winner_id is a FighterID, not
-    a corner label."""
+    """ Red corner wins vs. Blue corner wins vs. Draws """
     counts = {"Red corner win": 0, "Blue corner win": 0, "Draw": 0}
     cursor = conn.execute(
         "SELECT FightID, RedCornerFighterID, BlueCornerFighterID FROM fights WHERE Status = ?",
@@ -393,28 +431,12 @@ def corner_win_distribution(conn: sqlite3.Connection) -> dict:
 
 
 # =================== Weight/reach difference histograms ===================
-
 def _bucket(value: int, bucket_size: int) -> str:
     start = (value // bucket_size) * bucket_size
     return f"{start}-{start + bucket_size - 1}"
 
-
 def weight_difference_histogram(conn: sqlite3.Connection, bucket_size: int = 1) -> list:
-    """
-    Distribution of |red weigh-in - blue weigh-in|, in pounds.
-
-    Both fighters in a fight are always registered to the SAME division
-    (enforced at scheduling time), so this is never a difference in
-    weight CLASS -- it's the actual weigh-in each fighter posted on the
-    day, which is free to vary within the division's own allowed range.
-    That value lives in each fight's pre-fight meta (profile.weigh_in),
-    not fighters.csv (which has no weigh-in column) or fights.csv
-    (which only records the division, not a specific weight) -- so this
-    one needs each fight's JSON, unlike reach_difference_histogram below.
-
-    Bucketed in Python rather than SQL, since the values themselves only
-    exist after parsing JSON -- there's no SQL table to GROUP BY here.
-    """
+    """ Distribution of |red weigh-in - blue weigh-in|, in pounds"""
     bucket_size = int(bucket_size)
     if bucket_size <= 0:
         raise ValueError(f"bucket_size must be a positive integer, got {bucket_size}")
@@ -431,16 +453,23 @@ def weight_difference_histogram(conn: sqlite3.Connection, bucket_size: int = 1) 
     return sorted(counts.items(), key=lambda row: int(row[0].split("-")[0]))
 
 
+def rounds_distribution(conn: sqlite3.Connection) -> list:
+    """ Distribution of sanctioned rounds across completed fights """
+    counts = Counter()
+    for fight_id in get_completed_fight_ids(conn):
+        full = load_fight_json(fight_id)
+        if full is None:
+            continue
+        rounds = full.get("rounds")
+        if rounds is None:
+            continue
+        counts[rounds] += 1
+
+    return sorted(counts.items())
+
+
 def reach_difference_histogram(conn: sqlite3.Connection, bucket_size: int = 1) -> list:
-    """
-    Distribution of |red reach - blue reach|, in inches, from
-    fighters.csv -- a fixed physical attribute, unlike weigh-in above,
-    so this one stays entirely in SQL. bucket_size is passed through a
-    real `?` placeholder (twice -- once for the division, once for the
-    multiplication) rather than interpolated into the query text, since
-    it's genuinely just a value here, not a column or direction name --
-    those are the only things `?` placeholders can't stand in for.
-    """
+    """ Distribution of |red reach - blue reach| """
     bucket_size = int(bucket_size)
     if bucket_size <= 0:
         raise ValueError(f"bucket_size must be a positive integer, got {bucket_size}")
@@ -498,9 +527,9 @@ def main():
 
     print()
     print("Last recorded fight per fighter (any status, sort='asc'):")
-    print(f"  {'FighterID':<10}{'Name':<25}{'FightID':<10}{'Date':<12}")
+    print(f"  {'FighterID':<10}{'Name':<24}{'FightID':<10}{'Date':<12}")
     for fighter_id, name, fight_id, fight_date in last_fight_per_fighter(conn, sort="asc"):
-        print(f"  {fighter_id:<10}{name:<25}{fight_id or '--':<10}{fight_date or 'No last fight':<12}")
+        print(f"  {fighter_id:<10}{name:<24}{fight_id or '--':<10}{fight_date or 'No last fight':<12}")
 
     print()
     print("Stance matchups (pure SQL, no JSON needed):")
@@ -523,6 +552,11 @@ def main():
         print(f"  {label:<10}{count:>6}")
 
     print()
+    print("Sanctioned rounds (completed fights, from each fight's JSON):")
+    for rounds, count in rounds_distribution(conn):
+        print(f"  {rounds:<3}rounds {count:>6}")
+
+    print()
     print("Reach difference (inches, from fighters.csv):")
     for label, count in reach_difference_histogram(conn):
         print(f"  {label:<10}{count:>6}")
@@ -539,7 +573,7 @@ def main():
     print("  " + "-" * 24)
     for method in METHOD_ORDER:
         count = method_counts.get(method, 0)
-        share = f"{count / total_with_method:.2%}" if total_with_method else "--"
+        share = f"{count / total_with_method:.1%}" if total_with_method else "--"
         print(f"  {method:<8}{count:>8}{share:>10}")
 
     unexpected = set(method_counts) - set(METHOD_ORDER)

@@ -183,7 +183,7 @@ class RankingEditorFrame(ttk.Frame):
             return ""
 
         delta = abs(previous_rank - current_rank)
-        return f"\u25b2{delta}" if current_rank < previous_rank else f"\u25bc{delta}"
+        return f"\u25b2{delta}   " if current_rank < previous_rank else f"   \u25bc{delta}"
 
     # ---------- Table rendering ----------
     def refresh_table(self):

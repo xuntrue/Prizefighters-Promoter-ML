@@ -366,7 +366,7 @@ def main():
             f"Invalid birthdate: "
             f"{fighter_id} - {first_name} {last_name}: {birthdate!r}"
         )
-    for bucket, count in age_bucket_histogram(conn, as_of='01-01-1990', bucket_size=2):
+    for bucket, count in age_bucket_histogram(conn, as_of='01-03-1990', bucket_size=2):
         print(f"  {bucket:<10}{count:>6}")
 
     conn.close()
