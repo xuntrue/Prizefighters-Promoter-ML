@@ -34,6 +34,15 @@ class Contracts:
             with open(self.filepath, "w", newline="", encoding="utf-8") as f:
                 writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
                 writer.writeheader()
+    
+    def _row_from_csv(self, row: dict) -> dict:
+        return {
+            "contractID": row["contractID"],
+            "gymID": row["gymID"],
+            "fighterID": row["fighterID"],
+            "startDate": row["startDate"],
+            "endDate": row["endDate"]
+        }
 
     def get_all(self) -> list:
         self._ensure_file_exists()

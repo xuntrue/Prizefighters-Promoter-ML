@@ -149,7 +149,7 @@ class GymContractsTab(ttk.Frame):
 
         # Success
         self._set_status(
-            f'Contract {contract["contractID"]} successfully saved '
+            f'Contract #{contract["contractID"]} successfully saved '
             f'for {fighter_label}.',
             error=False,
         )

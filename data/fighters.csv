@@ -1,12 +1,12 @@
 FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weight,Reach,Stance,Style
 1,Jahkai,Lannan,,None,Mackay,AU,22-12-1960,259,72,0,4
-2,Rayzal,Yap,,None,Ipoh,MY,25-11-1960,289,68,0,3
+2,Rayzal,Yap,Razor,Prefix,Ipoh,MY,25-11-1960,289,68,0,3
 3,Ken,Inoue,Sumo,Middle,Kyoto,JP,21-04-1957,299,64,0,1
 4,Karl,Wolf,The Hunter,Middle,Hamburg,DE,07-08-1968,190,70,0,2
 5,David,Mbabazi,,None,Gulu,UG,31-08-1966,275,74,0,2
 6,Savvas,Petrou,,None,Paphos,CY,18-03-1967,240,74,0,4
 7,Borna,Pavlovic,,None,Zagreb,HR,03-07-1968,194,68,0,1
-8,Charles,Solomon,,None,West Bay,KY,12-12-1970,275,72,0,4
+8,Charles,Solomon,,None,West Bay,KY,12-12-1970,272,72,0,4
 9,Lloyd,Clark,One Punch,Middle,Kingston,JM,26-03-1971,253,67,1,3
 10,Antoine,Mujinga,,None,Tshikapa,CG,04-04-1968,182,72,0,4
 11,Khanh,Phan,,None,Hue,VN,17-05-1969,258,69,0,3
@@ -26,11 +26,11 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 25,Ruslan,Volkova,,None,Nizhny Novgorod,RU,10-05-1960,168,74,0,2
 26,Khan,Aslam,,None,Gujranwala,PK,15-09-1959,171,74,0,4
 27,Gianni,Mancini,,None,Turin,IT,09-02-1954,171,64,0,1
-28,Yong,Choi,,None,Ulsan,KR,05-07-1959,165,72,0,4
+28,Yong,Choi,The Falcon,Prefix,Ulsan,KR,05-07-1959,167,72,0,4
 29,Ayoub,Amrani,,None,Kenitra,MA,21-12-1961,174,66,0,4
-30,Brandom,Sullivan,,None,Pittsburgh,US,18-09-1961,169,63,0,1
+30,Brandom,Sullivan,,None,Pittsburgh,US,18-09-1961,172,63,0,1
 31,Felix,López,,None,Santiago de Cuba,CU,13-11-1961,167,67,0,4
-32,Guy,Richard,,None,Nantes,FR,16-05-1963,173,73,0,2
+32,Guy,Richard,,None,Nantes,FR,16-05-1963,175,73,0,2
 33,Wanchi,Li,,None,Lampang,TH,29-03-1965,175,74,0,4
 34,Cha,Park,,None,Goyang,KR,27-11-1965,167,72,1,2
 35,Rudolph,Koch,Marvel,Middle,Munich,DE,15-08-1966,161,67,0,1
@@ -38,8 +38,8 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 37,Diego,Moreira,,None,Uruguay,UY,28-08-1969,166,65,0,1
 38,Branko,Novak,,None,Trbovlje,SI,04-10-1969,160,68,1,3
 39,Ernest,Navickiene,,None,Mazeikiai,LT,10-09-1971,164,63,0,1
-40,Sok,Leng,,None,Phnom Penh,KH,02-06-1968,161,74,0,4
-41,George,Wilson,,None,Napier,NZ,09-01-1952,153,68,0,3
+40,Sok,Leng,,None,Phnom Penh,KH,02-06-1968,160,74,0,4
+41,George,Wilson,Rocky,Middle,Napier,NZ,09-01-1952,155,68,0,3
 42,Matyas,Marin,,None,Cluj-Napoca,RO,28-06-1957,159,70,0,3
 43,William,Rhodes,Flash Fire,Middle,Balitmore,US,04-08-1950,150,66,0,4
 44,Samuel,Carter,,None,Newark,US,17-12-1957,153,65,0,1
@@ -48,14 +48,14 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 47,Malcolm,Anderson,,None,Washington,US,19-07-1961,150,66,0,1
 48,Dominic,Matei,,None,Brasov,RO,30-03-1958,147,69,0,2
 49,Patrick,Monga,,None,Kinshasa,CG,03-02-1959,148,66,0,1
-50,Masao,Ito,Yoshi,Suffix,Sapporo,JP,10-06-1964,148,69,0,2
+50,Masao,Ito,Yoshi,Suffix,Sapporo,JP,10-06-1964,147,69,0,2
 51,Viktor,Pavlov,,None,Chelyabinsk,RU,09-06-1966,154,69,0,4
 52,Joon,Kwon,,None,Daegu,KR,21-05-1966,154,69,0,3
 53,Daniel,Ramirez,,None,San Cristobal,DO,23-07-1968,159,69,0,3
 54,Arin,Park,,None,Suwon,KR,13-12-1970,156,68,0,3
 55,Balint,Nemeth,,None,Pecs,HU,11-08-1970,156,70,0,2
 56,Kaito,Yamaguchi,,None,Sapporo,JP,07-05-1968,156,67,0,1
-57,Russell,Smith,,None,New York City,US,13-10-1970,149,67,0,1
+57,Russell,Smith,,None,New York City,US,13-10-1970,147,67,0,1
 58,Adam,Jones,,None,Leicester,UK,11-08-1967,151,64,1,1
 59,Alejandro,Reyes,,None,Mexico City,MX,28-12-1967,152,70,0,3
 60,Miguel,Garcia,,None,Guantanamo,CU,11-10-1971,158,72,1,2
@@ -75,11 +75,11 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 74,Victor,Shaw,,None,Birmingham,UK,13-11-1967,137,63,1,4
 75,Jiraiya,Hayashi,,None,Kobe,JP,22-10-1969,140,68,0,1
 76,Hector,Garcia,,None,Caracas,VE,15-12-1970,139,65,0,1
-77,Kyle,Sullivan,,None,Edinburgh,UK,17-11-1971,141,63,1,1
+77,Kyle,Sullivan,,None,Edinburgh,UK,17-11-1971,140,63,1,1
 78,Jonas,Johansson,,None,Uppsala,SE,09-12-1967,139,70,1,3
-79,Kieran,Thmpson,,None,Belfast,UK,06-01-1971,138,67,0,3
+79,Kieran,Thompson,,None,Belfast,UK,06-01-1971,138,67,0,3
 80,Samuel,Brooks,Iron Hands,Middle,Newark,US,20-01-1970,143,67,0,1
-81,Zhen Xiong,Hong,,None,Taipei,TW,27-09-1951,135,70,1,2
+81,Zhen Xiong,Hong,The Dragon,Prefix,Taipei,TW,27-09-1951,135,70,1,2
 82,Alisher,Ibraimov,,None,Namangan,UZ,13-11-1950,135,68,0,1
 83,Dragan,Tomic,,None,Belgrade,RS,22-01-1950,128,63,0,1
 84,Kevin Alejandro,Jiménez,,None,Guadalajara,MX,18-04-1967,131,72,0,4
@@ -94,7 +94,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 93,Teun,de Jong,,None,Rotterdam,NL,10-05-1962,132,63,0,1
 94,Adam,Solano,,None,San Vicente,CR,29-07-1960,134,70,0,4
 95,Ismail,El Masry,,None,Battir,PS,11-08-1970,130,71,0,4
-96,Salim,Hussain,,None,Hawalli,SA,28-08-1967,127,64,0,4
+96,Salim,Hussain,,None,Hawalli,SA,28-08-1967,126,64,0,4
 97,Juan,Garcia,,None,Pilar,AR,20-11-1969,128,68,0,4
 98,Pedro Flores,Ramírez,,None,Chihuahua,MX,06-11-1971,131,70,0,3
 99,José Luis,Bautista,,None,Tijuana,MX,05-11-1970,132,70,0,2
@@ -102,13 +102,13 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 101,Michael,Sanchez,,None,Trujillo Alto,PR,23-04-1954,119,68,0,3
 102,Matias,Rodriguez,,None,Antofagasta,CL,03-01-1958,124,68,1,3
 103,Wilbert,Lange,,None,Stuttgart,DE,15-04-1958,122,70,0,2
-104,Bryce,Johnston,,None,Baltimore,US,20-04-1962,124,71,1,4
+104,Bryce,Johnston,Pretty Boy,Middle,Baltimore,US,20-04-1962,125,71,1,4
 105,Edgar,Ivanovs,,None,Riga,LV,01-08-1957,124,70,1,2
 106,George,Moore,,None,Edinburgh,UK,11-11-1957,124,71,0,2
 107,Prasit,Lee,,None,Udon Thani,TH,02-11-1956,125,73,1,2
 108,Laim,Anderson,,None,Cambridge,CA,06-01-1962,126,67,0,3
 109,David,Cohen,,None,Tel Aviv,IL,14-05-1966,123,68,1,4
-110,Mohamed,Gar,,None,Erbil,IQ,06-05-1966,119,66,1,1
+110,Mohamed,Gar,,None,Erbil,IQ,06-05-1966,118,66,1,1
 111,Samuel,Sithole,,None,Giza,ZA,08-02-1967,123,73,1,2
 112,Nodir,Khasanov,,None,Kokand,UZ,21-06-1969,120,73,0,4
 113,Helgi,Gisladottir,,None,Mosfellsbaer,IS,20-03-1969,125,71,0,4
@@ -116,14 +116,14 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 115,Edgor,Pavlova,,None,Yekaterinburg,RU,07-07-1971,124,67,0,3
 116,Konstantin,Petrov,,None,Novosibirsk,RU,06-09-1971,123,69,0,4
 117,Akash,Sharma,,None,Ahmedabad,IN,14-05-1970,126,74,0,4
-118,Michel,Rakoto,,None,Mahajanga,MG,06-05-1967,119,70,0,2
+118,Michel,Rakoto,,None,Mahajanga,MG,06-05-1967,118,70,0,2
 119,Mason,Jones,,None,Vancouver,CA,25-03-1968,123,63,0,1
 120,Samuel,Williams,,None,Coopers Town,BS,24-12-1968,124,69,0,4
 121,Kannon,Suzuki,,None,Nagoya,JP,16-03-1954,118,71,0,3
 122,Kien,Anh,,None,Qui Nhon,VN,15-08-1951,117,65,1,4
 123,Aryan,Devi,,None,Pune,IN,03-04-1956,114,63,0,4
 124,Sajjad,Karim,,None,Kirkuk,IQ,24-07-1952,116,65,0,4
-125,Michal,Vargova,,None,Banska Bystrica,SK,26-09-1959,117,68,0,4
+125,Michal,Vargova,Sweet Pea,Middle,Banska Bystrica,SK,26-09-1959,118,68,0,4
 126,Rafael,Espinosa,,None,General Santos City,PH,07-04-1961,115,64,0,4
 127,Mohammed,Hassan,,None,Bayda,LY,09-08-1957,117,70,0,4
 128,Nathaniel,Santos,,None,Manila,PH,01-10-1957,116,64,0,1
@@ -149,7 +149,7 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 148,Brian,Martinez,Pocket Rocket,Middle,Los Angeles,US,25-03-1970,110,67,1,1
 149,Evhenyi,Kovalchuk,,None,Odessa,UA,12-02-1961,112,69,0,2
 150,Dawon,Kim,,None,Seoul,KR,09-10-1963,106,73,0,4
-151,Yordan,Hristov,,None,Varna,BG,18-01-1960,112,66,0,3
+151,Yordan,Hristov,King of the Hill,Middle,Varna,BG,18-01-1960,112,66,0,3
 152,Radouane,Hansen,,None,Bertrange,LU,08-02-1961,109,68,1,4
 153,Armando,Garcia,,None,Havana,CU,12-02-1962,107,66,0,1
 154,Lucas,Gagnon,,None,Hamilton,CA,16-11-1971,110,70,0,4
@@ -157,5 +157,9 @@ FighterID,FirstName,LastName,Nickname,Placement,Hometown,Country,Birthdate,Weigh
 156,Benjamin,Davis,,None,Atlanta,US,11-11-1965,109,74,1,2
 157,Brandon,Cruz,,None,San Diego,US,19-04-1953,108,71,0,3
 158,Sokha,Cheng,,None,Kampong Saom,KH,12-02-1962,111,71,1,4
-159,Mustafa,Aydin,,None,Antalya,TR,06-11-1968,102,65,1,1
+159,Mustafa,Aydin,,None,Antalya,TR,06-11-1968,105,65,1,1
 160,Ali,Ali,,None,Baghdad,IQ,01-01-1966,112,66,0,3
+161,Alikhan,Sadykov,,None,Taraz,KZ,10-07-1969,166,69,0,3
+162,Yahir Manuel,Juaréz,,None,Chihuahua,MX,02-04-1971,164,68,0,3
+163,Mateo Andrés,Beltrán,,None,Puebla,MX,24-12-1971,122,70,1,4
+164,Reo,Takahashi,,None,Kawasaki,JP,27-12-1967,128,71,1,3

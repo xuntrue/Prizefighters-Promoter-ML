@@ -130,5 +130,38 @@
       "000050",
       "00003D"
     ]
+  },
+  {
+    "event_id": 5,
+    "headliner": "Rhodes vs Wilson",
+    "slogan": "Night of the Champions",
+    "arena_id": 9,
+    "date": "12-05-1990",
+    "main_event_fight_id": "000051",
+    "co_main_fight_ids": [
+      "000052"
+    ],
+    "undercard_fight_ids": [
+      "000053",
+      "000054",
+      "000055",
+      "000056",
+      "000057",
+      "000058",
+      "000059",
+      "00005A",
+      "00005B",
+      "00005C"
+    ],
+    "preliminary_fight_ids": [
+      "00005D",
+      "00005E",
+      "00005F",
+      "000060",
+      "000061",
+      "000062",
+      "000063",
+      "000064"
+    ]
   }
 ]

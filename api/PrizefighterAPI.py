@@ -254,26 +254,23 @@ class PrizefighterAPI:
         self.events.delete(event_id)
 
     # ---- Pre-fight metadata ----
-
-    CORNERS = ("red_corner", "blue_corner")
-
     def _corner_fighter_id(self, fight: dict, corner: str) -> int:
-        if corner not in self.CORNERS:
-            raise FightError(f"corner must be one of {self.CORNERS}.")
+        if corner not in CORNERS:
+            raise FightError(f"corner must be one of {CORNERS}.")
         return fight["red_corner_fighter_id"] if corner == "red_corner" else fight["blue_corner_fighter_id"]
 
     def get_default_meta_for_fighter(self, fight_id: str, corner: str) -> dict:
-        """ 
-        Build a starting point for the pre-fight meta form ("_load_default")
-        attributes/skills/tendencies/career_stats
-        are carried forward from the fighter's most recently recorded meta
+        """
+        Build a starting point for the pre-fight meta form
+        Carry forward attributes/skills/tendencies/career_stats
+        from the fighter's most recently recorded fight
         """
         fight = self.fights.get_by_id(fight_id)
         if fight is None:
             raise FightError(f"No fight found with FightID {fight_id}.")
-
         fighter_id = self._corner_fighter_id(fight, corner)
 
+        # Search for last recorded bout
         base = None
         other_fights = sorted(
             (f for f in self.fights.get_by_fighter(fighter_id) if f["fight_id"] != fight_id),
@@ -289,19 +286,11 @@ class PrizefighterAPI:
             )
             prior_meta = (full.get("meta") or {}).get(candidate_corner)
             if prior_meta:
-                base = copy.deepcopy(prior_meta)
+                base = self.fights.get_updated_fight_meta(candidate["fight_id"], candidate_corner)
                 break
-
-        if base is None:
+        #print(f'Computed base (isNone={base is None}): \n{base}')
+        if base is None: # If not found, we generate blank
             base = blank_meta_section(fight["weight_limit"])
-
-        current_record = self.records.get_by_fighter_id(fighter_id)
-        base["profile"]["record"] = (
-            {k: current_record[k] for k in ("wins", "knockouts", "losses", "draws")}
-            if current_record else {"wins": 0, "knockouts": 0, "losses": 0, "draws": 0}
-        )
-        base["profile"]["weigh_in"] = self.get_fighter(fighter_id)["weight"]
-
         return base
 
     def save_fight_meta(self, fight_id: str, corner: str, meta: dict) -> None:
@@ -328,7 +317,7 @@ class PrizefighterAPI:
         self.records.update(fighter_id, record["wins"], record["knockouts"],
                             record["losses"], record["draws"])
 
-        if all(c in meta_obj for c in self.CORNERS):
+        if all(c in meta_obj for c in CORNERS):
             self.fights.update_status(fight_id, STATUS_META)
 
     # ---- Gyms ----
@@ -383,7 +372,7 @@ class PrizefighterAPI:
             )
 
         gyms = result.get("gyms", {})
-        for corner in self.CORNERS:
+        for corner in CORNERS:
             gym_id = gyms.get(corner)
             if gym_id is not None and not self.gyms.exists(gym_id):
                 raise GymError(f"No gym found with id {gym_id} ({corner}).")

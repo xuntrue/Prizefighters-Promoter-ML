@@ -166,7 +166,7 @@ class DivisionRankingsSection(ttk.Frame):
         self.editor.load_entries([
             {
                 k: row[k]
-                for k in ("fighter_id", "wins", "knockouts", "losses", "draws", "title", "fighter_weight")
+                for k in ("fighter_id", "wins", "knockouts", "losses", "draws", "title")
             }
             for row in snapshot
         ])

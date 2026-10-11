@@ -1,26 +1,9 @@
-"""
-analyse_fights.py
-
-Prints several counts and distributions drawn from fights.csv, plus the
-outcome-method distribution (UD, MD, SD, KO, TKO) pulled from each
-Complete fight's own JSON file.
-
-Everything here is done with real SQL against an in-memory SQLite
-database rather than pandas or plain Python loops over the CSV --
-the point of this script is SQL practice, not just getting the numbers
-out. Each count/distribution is its own function, taking an open
-connection and returning data (not printing it) -- main() is the only
-thing that prints, so these are easy to reuse or unit test later.
-
-Run from anywhere:
-    python analysis/analyse_fights.py
-"""
-
 import csv
 import json
 import os
 import sqlite3
 import sys
+
 from collections import Counter
 from itertools import combinations_with_replacement
 
@@ -35,13 +18,11 @@ FIGHTS_DIR = os.path.join(PROJECT_ROOT, "data", "fights")
 WEIGHTS_CSV = os.path.join(PROJECT_ROOT, "data", "weights.csv")
 FIGHTERS_CSV = os.path.join(PROJECT_ROOT, "data", "fighters.csv")
 
-# The order the outcome-method report is printed in, regardless of how
-# many of each method actually occurred.
+# The order the outcome-method report is printed in, regardless of how many of each method actually occurred
 METHOD_ORDER = ["UD", "MD", "SD", "KO", "TKO"]
 
 
 # ============================= Loading =============================
-
 def load_fights_into_sqlite(conn: sqlite3.Connection) -> None:
     """CREATE TABLE + INSERT fights.csv into an in-memory SQL table."""
     conn.execute(

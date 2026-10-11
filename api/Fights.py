@@ -15,6 +15,7 @@ CSV_FIELDNAMES = [
     "FightID", "RedCornerFighterID", "BlueCornerFighterID",
     "WeightClass", "Date", "Championship", "Status",
 ]
+CORNERS = ("red_corner", "blue_corner")
 
 DATE_FORMAT = "%d-%m-%Y"
 
@@ -36,7 +37,6 @@ class FightError(Exception):
 
 class Fights:
     """CRUD for the fights.csv index + fights/<FightID>.json detail files."""
-
     def __init__(self, csv_path: str = FIGHTS_CSV, json_dir: str = FIGHTS_DIR,
                  fighter_api: Fighter = None):
         self.csv_path = csv_path
@@ -150,6 +150,88 @@ class Fights:
         with open(self._json_path(fight_id), "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
+    def get_updated_fight_meta(self, fight_id: str, corner: str) -> dict:
+        """ Get the updated fight meta for a specific fighter given (fight_id, corner) """
+        fighter_id = self.get_full(fight_id).get("red_corner_fighter_id", {}) if (corner == "red_corner") else self.get_full(fight_id).get("blue_corner_fighter_id", {})
+        prior_meta = self.get_full(fight_id).get("meta", {})
+        prior_result = self.get_full(fight_id).get("result", {})
+        base = prior_meta.get(corner, {})
+
+        # Augment "profile" section
+        base["profile"]["record"] = prior_result.get("post_fight",{}).get(corner, {}).get(
+            "new_record", {"wins": 0, "knockouts": 0, "losses": 0, "draws": 0}
+        )
+        base["profile"]["weigh_in"] = self.fighter_api.get_by_id(fighter_id)["weight"] # Fetch latest weight from fighters.csv
+
+        # Augment "career_stats" section
+        base["career_stats"] = self.get_career_stats(base["career_stats"], prior_result, corner)
+
+        # Augment "skills" section
+        base["skills"]["experience"]["xp"] += prior_result.get("post_fight", {}).get(corner, {}).get("xp_gained", {})
+
+        # Augment "tendencies" section
+        tendency_changes = prior_result.get("post_fight", {}).get(corner, {}).get("tendency_changes", {})
+        base["tendencies"] = {
+            key: base["tendencies"].get(key, 0) + tendency_changes.get(key, 0)
+            for key in set(base["tendencies"]) | set(tendency_changes)
+        }
+
+        return base
+
+    def get_career_stats(self, base_stats: dict, prior_result: dict, corner: str) -> dict:
+        """ Implementation for getting career stats """
+        career_stats = {
+            "punches_thrown": base_stats.get("punches_thrown", 0) + self._calculate_punches_thrown(prior_result, corner),
+            "punches_landed": base_stats.get("punches_landed", 0) + self._calculate_punches_landed(prior_result, corner),
+            "punches_taken": base_stats.get("punches_taken", 0) + self._calculate_punches_taken(prior_result, corner),
+            "knockdowns": base_stats.get("knockdowns", 0) + self._calculate_knockdowns(prior_result, corner),
+            "times_knocked_down": base_stats.get("times_knocked_down", 0) + self._calculate_times_knockeddown(prior_result, corner),
+            "titles_won": base_stats.get("titles_won", 0),
+            "titles_defended": base_stats.get("titles_defended", 0),
+            "total_fans": prior_result.get("post_fight", {}).get(corner, {}).get("total_fans", 0),
+        }
+        return career_stats
+
+    def _calculate_punches_thrown(self, results: dict, corner: str) -> int:
+        """ Calculate punches thrown for a single corner based on results """
+        punches_thrown = 0
+        for round_data in results["rounds"][corner]:
+            punches_thrown += round_data["punches"]["head"]["thrown"]
+            punches_thrown += round_data["punches"]["body"]["thrown"]
+        return punches_thrown
+
+    def _calculate_punches_landed(self, results: dict, corner: str) -> int:
+        """ Calculate punches landed for a single corner based on results """
+        punches_landed = 0
+        for round_data in results["rounds"][corner]:
+            punches_landed += round_data["punches"]["head"]["landed"]
+            punches_landed += round_data["punches"]["body"]["landed"]
+        return punches_landed
+
+    def _calculate_punches_taken(self, results: dict, corner: str) -> int:
+        """ Calculate punches taken for a single corner based on results """
+        punches_taken = 0
+        opposite_corner = "red_corner" if corner == "blue_corner" else "blue_corner"
+        for round_data in results["rounds"][opposite_corner]:
+            punches_taken += round_data["punches"]["head"]["landed"]
+            punches_taken += round_data["punches"]["body"]["landed"]
+        return punches_taken
+
+    def _calculate_knockdowns(self, results: dict, corner: str) -> int:
+        """ Calculate knockdowns for a single corner based on results """
+        knockdowns = 0
+        opposite_corner = "red_corner" if corner == "blue_corner" else "blue_corner"
+        for round_data in results["rounds"][opposite_corner]:
+            knockdowns += round_data["knocked_down"]
+        return knockdowns
+
+    def _calculate_times_knockeddown(self, results: dict, corner: str) -> int:
+        """ Calculate times knocked down for a single corner based on results """
+        knockdowns = 0
+        for round_data in results["rounds"][corner]:
+            knockdowns += round_data["knocked_down"]
+        return knockdowns
+
     # ================= Validation =================
     def _validate_new_fight(self, date_str, weight_limit, red_corner_fighter_id,
                              blue_corner_fighter_id, rounds, round_minutes, championship):
@@ -187,8 +269,7 @@ class Fights:
     def schedule(self, date: str, weight_limit: int, red_corner_fighter_id: int,
                  blue_corner_fighter_id: int, rounds: int, round_minutes: int,
                  championship: bool = False) -> dict:
-        """Create a new fight: writes the fights.csv row AND the full
-        fights/<FightID>.json detail file."""
+        """Create a new fight: writes the fights.csv row AND the full fights/<FightID>.json detail file """
         self._validate_new_fight(
             date, weight_limit, red_corner_fighter_id, blue_corner_fighter_id,
             rounds, round_minutes, championship,
@@ -259,12 +340,7 @@ class Fights:
         self._save_full(fight_id, full)
 
     def save_meta(self, fight_id: str, meta: dict) -> None:
-        """Overwrite the full meta object (both corners) for one fight.
-        Used by PrizefighterAPI.save_fight_meta(), which builds the
-        merged {red_corner, blue_corner} dict one corner at a time --
-        this module doesn't know anything about the meta schema itself
-        (that lives in Fighter.py), it just stores whatever dict it's
-        handed under "meta"."""
+        """ OVERWRITE the full meta object (both corners) for one fight """
         full = self.get_full(fight_id)
         if full is None:
             raise FightError(f"No fight found with FightID {fight_id}.")
@@ -272,10 +348,7 @@ class Fights:
         self._save_full(fight_id, full)
 
     def save_result(self, fight_id: str, result: dict) -> None:
-        """Overwrite the full result object for one fight. Used by
-        PrizefighterAPI.save_fight_result() after validate_result() (below)
-        has cleaned the data; this method itself doesn't validate anything,
-        same division of responsibility as save_meta()."""
+        """ OVERWRITE the full result object for one fight """
         full = self.get_full(fight_id)
         if full is None:
             raise FightError(f"No fight found with FightID {fight_id}.")
@@ -291,16 +364,13 @@ class Fights:
         self.update_status(fight_id, STATUS_CANCELLED)
 
     def delete(self, fight_id: str) -> None:
-        """Permanently remove a fight -- only allowed while it's still
-        Scheduled, so an Evented/Meta/Complete fight (which other data
-        may already reference) can never be deleted out from under it."""
+        """ Permanently remove a fight -- only allowed while it's still Scheduled """
         fight = self.get_by_id(fight_id)
         if fight is None:
             raise FightError(f"No fight found with FightID {fight_id}.")
         if fight["status"] != STATUS_SCHEDULED:
             raise FightError(
-                f'Only Scheduled fights can be deleted outright (this one is {fight["status"]}) -- '
-                f"use cancel() instead."
+                f'Only Scheduled fights can be deleted outright (this one is {fight["status"]}) -- use cancel() instead.'
             )
 
         existing = self.get_all()
@@ -310,7 +380,6 @@ class Fights:
         path = self._json_path(fight_id)
         if os.path.exists(path):
             os.remove(path)
-
 
 # =====================================================================
 # Post-fight result schema

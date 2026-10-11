@@ -101,6 +101,21 @@ def fighters_by_country(conn: sqlite3.Connection) -> list:
     )
     return cursor.fetchall()
 
+def countries_without_fighters(conn: sqlite3.Connection) -> list:
+    """
+    Every country in countries.csv that has no fighters at all, as a list of (A2 code, country name) ordered alphabetically by name.
+    """
+    cursor = conn.execute(
+        """
+        SELECT c.A2, c.CountryName
+        FROM countries AS c
+        LEFT JOIN fighters AS f ON f.Country = c.A2
+        WHERE f.FighterID IS NULL
+        ORDER BY c.CountryName ASC
+        """
+    )
+    return cursor.fetchall()
+
 def weight_distribution(conn: sqlite3.Connection, bucket_size: int = 5) -> list:
     """Weight distribution in 5 lb intervals, from lightest to heaviest."""
     cursor = conn.execute(
@@ -312,6 +327,12 @@ def main():
         print(f"  {country:<25}{count:>6}")
 
     print()
+    unrepresented = countries_without_fighters(conn)
+    print(f"Countries with no fighters: {len(unrepresented)}")
+    for a2, country_name in unrepresented:
+        print(f"  {a2:<4}{country_name}")
+
+    print()
     print("Weight distribution:")
     for weight_bin, bin_upper, count in weight_distribution(conn, bucket_size=10):
         print(f"  {weight_bin}-{bin_upper-1} lbs: {count}")
@@ -366,7 +387,7 @@ def main():
             f"Invalid birthdate: "
             f"{fighter_id} - {first_name} {last_name}: {birthdate!r}"
         )
-    for bucket, count in age_bucket_histogram(conn, as_of='01-03-1990', bucket_size=2):
+    for bucket, count in age_bucket_histogram(conn, as_of='01-06-1990', bucket_size=2):
         print(f"  {bucket:<10}{count:>6}")
 
     conn.close()
