@@ -1,0 +1,129 @@
+{
+  "fight_id": "000075",
+  "red_corner_fighter_id": 162,
+  "blue_corner_fighter_id": 161,
+  "weight_limit": 175,
+  "date": "29-09-1990",
+  "championship": false,
+  "rounds": 3,
+  "round_minutes": 1,
+  "status": "Meta",
+  "event_id": 6,
+  "meta": {
+    "red_corner": {
+      "profile": {
+        "weigh_in": 164,
+        "record": {
+          "wins": 0,
+          "knockouts": 0,
+          "losses": 0,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 0,
+        "punches_landed": 0,
+        "punches_taken": 0,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 0
+      },
+      "attributes": {
+        "strength": 4.0,
+        "speed": 4.0,
+        "stamina": 1.5,
+        "endurance": 5.0,
+        "chin": 3.0,
+        "jab": 1.0,
+        "cross": 3.5,
+        "lead_hook": 1.0,
+        "rear_hook": 2.0,
+        "lead_uppercut": 2.0,
+        "rear_uppercut": 2.5
+      },
+      "skills": {
+        "experience": {
+          "level": 0,
+          "xp": 0
+        },
+        "signature_traits": {
+          "group_1": null,
+          "group_2": null,
+          "group_3": null,
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 88,
+        "single_punches_combinations": 18,
+        "speed_power": 59,
+        "inside_outside": 39,
+        "block_dodge": 4,
+        "counter_aggressive_first_half": 63,
+        "cautious_reckless_first_half": 85,
+        "counter_aggressive_second_half": 79,
+        "cautious_reckless_second_half": 55
+      }
+    },
+    "blue_corner": {
+      "profile": {
+        "weigh_in": 166,
+        "record": {
+          "wins": 0,
+          "knockouts": 0,
+          "losses": 1,
+          "draws": 0
+        }
+      },
+      "career_stats": {
+        "punches_thrown": 117,
+        "punches_landed": 54,
+        "punches_taken": 62,
+        "knockdowns": 0,
+        "times_knocked_down": 0,
+        "titles_won": 0,
+        "titles_defended": 0,
+        "total_fans": 0
+      },
+      "attributes": {
+        "strength": 3.0,
+        "speed": 5.0,
+        "stamina": 5.0,
+        "endurance": 5.0,
+        "chin": 4.5,
+        "jab": 2.0,
+        "cross": 2.0,
+        "lead_hook": 2.0,
+        "rear_hook": 2.0,
+        "lead_uppercut": 1.0,
+        "rear_uppercut": 1.5
+      },
+      "skills": {
+        "experience": {
+          "level": 0,
+          "xp": 20
+        },
+        "signature_traits": {
+          "group_1": null,
+          "group_2": null,
+          "group_3": null,
+          "group_4": null
+        }
+      },
+      "tendencies": {
+        "body_head": 71,
+        "single_punches_combinations": 43,
+        "speed_power": 75,
+        "inside_outside": 22,
+        "block_dodge": 21,
+        "counter_aggressive_first_half": 62,
+        "cautious_reckless_first_half": 3,
+        "counter_aggressive_second_half": 70,
+        "cautious_reckless_second_half": 0
+      }
+    }
+  },
+  "result": {}
+}
