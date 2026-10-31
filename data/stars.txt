@@ -1,0 +1,41 @@
+year,firstname,lastname,nickname,weight
+1990, Lloyd,Clarke,One Punch
+1991, Jacob,Paewai,Punchy
+1992, Arty,Smtih,Atlas
+1993, Joel,Gutierrez,Jawbreaker
+1994, Chris,Salazar,The Nightmare
+1995, Oscar,de la Cruz,Senor
+1996, Cyril,Adamek,Obcan
+1997, Anton,Bauer,AB
+1998, Fabian,Braun,Arrow
+1999, Akio,Chiba,Blitz
+2000, Kai,Matsuda,Master
+2001, Joe Gunner,Grant,Justice
+2002, Mino,Nguyen,Maestro
+2003, Gabriel,Sultiao,Pep
+2004, Sylvain,Petit,Puce
+2005, Arturo,Charvez,El Bandera Roja
+2006, Jakub,Ivanov,Icemane
+2007, Marios,Papdimitriou,Bloodsome
+2008, Caleb,Nash,Plant
+2009, Min,Jang,Micha
+2010, Andreas,Pichler,Boom Boom
+2011, Wanchi,Saengthong,The Great
+2012, Joseph,Jacquet,Cogneur
+2013, Min Seok,Nam,Yaksha
+2014, Andreas,Muller,Lightning
+2015, Jimmy,Willems,Paul
+2016, Arief,Dewi,Major
+2017, Marcus,Mitchell,Mauler
+2018, Hugo,Hermans,Fast Hands
+2019, Roman,Ibarra,Romando
+2020, Hossein,Mahmoudi,Madman
+2021, Henry,Král,Crab-hammer
+2022, Rubén,Velásquez,El Dorado
+2023, Fang,Yang,Kung Fu Kid
+2024, Kareem,Omar,Too Speedy
+2025, Matthias,Fiser,Jewel
+2026, Jiang,Li,Chi
+2027, Ramon,Núnez,The KO King
+2028, Keo,Tam,Starry
+2029, Kenji,Saito,Big Bang
