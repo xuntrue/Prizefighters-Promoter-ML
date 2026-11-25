@@ -1,26 +1,15 @@
-from pathlib import Path
-
 import random
-import pandas as pd
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-COUNTRIES_FILE = DATA_DIR / "countries.csv"
-ARENAS_FILE = DATA_DIR / "arenas.csv"
-FLAGS_DIR = DATA_DIR / "country_flags"
+import pandas as pd
 
 COUNTRY_CODE_COL = "A-2"
 COUNTRY_NAME_COL = "CountryName"
-
-FOUNDED_COL = "founded"
+FOUNDED_COL = "founded"  # change here if you rename the column to "founded"
 
 def section(title):
     print(f"\n{'=' * 70}\n{title}\n{'=' * 70}")
 
-def load_countries():
-    countries = pd.read_csv(COUNTRIES_FILE, keep_default_na=False)  # "NA" = Namibia, not missing
-    countries[COUNTRY_CODE_COL] = countries[COUNTRY_CODE_COL].str.strip()
-    return countries
-
+# ---------------------------------------------------------------- countries
 def analyse_countries(countries):
     section("1. COUNTRIES")
     codes = countries[COUNTRY_CODE_COL]
@@ -35,9 +24,10 @@ def analyse_countries(countries):
     if not bad.empty:
         print(f"Codes that aren't two uppercase letters: {sorted(bad.unique())}")
 
-def analyse_flags(countries):
+# -------------------------------------------------------------------- flags
+def analyse_flags(api, countries):
     section("2. COUNTRY FLAGS")
-    flag_codes = {p.stem for p in FLAGS_DIR.glob("*.png")}
+    flag_codes = api.get_flag_codes()
     country_codes = set(countries[COUNTRY_CODE_COL])
 
     print(f"Flag files found: {len(flag_codes)}")
@@ -52,6 +42,7 @@ def analyse_flags(countries):
     if orphans:
         print(f"Flag files with no matching country: {orphans}")
 
+# ------------------------------------------------------------------- arenas
 def show_records(arenas, n, seed):
     print(f"\n{n} random records:")
     rng = random.Random(seed)
@@ -129,8 +120,9 @@ def analyse_correlation(arenas):
     direction = "positive" if spearman > 0 else "negative"
     print(f"\nVerdict: {verdict} {direction} relationship between age and capacity.")
 
-def analyse_arenas(countries, n=10, sample_size=5, bin_years=10, min_arenas_per_country=3, seed=None):
-    arenas = pd.read_csv(ARENAS_FILE, keep_default_na=False)
+def analyse_arenas(api, countries, n=10, sample_size=5, bin_years=10,
+                   min_arenas_per_country=3, seed=None):
+    arenas = api.get_arenas()
 
     section("3. ARENA RECORDS")
     print(f"Total arena records: {len(arenas)}")
@@ -142,11 +134,10 @@ def analyse_arenas(countries, n=10, sample_size=5, bin_years=10, min_arenas_per_
     analyse_correlation(arenas)
     return arenas
 
-def run(**options):
+def run(api, **options):
+    """Print the full overview. `api` is a PrizeFighterAPI instance."""
     pd.set_option("display.width", 200)
-    countries = load_countries()
-    
+    countries = api.get_countries()
     analyse_countries(countries)
-    analyse_flags(countries)
-
-    return analyse_arenas(countries, **options)
+    analyse_flags(api, countries)
+    return analyse_arenas(api, countries, **options)
