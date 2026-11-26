@@ -190,7 +190,7 @@ arena_id,arena_name,country,city,capacity,founded
 189,Arena Coliseo de Caguas,PR,Caguas,1948,1982
 190,Swansea Leisure Centre,GB,Swansea,1602,2008
 191,Nakhon Ratchasima Civic Center,TH,Nakhon Ratchasima,705,1960
-192,Abuja Leisure Centre,NG,Abuja,3448,1963
+192,Workers'Stadium,CN,Beijing,68000,2023
 193,Beacon Arena Tokyo,JP,Tokyo,13333,2018
 194,Abuja Corn Exchange,NG,Abuja,1664,1972
 195,Cebu City Gymnasium,PH,Cebu City,3199,1968
@@ -425,7 +425,7 @@ arena_id,arena_name,country,city,capacity,founded
 424,Shenzhen Sports Park Stadium,CN,Shenzhen,54460,1988
 425,Bristol Indoor Arena,GB,Bristol,6057,1975
 426,Shanghai Arena,CN,Shanghai,17219,1982
-427,Los Angeles Memorial Stadium,US,Los Angeles,22790,1977
+427,Shanghai Stadium,CN,Shanghai,72000,1997
 428,Calgary Convention Center,CA,Calgary,5892,2004
 429,Glendale Boxing Club,US,Glendale,2843,1999
 430,Lyon Arena,FR,Lyon,12644,1995
@@ -466,13 +466,13 @@ arena_id,arena_name,country,city,capacity,founded
 465,Plaza de Toros de Córdoba,AR,Córdoba,67970,1978
 466,Chelyabinsk Palace of Sports,RU,Chelyabinsk,11027,2020
 467,Halle de Lyon,FR,Lyon,7663,1959
-468,Dammam Sports Hall,SA,Dammam,8564,2018
+468,Hangzhou Sports Park Stadium,CN,Hangzhou,80000,2018
 469,Bristol Corn Exchange,GB,Bristol,853,1975
 470,Ufa Sports Hall,RU,Ufa,1139,1935
 471,Shymkent Sports Palace,KZ,Shymkent,3780,1999
 472,Arena Mérida,MX,Mérida,4207,2015
 473,Coliseo José Cuevas,PR,San Juan,15066,1983
-474,Novosibirsk Sports Palace,RU,Novosibirsk,3762,1995
+474,Beijing National Stadium,CN,Beijing,91000,2008
 475,Denver Convention Center,US,Denver,8685,1974
 476,Uncasville Events Center,US,Uncasville,10381,2022
 477,Unity Stadium,AU,Gold Coast,59780,2005
@@ -490,7 +490,7 @@ arena_id,arena_name,country,city,capacity,founded
 489,Auditorio del Estado de Monterrey,MX,Monterrey,7428,1967
 490,Leicester Ice Arena,GB,Leicester,5312,1993
 491,Halcyon Suite Pretoria,ZA,Pretoria,2289,1988
-492,Shizuoka General Gymnasium,JP,Shizuoka,3754,1980
+492,Guangdon Olympic Stadium,CN,Guangzhou,80012,2001
 493,Gimnasio Municipal de Barquisimeto,VE,Barquisimeto,2360,1977
 494,San Antonio Convention Center,US,San Antonio,7618,2001
 495,Memphis Convention Center,US,Memphis,4021,2021
@@ -499,3 +499,24 @@ arena_id,arena_name,country,city,capacity,founded
 498,Fresno Expo Hall,US,Fresno,4068,1981
 499,Washington Armory,US,Washington,1275,2013
 500,Ginásio do Rio de Janeiro,BR,Rio de Janeiro,10712,2002
+501,Rancho Grande Bar,MX,Tijuana,600,1986
+502,Billar El Perro Salado,MX,Tijuana,500,2012
+503,Exchange LA,US,Los Angeles,2010,1700
+504,Sportsmen's Lodge,US,Los Angeles,260,1946
+505,The Forum,US,Inglewood,17500,1967
+506,Belasco Theater,US,Los Angeles,1500,1926
+507,T-Mobile Arena,US,Las Vegas,2000,2016
+508,MGM Grand Marquee Ballroom,US,Las Vegas,6140,1993
+509,Casino Del Sol,US,Tucson,5000,2001
+510,Place Bell,CA,Quebec,10172,2017
+511,Fantasy Springs Resort Casino,US,Indio,3700,1995
+512,StubHub Center,US,Carson,27000,2003
+513,Madison Square Garden,US,New York City,22000,1968
+514,MGM Grand Garden Arena,US,Las Vegas,5000,2003
+515,Honda Center,US,Anaheim,17500,1993
+516,American Airlines Center,US,Dallas,20000,2001
+517,Alamodome,US,San Antonio,6500,1993
+518,Crypto.com Arena,US,Los Angeles,19500,2020
+519,Toyota Center,US,Houston,20000,2003
+520,Barclays Center,US,New York City,19000,2012
+521,Times Square,US,New York City,1000,2015

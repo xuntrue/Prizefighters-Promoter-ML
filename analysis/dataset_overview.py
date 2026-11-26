@@ -1,3 +1,4 @@
+import difflib
 import random
 
 import pandas as pd
@@ -9,7 +10,7 @@ COUNTRY_NAME_COL = "CountryName"
 FOUNDED_COL = "founded"  # change here if you rename the column to "founded"
 
 def table(df, index=False):
-    """Print a DataFrame or Series indented under its subtitle."""
+    """ Print a DataFrame or Series indented under its subtitle """
     for row in df.to_string(index=index).splitlines():
         fmt.line(f"  {row}")
 
@@ -57,7 +58,55 @@ def analyse_records(arenas, sample_size, seed):
     fmt.subtitle(f"{sample_size} random records")
     rng = random.Random(seed)
     rows = rng.sample(range(len(arenas)), k=min(sample_size, len(arenas)))  # never repeats
-    table(arenas.iloc[rows])
+    table(arenas.iloc[rows].sort_values("arena_id"))
+
+def normalise_name(name):
+    return " ".join(str(name).casefold().split())
+
+def analyse_duplicate_names(arenas):
+    fmt.subtitle("Duplicate arena names")
+    key = arenas["arena_name"].map(normalise_name)
+    dupes = arenas[key.duplicated(keep=False)]  # keep=False marks every copy, not just the 2nd+
+
+    if dupes.empty:
+        fmt.line("  none")
+        return
+    groups = dupes.assign(_key=key).sort_values(["_key", "arena_id"])
+    names = groups["_key"].nunique()
+    fmt.line(f"  {len(dupes)} records share {names} name{'s' if names != 1 else ''}:")
+    table(groups.drop(columns="_key"))
+
+
+def similar_name_pairs(arenas, threshold):
+    """ Pairs of arenas in the same city whose names are at least `threshold` similar """
+    pairs = []
+    matcher = difflib.SequenceMatcher(autojunk=False)
+    for (country, city), group in arenas.groupby(["country", "city"]):
+        records = list(zip(group["arena_id"], group["arena_name"],
+                           group["arena_name"].map(normalise_name)))
+        for j, (id_b, name_b, norm_b) in enumerate(records):
+            matcher.set_seq2(norm_b)
+            for id_a, name_a, norm_a in records[:j]:
+                if norm_a == norm_b:
+                    continue
+                matcher.set_seq1(norm_a)
+                # cheap upper bounds first; ratio() is only computed when they pass
+                if (matcher.real_quick_ratio() >= threshold
+                        and matcher.quick_ratio() >= threshold
+                        and (score := matcher.ratio()) >= threshold):
+                    pairs.append((score, id_a, name_a, id_b, name_b, city, country))
+    columns = ["similarity", "id_a", "name_a", "id_b", "name_b", "city", "country"]
+    return pd.DataFrame(pairs, columns=columns).sort_values("similarity", ascending=False)
+
+
+def analyse_similar_names(arenas, threshold):
+    fmt.subtitle(f"Similar names in the same city (similarity >= {threshold:.0%})")
+    pairs = similar_name_pairs(arenas, threshold)
+    if pairs.empty:
+        fmt.line("  none")
+        return
+    fmt.line(f"  {len(pairs)} pairs to review:")
+    table(pairs.assign(similarity=pairs["similarity"].map("{:.2%}".format)))
 
 def analyse_country_distribution(arenas, countries):
     fmt.title("ARENAS BY COUNTRY")
@@ -65,8 +114,7 @@ def analyse_country_distribution(arenas, countries):
     counts = arenas["country"].value_counts()
 
     fmt.subtitle("Arena records per country")
-    labelled = {f"{code} {names.get(code, '(not in countries.csv)')}": n
-                for code, n in counts.items()}
+    labelled = {f"{names.get(code, '(not in countries.csv)')} ({code})": n for code, n in counts.items()}
     fmt.histogram(labelled, width=40)
 
     used = set(arenas["country"])
@@ -136,7 +184,7 @@ def analyse_correlation(arenas):
     fmt.line(f"\nVerdict: {verdict} {direction} relationship between age and capacity.")
 
 # ---------------------------------------------------------------------- run
-def run(api, n=10, sample_size=5, bin_years=10, min_arenas_per_country=3, seed=None):
+def run(api, n=10, sample_size=5, bin_years=10, min_arenas_per_country=3, similarity_threshold=0.80, seed=None):
     """Print the full overview. `api` is a PrizeFighterAPI instance."""
     pd.set_option("display.width", 200)
 
@@ -146,6 +194,8 @@ def run(api, n=10, sample_size=5, bin_years=10, min_arenas_per_country=3, seed=N
 
     arenas = api.get_arenas()
     analyse_records(arenas, sample_size, seed)
+    analyse_duplicate_names(arenas)
+    analyse_similar_names(arenas, similarity_threshold)
     analyse_country_distribution(arenas, countries)
     analyse_founded(arenas, n, bin_years)
     analyse_capacity(arenas, n, min_arenas_per_country)
